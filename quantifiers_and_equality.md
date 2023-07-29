@@ -1,60 +1,34 @@
-Quantifiers and Equality
-========================
+# Quantifiers and Equality (量化子と等号)
 
-The last chapter introduced you to methods that construct proofs of
-statements involving the propositional connectives. In this chapter,
-we extend the repertoire of logical constructions to include the
-universal and existential quantifiers, and the equality relation.
+第3章では、命題論理の結合子を含む定理の証明を構築する方法を紹介した。この章では、命題論理の結合子に加え、全称量化子、存在量化子、等号関係を用いた定理とその証明を構築する方法を紹介する。
 
-The Universal Quantifier
-------------------------
+## The Universal Quantifier (全称量化子)
 
-Notice that if ``α`` is any type, we can represent a unary predicate
-``p`` on ``α`` as an object of type ``α → Prop``. In that case, given
-``x : α``, ``p x`` denotes the assertion that ``p`` holds of
-``x``. Similarly, an object ``r : α → α → Prop`` denotes a binary
-relation on ``α``: given ``x y : α``, ``r x y`` denotes the assertion
-that ``x`` is related to ``y``.
+任意の型 ``α`` に対して、``α`` 上の一変数述語 ``p`` は、型 ``α → Prop`` の項として表現できることに注目してほしい。この場合、``x : α`` が与えられると、``p x`` は ``x`` について ``p`` が成り立つという主張を表す。同様に、項 ``r : α → α → Prop`` は ``α`` 上の二項関係を表す。``x y : α`` が与えられると、``r x y`` は ``x`` と ``y`` の間に二項関係 ``r`` が成立するという主張を表す。
 
-The universal quantifier, ``∀ x : α, p x`` is supposed to denote the
-assertion that "for every ``x : α``, ``p x``" holds. As with the
-propositional connectives, in systems of natural deduction, "forall"
-is governed by an introduction and elimination rule. Informally, the
-introduction rule states:
+全称量化子 ``∀`` を用いた主張 ``∀ x : α, p x`` は、「全ての ``x : α`` に対して、``p x`` が成立する」という主張を表す。命題結合子と同様に、自然演繹の体系においては、全称量化子は導入則と除去則によって統制される。非形式的には、全称量化子の導入則は次のように表される:
 
-> Given a proof of ``p x``, in a context where ``x : α`` is arbitrary, we obtain a proof ``∀ x : α, p x``.
+> ``x : α`` が任意に選べる文脈で ``p x`` の証明が与えられたとき、``∀ x : α, p x`` の証明を得ることができる。
 
-The elimination rule states:
+全称量化子の除去則は次のように表される:
 
-> Given a proof ``∀ x : α, p x`` and any term ``t : α``, we obtain a proof of ``p t``.
+> ``∀ x : α, p x`` の証明があるとき、任意の項 ``t : α`` に対して、``p t`` の証明を得ることができる。
 
-As was the case for implication, the propositions-as-types
-interpretation now comes into play. Remember the introduction and
-elimination rules for dependent arrow types:
+含意の場合と同様に、「型としての命題」の考え方が有効である。依存関数型の導入則と除去則を思い出してほしい:
 
-> Given a term ``t`` of type ``β x``, in a context where ``x : α`` is arbitrary, we have ``(fun x : α => t) : (x : α) → β x``.
+> ``x : α`` が任意に選べる文脈で型 ``β x`` の項 ``t`` が作れるとき、項 ``(fun x : α => t) : (x : α) → β x`` が作れる。
 
-The elimination rule states:
+依存関数型の除去則は次のように表される:
 
-> Given a term ``s : (x : α) → β x`` and any term ``t : α``, we have ``s t : β t``.
+> 項 ``s : (x : α) → β x`` が与えられたとき、型 ``α`` の任意の項 ``t : α`` に対して、項 ``s t : β t`` を得ることができる。
 
-In the case where ``p x`` has type ``Prop``, if we replace
-``(x : α) → β x`` with ``∀ x : α, p x``, we can read these as the correct rules
-for building proofs involving the universal quantifier.
+``p x`` が ``Prop`` 型を持つとき、型 ``(x : α) → β x`` を型 ``∀ x : α, p x`` とみなすことで、依存関数型の導入則と除去則を全称量化子の導入則と除去則とみなすことができる。これらの規則に従って、全称量化子を含む証明を構築することができる。
 
-The Calculus of Constructions therefore identifies dependent arrow
-types with forall-expressions in this way. If ``p`` is any expression,
-``∀ x : α, p`` is nothing more than alternative notation for
-``(x : α) → p``, with the idea that the former is more natural than the latter
-in cases where ``p`` is a proposition. Typically, the expression ``p``
-will depend on ``x : α``. Recall that, in the case of ordinary
-function spaces, we could interpret ``α → β`` as the special case of
-``(x : α) → β`` in which ``β`` does not depend on ``x``. Similarly, we
-can think of an implication ``p → q`` between propositions as the
-special case of ``∀ x : p, q`` in which the expression ``q`` does not
-depend on ``x``.
+「型としての命題」の考え方に従って、Calculus of Constructionsでは、従属関数型と全称量化子を同一視する。つまり、任意の項 ``p`` に対して、``∀ x : α, p`` は ``(x : α) → p`` の代替表現に過ぎず、``p`` が命題のときは、後者の表現の方が自然である、と考えるのである。
 
-Here is an example of how the propositions-as-types correspondence gets put into practice.
+通常の関数の場合、``α → β`` は ``β`` が ``x : α`` に依存しない場合の ``(x : α) → β`` だと解釈できることを思い出してほしい。同様に、命題間の含意 ``p → q`` は命題 ``q`` が ``x : p`` に依存しない場合の ``∀ x : p, q`` だと解釈することができる。
+
+以下は、全称量化子に関する「型としての命題」対応がどのように実践されるかの例である。
 
 ```lean
 example (α : Type) (p q : α → Prop) : (∀ x : α, p x ∧ q x) → ∀ y : α, p y :=
@@ -63,20 +37,9 @@ example (α : Type) (p q : α → Prop) : (∀ x : α, p x ∧ q x) → ∀ y : 
   show p y from (h y).left
 ```
 
-As a notational convention, we give the universal quantifier the
-widest scope possible, so parentheses are needed to limit the
-quantifier over ``x`` to the hypothesis in the example above. The
-canonical way to prove ``∀ y : α, p y`` is to take an arbitrary ``y``,
-and prove ``p y``. This is the introduction rule. Now, given that
-``h`` has type ``∀ x : α, p x ∧ q x``, the expression ``h y`` has type
-``p y ∧ q y``. This is the elimination rule. Taking the left conjunct
-gives the desired conclusion, ``p y``.
+表記上の慣習として、Leanは全称量化子に可能な限り広いスコープを与えるので、上の例では ``x`` に対する量化子のスコープを限定するために括弧が必要である。そして、``∀ y : α, p y`` を証明する正規の方法は、``y`` を任意に取り、``p y`` を証明することである。これが全称量化子の導入則の使用例である。次に、型 ``∀ x : α, p x ∧ q x`` を持つ項 ``h`` が与えられると、項 ``h y`` は型 ``p y ∧ q y`` を持つ。これが全称量化子の除去則の使用例である。連言命題 ``h y`` の左の命題を取ると、所望の結論 ``p y`` が得られる。
 
-Remember that expressions which differ up to renaming of bound
-variables are considered to be equivalent. So, for example, we could
-have used the same variable, ``x``, in both the hypothesis and
-conclusion, and instantiated it by a different variable, ``z``, in the
-proof:
+束縛変数の名前を変えることで同じにできる2つの式は、等価であるとみなされる(α-同値)ことを思い出してほしい。例えば、上記の例について、結論の前件と後件の両方で同じ変数名 ``x`` を用いて、証明の中では別の変数名 ``z`` を使ってインスタンスを表現することもできる。
 
 ```lean
 example (α : Type) (p q : α → Prop) : (∀ x : α, p x ∧ q x) → ∀ x : α, p x :=
@@ -85,7 +48,7 @@ example (α : Type) (p q : α → Prop) : (∀ x : α, p x ∧ q x) → ∀ x : 
   show p z from And.left (h z)
 ```
 
-As another example, here is how we can express the fact that a relation, ``r``, is transitive:
+もう一つの例として、関係 ``r`` が推移的であることはどのように表現されるかを提示しよう:
 
 ```lean
 variable (α : Type) (r : α → α → Prop)
@@ -94,21 +57,16 @@ variable (trans_r : ∀ x y z, r x y → r y z → r x z)
 variable (a b c : α)
 variable (hab : r a b) (hbc : r b c)
 
-#check trans_r    -- ∀ (x y z : α), r x y → r y z → r x z
-#check trans_r a b c
-#check trans_r a b c hab
-#check trans_r a b c hab hbc
+#check trans_r                -- ∀ (x y z : α), r x y → r y z → r x z
+/- (r : α → α → Prop) と 「r x y → r y z → r x z」により x,y,z の型が推論されている -/
+#check trans_r a b c          -- r a b → r b c → r a c
+#check trans_r a b c hab      -- r b c → r a c
+#check trans_r a b c hab hbc  -- r a c
 ```
 
-Think about what is going on here. When we instantiate ``trans_r`` at
-the values ``a b c``, we end up with a proof of ``r a b → r b c → r a c``.
-Applying this to the "hypothesis" ``hab : r a b``, we get a proof
-of the implication ``r b c → r a c``. Finally, applying it to the
-hypothesis ``hbc`` yields a proof of the conclusion ``r a c``.
+この例で何が起こっているのかを考えてみよう。``trans_r`` を値 ``a b c`` でインスタンス化すると、これは ``r a b → r b c → r a c`` の証明になる。これを「前提」``hab : r a b`` に適用すると、含意命題 ``r b c → r a c`` の証明が得られる。最後に、これを前提 ``hbc`` に適用すると、結論 ``r a c`` の証明が得られる。
 
-In situations like this, it can be tedious to supply the arguments
-``a b c``, when they can be inferred from ``hab hbc``. For that reason, it
-is common to make these arguments implicit:
+``hab`` と ``hbc`` があれば最初の3つの引数が ``a b c`` であることは容易に推論できる。このような状況において、引数 ``a b c`` を毎回与えるのは面倒かもしれない。そのため、これらを暗黙の引数にするのが一般的である:
 
 ```lean
 variable (α : Type) (r : α → α → Prop)
@@ -117,19 +75,14 @@ variable (trans_r : ∀ {x y z}, r x y → r y z → r x z)
 variable (a b c : α)
 variable (hab : r a b) (hbc : r b c)
 
-#check trans_r
-#check trans_r hab
-#check trans_r hab hbc
+#check trans_r          -- r ?m.131 ?m.132 → r ?m.132 ?m.133 → r ?m.131 ?m.133
+#check trans_r hab      -- r b ?m.172 → r a ?m.172
+#check trans_r hab hbc  -- r a c
 ```
 
-The advantage is that we can simply write ``trans_r hab hbc`` as a
-proof of ``r a c``. A disadvantage is that Lean does not have enough
-information to infer the types of the arguments in the expressions
-``trans_r`` and ``trans_r hab``. The output of the first ``#check``
-command is ``r ?m.1 ?m.2 → r ?m.2 ?m.3 → r ?m.1 ?m.3``, indicating
-that the implicit arguments are unspecified in this case.
+``x y z`` を暗黙の引数にする利点は、``r a c`` の証明を ``trans_r hab hbc`` と簡単に書けることである。欠点は、項 ``trans_r`` と項 ``trans_r hab`` の型を推論するのに必要な情報をLeanに与えることができないことである。最初の ``#check`` コマンドの出力は ``r ?m.1 ?m.2 → r ?m.2 ?m.3 → r ?m.1 ?m.3`` であり、暗黙の引数が特定できなかったことを示している。
 
-Here is an example of how we can carry out elementary reasoning with an equivalence relation:
+次は ``r`` が同値関係であるという前提を使って初歩的な推論を行う例である:
 
 ```lean
 variable (α : Type) (r : α → α → Prop)
@@ -142,58 +95,27 @@ example (a b c d : α) (hab : r a b) (hcb : r c b) (hcd : r c d) : r a d :=
   trans_r (trans_r hab (symm_r hcb)) hcd
 ```
 
-To get used to using universal quantifiers, you should try some of the
-exercises at the end of this section.
+全称量化子の使い方に慣れるために、この章の最後にある練習問題をいくつかやってみるとよい。
 
-It is the typing rule for dependent arrow types, and the universal
-quantifier in particular, that distinguishes ``Prop`` from other
-types.  Suppose we have ``α : Sort i`` and ``β : Sort j``, where the
-expression ``β`` may depend on a variable ``x : α``. Then
-``(x : α) → β`` is an element of ``Sort (imax i j)``, where ``imax i j`` is the
-maximum of ``i`` and ``j`` if ``j`` is not 0, and 0 otherwise.
+依存関数型には型付け規則があるが、全称量化子には特殊な型付け規則がある。これが ``Prop`` と他の型の違いである。``α : Sort i`` と ``β : Sort j`` があり、項 ``β`` は ``x : α`` に依存するかもしれないとする。このとき、``(x : α) → β`` は型 ``Sort (imax i j)`` の項である。ここで、``imax i j`` は ``j`` が0でないなら ``i`` と ``j`` の最大値で、``j`` が0なら0である。
 
-The idea is as follows. If ``j`` is not ``0``, then ``(x : α) → β`` is
-an element of ``Sort (max i j)``. In other words, the type of
-dependent functions from ``α`` to ``β`` "lives" in the universe whose
-index is the maximum of ``i`` and ``j``. Suppose, however, that ``β``
-is of ``Sort 0``, that is, an element of ``Prop``. In that case,
-``(x : α) → β`` is an element of ``Sort 0`` as well, no matter which
-type universe ``α`` lives in. In other words, if ``β`` is a
-proposition depending on ``α``, then ``∀ x : α, β`` is again a
-proposition. This reflects the interpretation of ``Prop`` as the type
-of propositions rather than data, and it is what makes ``Prop``
-*impredicative*.
+``imax i j`` の定義は次のように解釈すればよい。もし ``j`` が ``0`` でないなら、``(x : α) → β`` は型 ``Sort (max i j)`` の項である。言い換えれば、``α`` から ``β`` への依存関数型は、インデックスが ``i`` と ``j`` の最大値である宇宙に「住んで」いる。他方で、``β`` が ``Sort 0``、つまり ``Prop`` の項であるとしよう。この場合、``α`` がどの階層的型宇宙に住んでいるかに関わらず、``(x : α) → β`` も ``Sort 0`` (``Prop``) の項となる。言い換えれば、``β`` が ``α`` に依存する命題であれば、 ``∀ x : α, β`` も命題であるということである。これは、``Prop`` は単なるデータの型ではなく命題の型であるという解釈を反映している。そして以上のことは ``Prop`` を*impredicative*(自己参照可能？)にしている。
 
-The term "predicative" stems from foundational developments around the
-turn of the twentieth century, when logicians such as Poincaré and
-Russell blamed set-theoretic paradoxes on the "vicious circles" that
-arise when we define a property by quantifying over a collection that
-includes the very property being defined. Notice that if ``α`` is any
-type, we can form the type ``α → Prop`` of all predicates on ``α``
-(the "power type of ``α``"). The impredicativity of ``Prop`` means that we
-can form propositions that quantify over ``α → Prop``. In particular,
-we can define predicates on ``α`` by quantifying over all predicates
-on ``α``, which is exactly the type of circularity that was once
-considered problematic.
+*predicative*(自己参照不能？)という用語は、20世紀初頭の数学基礎論の発展に由来する。当時、ポアンカレやラッセルといった論理学者が、集合論におけるパラドックスを、性質Aを持つ集合を量化することで性質Aを定義するときに生じる「悪循環」のせいにしたのである。任意の型 ``α`` に対して、``α`` 上の全ての(一変数)述語からなる型 ``α → Prop`` (``α`` の「べき型」)を作れることに注目してほしい。``Prop`` のimpredicativity(自己参照可能性？)とは、``α → Prop`` を量化した命題を作れることを意味する。特に、``α`` 上の述語を全称量化することで、``α`` 上の述語を定義することができ(``∀ X : α → Prop, β`` と書くことで「全ての ``α`` 上の述語に対して ``β`` が成立する」という ``α`` 上の述語を定義することができ)、これはまさにかつて問題視された類の循環である。
 
-Equality
---------
+## Equality (等号)
 
-Let us now turn to one of the most fundamental relations defined in
-Lean's library, namely, the equality relation. In [Chapter Inductive Types](inductive_types.md),
-we will explain *how* equality is defined from the primitives of Lean's logical framework.
-In the meanwhile, here we explain how to use it.
+ここで、Leanのライブラリで定義されている最も基本的な関係の一つである「等号関係」に注目しよう。[7章 Inductive Types (帰納型)](./inductive_types.md)では、Leanの*logical framework*(論理フレームワーク)の根本から「どのように」等号が定義されるかを説明する。その前に、ここでは等号の使い方を説明する。
 
-Of course, a fundamental property of equality is that it is an equivalence relation:
+もちろん、等号の基本的な性質の一つは、「等号は同値関係である」という性質である:
 
 ```lean
-#check Eq.refl    -- ∀ (a : ?m.1), a = a
-#check Eq.symm    -- ?m.2 = ?m.3 → ?m.3 = ?m.2
-#check Eq.trans   -- ?m.2 = ?m.3 → ?m.3 = ?m.4 → ?m.2 = ?m.4
+#check Eq.refl    -- {α : Sort u_1} (a : α) : a = a
+#check Eq.symm    -- {α : Sort u} {a b : α} (h : a = b) : b = a
+#check Eq.trans   -- {α : Sort u} {a b c : α} (h₁ : a = b) (h₂ : b = c) : a = c
 ```
 
-We can make the output easier to read by telling Lean not to insert
-the implicit arguments (which are displayed here as metavariables).
+Leanに暗黙の引数(ここではメタ変数として表示されている)を挿入しないように指示することで、出力を読みやすくすることができる。
 
 ```lean
 universe u
@@ -203,9 +125,9 @@ universe u
 #check @Eq.trans.{u}  -- ∀ {α : Sort u} {a b c : α}, a = b → b = c → a = c
 ```
 
-The inscription ``.{u}`` tells Lean to instantiate the constants at the universe ``u``.
+``.{u}`` という記法は、宇宙 ``u`` で定数をインスタンス化することをLeanに指示する。
 
-Thus, for example, we can specialize the example from the previous section to the equality relation:
+したがって、例えば、前節の例を等号関係に特化させることができる:
 
 ```lean
 variable (α : Type) (a b c d : α)
@@ -215,7 +137,7 @@ example : a = d :=
   Eq.trans (Eq.trans hab (Eq.symm hcb)) hcd
 ```
 
-We can also use the projection notation:
+射影表記(``Foo.bar e`` の ``e.bar`` という略記)も使うことができる:
 
 ```lean
 # variable (α : Type) (a b c d : α)
@@ -223,11 +145,7 @@ We can also use the projection notation:
 example : a = d := (hab.trans hcb.symm).trans hcd
 ```
 
-Reflexivity is more powerful than it looks. Recall that terms in the
-Calculus of Constructions have a computational interpretation, and
-that the logical framework treats terms with a common reduct as the
-same. As a result, some nontrivial identities can be proved by
-reflexivity:
+反射律 ``Eq.refl`` は見た目よりも強力である。Calculus of Constructionsにおいて、任意の型は計算可能な解釈を持ち、論理フレームワークは同一の簡約結果を持つ項たちを同じものとして扱うことを思い出してほしい。その結果、いくつかの非自明な恒等式を反射律によって証明することができる:
 
 ```lean
 variable (α β : Type)
@@ -237,7 +155,7 @@ example (a : α) (b : β) : (a, b).1 = a := Eq.refl _
 example : 2 + 3 = 5 := Eq.refl _
 ```
 
-This feature of the framework is so important that the library defines a notation ``rfl`` for ``Eq.refl _``:
+論理フレームワークのこの機能は非常に重要であるため、Leanのライブラリでは ``Eq.refl _`` により ``rfl`` という記法を定義している:
 
 ```lean
 # variable (α β : Type)
@@ -246,32 +164,25 @@ example (a : α) (b : β) : (a, b).1 = a := rfl
 example : 2 + 3 = 5 := rfl
 ```
 
-Equality is much more than an equivalence relation, however. It has
-the important property that every assertion respects the equivalence,
-in the sense that we can substitute equal expressions without changing
-the truth value. That is, given ``h1 : a = b`` and ``h2 : p a``, we
-can construct a proof for ``p b`` using substitution:
-``Eq.subst h1 h2``.
+しかし、等号は同値関係以上のものである。等号は、左辺の式を右辺の式に置き換えても、あるいは右辺の式を左辺の式に置き換えても真理値が変わらないという意味で、全ての命題が等号によって主張される同値性を尊重するという重要な性質を持っている。つまり、``h1 : a = b`` と ``h2 : p a`` があれば、代入 ``Eq.subst h1 h2`` を使って ``p b`` の証明を作ることができる。
 
 ```lean
 example (α : Type) (a b : α) (p : α → Prop)
         (h1 : a = b) (h2 : p a) : p b :=
   Eq.subst h1 h2
 
-example (α : Type) (a b : α) (p : α → Prop)
+example (α : Type) (a b : α) (p : α → Prop)  -- h2の型の中に登場するh1の左辺をh1の右辺で書き換える
     (h1 : a = b) (h2 : p a) : p b :=
+  h1 ▸ h2
+
+example (α : Type) (a b : α) (p : α → Prop)  -- h2の型の中に登場するh1の右辺をh1の左辺で書き換える
+    (h1 : a = b) (h2 : p b) : p a :=
   h1 ▸ h2
 ```
 
-The triangle in the second presentation is a macro built on top of
-``Eq.subst`` and ``Eq.symm``, and you can enter it by typing ``\t``.
+2番目、3番目の例の中の三角形は、``Eq.subst`` と ``Eq.symm`` の上に構築されたマクロで、``\t`` と打つことで入力できる。``h1 ▸ h2`` は「``h1`` を使って ``h2`` を書き換える」と解釈できる。
 
-The rule ``Eq.subst`` is used to define the following auxiliary rules,
-which carry out more explicit substitutions. They are designed to deal
-with applicative terms, that is, terms of form ``s t``. Specifically,
-``congrArg`` can be used to replace the argument, ``congrFun`` can be
-used to replace the term that is being applied, and ``congr`` can be
-used to replace both at once.
+``Eq.subst`` 規則は、より明示的な置換を行う以下の補助規則を定義するために使われる。これらは関数適用項、つまり ``s t`` の形の項を扱うためのものである。具体的には、``congrArg`` は ``s`` を固定して ``t`` を置換するのに使われ、``congrFun`` は ``t`` を固定して ``s`` を置換するのに使われ、``congr`` は ``s`` と ``t`` の両方を一度に置換するのに使われる。
 
 ```lean
 variable (α : Type)
@@ -285,7 +196,7 @@ example : f a = g a := congrFun h₂ a
 example : f a = g b := congr h₂ h₁
 ```
 
-Lean's library contains a large number of common identities, such as these:
+Leanのライブラリは次のような一般的な恒等式が多数収載されている:
 
 ```lean
 variable (a b c : Nat)
@@ -304,12 +215,7 @@ example : (a + b) * c = a * c + b * c := Nat.add_mul a b c
 example : (a + b) * c = a * c + b * c := Nat.right_distrib a b c
 ```
 
-Note that ``Nat.mul_add`` and ``Nat.add_mul`` are alternative names
-for ``Nat.left_distrib`` and ``Nat.right_distrib``, respectively.  The
-properties above are stated for the natural numbers (type ``Nat``).
-
-Here is an example of a calculation in the natural numbers that uses
-substitution combined with associativity and distributivity.
+``Nat.mul_add`` と ``Nat.add_mul`` はそれぞれ ``Nat.left_distrib`` と ``Nat.right_distrib`` の別名である。上記の性質は、自然数（``Nat`` 型）に関するものである。
 
 ```lean
 example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
@@ -320,33 +226,19 @@ example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
   h2.trans (Nat.add_assoc (x * x + y * x) (x * y) (y * y)).symm
 ```
 
-Notice that the second implicit parameter to ``Eq.subst``, which
-provides the context in which the substitution is to occur, has type
-``α → Prop``.  Inferring this predicate therefore requires an instance
-of *higher-order unification*. In full generality, the problem of
-determining whether a higher-order unifier exists is undecidable, and
-Lean can at best provide imperfect and approximate solutions to the
-problem. As a result, ``Eq.subst`` doesn't always do what you want it
-to.  The macro ``h ▸ e`` uses more effective heuristics for computing
-this implicit parameter, and often succeeds in situations where
-applying ``Eq.subst`` fails.
+``Eq.subst`` の2番目の暗黙の引数は、置換が行われる文脈を提供するもので、``α → Prop`` 型を持っていることに注意してほしい。
 
-Because equational reasoning is so common and important, Lean provides
-a number of mechanisms to carry it out more effectively. The next
-section offers syntax that allow you to write calculational proofs in
-a more natural and perspicuous way. But, more importantly, equational
-reasoning is supported by a term rewriter, a simplifier, and other
-kinds of automation. The term rewriter and simplifier are described
-briefly in the next section, and then in greater detail in the next
-chapter.
+```lean
+#check Eq.subst  -- {α : Sort u} {motive : α → Prop} {a b : α} (h₁ : a = b) (h₂ : motive a) : motive b
+```
 
-Calculational Proofs
---------------------
+したがって、この述語を推論するには、*higher-order unification*(高階ユニフィケーション)のインスタンス(高階単一子)が必要である。一般論として、高階単一子が存在するかを決定する問題は決定不能であり、Leanはせいぜいこの問題に対して不完全で近似的な解を提供することしかできない。そのため、``Eq.subst`` は必ずしも思い通りに動くとは限らない。マクロ ``h ▸ e`` はこの暗黙の引数を計算する際により効果的なヒューリスティクスを使う。そのため、``Eq.subst`` の適用が失敗するような状況でも、``h ▸ e`` が成功することがしばしばある。
 
-A calculational proof is just a chain of intermediate results that are
-meant to be composed by basic principles such as the transitivity of
-equality. In Lean, a calculational proof starts with the keyword
-``calc``, and has the following syntax:
+等式の推論は非常に一般的で重要であるため、Leanはそれをより効率的に実行するためのメカニズムを数多く提供している。次の節では、より自然で簡潔な方法で計算的証明を書くための構文を提供する。しかし、より重要なのは、等式推論が*rewriter*(項書き換え器)、*simplifier*(単純化器)、その他の自動化によって成り立っていることである。項書き換え器と単純化器については次の節で簡単に説明し、次の章でさらに詳しく説明する。
+
+## Calculational Proofs (計算的証明)
+
+計算的証明は、等号の推移律などの基本原則によって構成される中間結果の連鎖にすぎない。Leanにおいて、計算的証明はキーワード ``calc`` から始まる以下の構文を持つ:
 
 ```
 calc
@@ -356,11 +248,9 @@ calc
   '_'       'op_n'  <expr>_n  ':='  <proof>_n
 ```
 
-Note that the `calc` relations all have the same indentation. Each
-``<proof>_i`` is a proof for ``<expr>_{i-1} op_i <expr>_i``.
+``calc`` 以降の一連の行は全て同じインデントを持つ必要があることに注意。そうでなければコンパイルエラーになる。各 ``<proof>_i`` は ``<expr>_{i-1} op_i <expr>_i`` の証明である必要がある。
 
-We can also use `_` in the first relation (right after ``<expr>_0``)
-which is useful to align the sequence of relation/proof pairs:
+最初の行に ``calc <expr>_0`` と書いた後、その次の行から `_` を使う事もできる。これは関係命題と証明の組からなる行を揃えるのに便利である。
 
 ```
 calc <expr>_0 
@@ -370,7 +260,7 @@ calc <expr>_0
     '_' 'op_n' <expr>_n ':=' <proof>_n
 ```
 
-Here is an example:
+次は計算的証明の一例である:
 
 ```lean
 variable (a b c d e : Nat)
@@ -388,11 +278,7 @@ theorem T : a = e :=
     _ = e      := Eq.symm h4
 ```
 
-This style of writing proofs is most effective when it is used in
-conjunction with the ``simp`` and ``rewrite`` tactics, which are
-discussed in greater detail in the next chapter. For example, using
-the abbreviation ``rw`` for rewrite, the proof above could be written
-as follows:
+この証明の書き方は、次章で詳しく説明する ``simp`` タクティクや ``rewrite`` タクティクと併用すると最も効果的である。例えば、``rewrite`` の略語 ``rw`` を使うと、上記の証明は次のように書ける:
 
 ```lean
 # variable (a b c d e : Nat)
@@ -409,13 +295,9 @@ theorem T : a = e :=
     _ = e      := by rw [h4]
 ```
 
-Essentially, the ``rw`` tactic uses a given equality (which can be a
-hypothesis, a theorem name, or a complex term) to "rewrite" the
-goal. If doing so reduces the goal to an identity ``t = t``, the
-tactic applies reflexivity to prove it.
+基本的に、``rw`` タクティクは ``[]`` でくくられた等式(前提、定理名、複合的な項のいずれでもよい)を用いてゴールを「書き換える」。その結果、ゴールが恒等式 ``t = t`` になったら、``rw`` タクティクは自動で反射律を使ってゴールを証明する。
 
-Rewrites can be applied sequentially, so that the proof above can be
-shortened to this:
+段階的な書き換えを一度に実行することもできる。上の証明は次のように短縮できる:
 
 ```lean
 # variable (a b c d e : Nat)
@@ -430,7 +312,7 @@ theorem T : a = e :=
     _ = e      := by rw [h4]
 ```
 
-Or even this:
+ここまで短くしてもよい:
 
 ```lean
 # variable (a b c d e : Nat)
@@ -442,11 +324,7 @@ theorem T : a = e :=
   by rw [h1, h2, h3, Nat.add_comm, h4]
 ```
 
-The ``simp`` tactic, instead, rewrites the goal by applying the given
-identities repeatedly, in any order, anywhere they are applicable in a
-term. It also uses other rules that have been previously declared to
-the system, and applies commutativity wisely to avoid looping. As a
-result, we can also prove the theorem as follows:
+``simp`` タクティクは、ゴールの項の中に与えられた恒等式が適用できる場所がある限り、与えられた恒等式を任意の順番で繰り返し適用し、ゴールを書き換える。また、システム内で宣言された既存のルールも活用し、書き換えのループを避けるため可換性を賢く適用する。上記の証明は ``simp`` を使って次のように証明することもできる:
 
 ```lean
 # variable (a b c d e : Nat)
@@ -458,10 +336,9 @@ theorem T : a = e :=
   by simp [h1, h2, h3, Nat.add_comm, h4]
 ```
 
-We will discuss variations of ``rw`` and ``simp`` in the next chapter.
+次の章では ``rw`` と ``simp`` の派生について説明する。
 
-The ``calc`` command can be configured for any relation that supports
-some form of transitivity. It can even combine different relations.
+``calc`` コマンドは、何らかの形で推移律を持つあらゆる関係に対して使うことができる。計算的証明の中で異なる関係を組み合わせることもできる。
 
 ```lean
 example (a b c d : Nat) (h1 : a = b) (h2 : b ≤ c) (h3 : c + 1 < d) : a < d :=
@@ -472,9 +349,7 @@ example (a b c d : Nat) (h1 : a = b) (h2 : b ≤ c) (h3 : c + 1 < d) : a < d :=
     _ < d     := h3
 ```
 
-You can "teach" `calc` new transitivity theorems by adding new instances
-of the `Trans` type class. Type classes are introduced later, but the following
-small example demonstrates how to extend the `calc` notation using new `Trans` instances.
+``Trans`` 型クラスの新しいインスタンスを追加することで、``calc`` に新しい推移律の定理を「教える」ことができる。型クラスは後で紹介するが、とりあえず以下に新しい ``Trans`` インスタンスを使って ``calc`` 記法を拡張する方法を示す小さな例を挙げる。
 
 ```lean
 def divides (x y : Nat) : Prop :=
@@ -506,14 +381,9 @@ example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
     _ ∣ 2*z := divides_mul ..
 ```
 
-The example above also makes it clear that you can use `calc` even if you
-do not have an infix notation for your relation. Finally we remark that
-the vertical bar `∣` in the example above is the unicode one. We use
-unicode to make sure we do not overload the ASCII `|` used in the
-`match .. with` expression.
+上記の例から、ユーザーが定義した関係がinfix表記を持たなくても、その関係について ``calc`` が使えることがわかる。最後に、上記の例の縦棒 `∣` はunicodeのものである。``match ... with`` 式で使われるASCIIの ``|`` のオーバーロードを避けるためにunicodeの記号を用いた。
 
-With ``calc``, we can write the proof in the last section in a more
-natural and perspicuous way.
+``calc`` を用いると、前節の証明をより自然にわかりやすく書くことができる。
 
 ```lean
 example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
@@ -524,9 +394,7 @@ example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
     _ = x * x + y * x + x * y + y * y              := by rw [←Nat.add_assoc]
 ```
 
-The alternative `calc` notation is worth considering here. When the
-first expression is taking this much space, using `_` in the first
-relation naturally aligns all relations:
+ここでは、``calc`` の他の記法を検討する価値がある。最初の式がこれだけ広いスペースをとる場合、最初の関係式に ``_`` を使うと、全ての関係式が自然に整列される:
 
 ```lean
 example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
@@ -537,10 +405,7 @@ example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
     _ = x * x + y * x + x * y + y * y   := by rw [←Nat.add_assoc]
 ```
 
-Here the left arrow before ``Nat.add_assoc`` tells rewrite to use the
-identity in the opposite direction. (You can enter it with ``\l`` or
-use the ascii equivalent, ``<-``.) If brevity is what we are after,
-both ``rw`` and ``simp`` can do the job on their own:
+ここで、``Nat.add_assoc`` の前の左矢印は、書き換えの際に与えられた恒等式を逆向きに使うように ``rw`` に指示する(左矢印は ``\l`` と打つと入力できる。これと等価なascii文字列 ``<-`` を使ってもいい)。簡潔さを求めるなら、次のように単独の ``rw`` や ``simp`` を使うだけで証明を完結させることもできる。 
 
 ```lean
 example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
@@ -550,18 +415,11 @@ example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
   by simp [Nat.mul_add, Nat.add_mul, Nat.add_assoc]
 ```
 
-The Existential Quantifier
---------------------------
+## The Existential Quantifier (存在量化子)
 
-Finally, consider the existential quantifier, which can be written as
-either ``exists x : α, p x`` or ``∃ x : α, p x``.  Both versions are
-actually notationally convenient abbreviations for a more long-winded
-expression, ``Exists (fun x : α => p x)``, defined in Lean's library.
+最後に、存在量化子について考えよう。存在量化子は ``exists x : α, p x`` または ``∃ x : α, p x`` と書くことができる。どちらの記法も、Leanのライブラリで定義されている ``Exists (fun x : α => p x)`` という長ったらしい表現の便利な省略形である。
 
-As you should by now expect, the library includes both an introduction
-rule and an elimination rule. The introduction rule is
-straightforward: to prove ``∃ x : α, p x``, it suffices to provide a
-suitable term ``t`` and a proof of ``p t``. Here are some examples:
+もうお分かりのように、Leanのライブラリは存在量化子の導入則と除去則を含んでいる。導入則は簡単である: ``∃ x : α, p x`` を証明するには、適切な項 ``t : α`` と ``p t`` の証明を与えればよい。次はその例である:
 
 ```lean
 example : ∃ x : Nat, x > 0 :=
@@ -574,11 +432,10 @@ example (x : Nat) (h : x > 0) : ∃ y, y < x :=
 example (x y z : Nat) (hxy : x < y) (hyz : y < z) : ∃ w, x < w ∧ w < z :=
   Exists.intro y (And.intro hxy hyz)
 
-#check @Exists.intro
+#check @Exists.intro  -- @Exists.intro : ∀ {α : Sort u_1} {p : α → Prop} (w : α), p w → Exists p
 ```
 
-We can use the anonymous constructor notation ``⟨t, h⟩`` for
-``Exists.intro t h``, when the type is clear from the context.
+型が文脈から明らかな場合、``Exists.intro t h`` の代わりに、匿名コンストラクタ表記 ``⟨t, h⟩`` を使うことができる。
 
 ```lean
 example : ∃ x : Nat, x > 0 :=
@@ -589,18 +446,10 @@ example (x : Nat) (h : x > 0) : ∃ y, y < x :=
   ⟨0, h⟩
 
 example (x y z : Nat) (hxy : x < y) (hyz : y < z) : ∃ w, x < w ∧ w < z :=
-  ⟨y, hxy, hyz⟩
+  ⟨y, hxy, hyz⟩  -- ⟨y, hxy, hyz⟩ は ⟨y, ⟨hxy, hyz⟩ ⟩ と同じ
 ```
 
-Note that ``Exists.intro`` has implicit arguments: Lean has to infer
-the predicate ``p : α → Prop`` in the conclusion ``∃ x, p x``.  This
-is not a trivial affair. For example, if we have have
-``hg : g 0 0 = 0`` and write ``Exists.intro 0 hg``, there are many possible values
-for the predicate ``p``, corresponding to the theorems ``∃ x, g x x = x``,
-``∃ x, g x x = 0``, ``∃ x, g x 0 = x``, etc. Lean uses the
-context to infer which one is appropriate. This is illustrated in the
-following example, in which we set the option ``pp.explicit`` to true
-to ask Lean's pretty-printer to show the implicit arguments.
+``Exists.intro`` には暗黙の引数があることに注意してほしい: Leanは結論 ``∃ x, p x`` から述語 ``p : α → Prop`` が何であるかを推論しなければならない。これは簡単なことではない。例えば、``hg : g 0 0 = 0`` とし、``Exists.intro 0 hg`` と書くとする。このとき、述語 ``p`` は 定理 ``∃ x, g x x = x``、``∃ x, g x x = 0``、``∃ x, g x 0 = x`` などに対応する様々な値を取りうる。Leanは文脈からどれが適切かを推論する。次の例では、``pp.explicit`` オプションを ``true`` に設定し、``#print`` コマンドに暗黙の引数を表示するように問い合わせている。
 
 ```lean
 variable (g : Nat → Nat → Nat)
@@ -611,23 +460,14 @@ theorem gex2 : ∃ x, g x 0 = x := ⟨0, hg⟩
 theorem gex3 : ∃ x, g 0 0 = x := ⟨0, hg⟩
 theorem gex4 : ∃ x, g x x = 0 := ⟨0, hg⟩
 
-set_option pp.explicit true  -- display implicit arguments
+set_option pp.explicit true  -- 暗黙の引数を表示する
 #print gex1
 #print gex2
 #print gex3
 #print gex4
 ```
 
-We can view ``Exists.intro`` as an information-hiding operation, since
-it hides the witness to the body of the assertion. The existential
-elimination rule, ``Exists.elim``, performs the opposite operation. It
-allows us to prove a proposition ``q`` from ``∃ x : α, p x``, by
-showing that ``q`` follows from ``p w`` for an arbitrary value
-``w``. Roughly speaking, since we know there is an ``x`` satisfying
-``p x``, we can give it a name, say, ``w``. If ``q`` does not mention
-``w``, then showing that ``q`` follows from ``p w`` is tantamount to
-showing that ``q`` follows from the existence of any such ``x``. Here
-is an example:
+``Exists.intro`` は主張本体の証人(存在量化を受けた主張を満たす項)を隠すため、情報を隠す操作であると解釈することができる。存在量化子の除去則 ``Exists.elim`` はその逆の操作を行う。``Exists.elim`` は任意の値 ``w : α`` に対して ``p w`` ならば ``q`` が成立することを示すことで、``∃ x : α, p x`` から命題 ``q`` を証明することを可能にする。大雑把に言えば、``∃ x : α, p x`` が成立するなら ``p x`` を満たす ``x`` が存在することがわかるので、その ``x`` に名前、例えば ``w`` を与えることができる。もし ``q`` が ``w`` に言及していなければ、``q`` が ``p w`` から導かれることを示すことは、``q`` が ``p w`` を満たす ``x`` の存在から導かれることを示すことに等しい。次はその例である:
 
 ```lean
 variable (α : Type) (p q : α → Prop)
@@ -637,24 +477,31 @@ example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
     (fun w =>
      fun hw : p w ∧ q w =>
      show ∃ x, q x ∧ p x from ⟨w, hw.right, hw.left⟩)
+
+#check @Exists.elim  -- ∀ {α : Sort u_1} {p : α → Prop} {b : Prop}, (∃ x, p x) → (∀ (a : α), p a → b) → b
 ```
 
-It may be helpful to compare the exists-elimination rule to the
-or-elimination rule: the assertion ``∃ x : α, p x`` can be thought of
-as a big disjunction of the propositions ``p a``, as ``a`` ranges over
-all the elements of ``α``. Note that the anonymous constructor
-notation ``⟨w, hw.right, hw.left⟩`` abbreviates a nested constructor
-application; we could equally well have written ``⟨w, ⟨hw.right, hw.left⟩⟩``.
+ここで、匿名コンストラクタ表記 ``⟨w, hw.right, hw.left⟩`` が入れ子になったコンストラクタの適用を省略していることに注意。``⟨w, hw.right, hw.left⟩`` は ``⟨w, ⟨hw.right, hw.left⟩⟩`` と書いたのと同じである。
 
-Notice that an existential proposition is very similar to a sigma
-type, as described in dependent types section.  The difference is that
-given ``a : α`` and ``h : p a``, the term ``Exists.intro a h`` has
-type ``(∃ x : α, p x) : Prop`` and ``Sigma.mk a h`` has type
-``(Σ x : α, p x) : Type``. The similarity between ``∃`` and ``Σ`` is another
-instance of the Curry-Howard isomorphism.
+存在量化子除去則と選言除去則を比較することは有用であろう: 主張 ``∃ x : α, p x`` は、 ``a`` が型 ``α`` の全ての項をわたるときの、命題 ``p a`` 全てを選言で繋げたものと考えることができる。
 
-Lean provides a more convenient way to eliminate from an existential
-quantifier with the ``match`` expression:
+存在命題は、2章の従属型の節で説明したシグマ型(依存積型)に非常に似ていることに注目しよう。``a : α`` と ``h : p a`` が与えられたとき、項 ``Exists.intro a h`` は型 ``(∃ x : α, p x) : Prop`` を持つ一方で、``Sigma.mk a h`` は型 ``(Σ x : α, p x) : Type`` を持つ。この ``∃`` と ``Σ`` の類似性はカリー=ハワード同型のもう一つの例である。
+
+```lean
+section exist_prop
+variable (a : α) (p : α → Prop) (h : p a)
+
+#check Exists.intro a h  -- Exists p
+end exist_prop
+
+section sigma_type
+variable (a : α) (p : α → Type) (h : p a)
+
+#check Sigma.mk a h      -- Sigma p
+end sigma_type
+```
+
+Leanは、``match`` 式を用いた、存在量化子を除去するためのより便利な方法を提供する:
 
 ```lean
 variable (α : Type) (p q : α → Prop)
@@ -664,14 +511,7 @@ example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
   | ⟨w, hw⟩ => ⟨w, hw.right, hw.left⟩
 ```
 
-The ``match`` expression is part of Lean's function definition system,
-which provides convenient and expressive ways of defining complex
-functions.  Once again, it is the Curry-Howard isomorphism that allows
-us to co-opt this mechanism for writing proofs as well.  The ``match``
-statement "destructs" the existential assertion into the components
-``w`` and ``hw``, which can then be used in the body of the statement
-to prove the proposition. We can annotate the types used in the match
-for greater clarity:
+``match`` 式はLeanの関数定義システムの一部であり、複雑な関数を定義する便利で表現力豊かな方法を提供する。再びカリー=ハワード同型により、この関数定義方法 ``match`` を証明の記述にも応用させることができる。``match`` 文は存在量化された主張を ``w`` と ``hw`` に「分解」する。これらは命題の証明記述内で使うことができる。より明確にするために、マッチで分解されてできた要素に型の注釈を付けることができる:
 
 ```lean
 # variable (α : Type) (p q : α → Prop)
@@ -680,16 +520,16 @@ example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
   | ⟨(w : α), (hw : p w ∧ q w)⟩ => ⟨w, hw.right, hw.left⟩
 ```
 
-We can even use the match statement to decompose the conjunction at the same time:
+match文を使って、存在量化子と連言を同時に分解することもできる:
 
 ```lean
 # variable (α : Type) (p q : α → Prop)
 example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
   match h with
-  | ⟨w, hpw, hqw⟩ => ⟨w, hqw, hpw⟩
+  | ⟨(w : α), (hpw : p w), (hqw : q w)⟩ => ⟨w, hqw, hpw⟩
 ```
 
-Lean also provides a pattern-matching ``let`` expression:
+Leanは ``let`` キーワードにもパターンマッチングを提供する:
 
 ```lean
 # variable (α : Type) (p q : α → Prop)
@@ -698,9 +538,7 @@ example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
   ⟨w, hqw, hpw⟩
 ```
 
-This is essentially just alternative notation for the ``match``
-construct above. Lean will even allow us to use an implicit ``match``
-in the ``fun`` expression:
+これは、基本的に上記の ``match`` 構文の代替表記に過ぎない。Leanでは、``fun`` キーワードの中で暗黙の ``match`` を使うこともできる:
 
 ```lean
 # variable (α : Type) (p q : α → Prop)
@@ -708,27 +546,34 @@ example : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x :=
   fun ⟨w, hpw, hqw⟩ => ⟨w, hqw, hpw⟩
 ```
 
-We will see in [Chapter Induction and Recursion](./induction_and_recursion.md) that all these variations are
-instances of a more general pattern-matching construct.
+[8章 Induction and Recursion (帰納と再帰)](./induction_and_recursion.md) では、これらの派生構文は全てより一般的なパターンマッチング構文のインスタンスであることを説明する。
 
-In the following example, we define ``is_even a`` as ``∃ b, a = 2 * b``,
-and then we show that the sum of two even numbers is an even number.
+次の例では、``is_even a`` を ``∃ b, a = 2 * b`` と定義し、2つの偶数の和は偶数であることを示す。
 
 ```lean
-def is_even (a : Nat) := ∃ b, a = 2 * b
+def is_even (a : Nat) : Prop := ∃ b : Nat, a = 2 * b
 
-theorem even_plus_even (h1 : is_even a) (h2 : is_even b) : is_even (a + b) :=
+theorem even_plus_even {a b : Nat} (h1 : is_even a) (h2 : is_even b) : is_even (a + b) :=
   Exists.elim h1 (fun w1 (hw1 : a = 2 * w1) =>
   Exists.elim h2 (fun w2 (hw2 : b = 2 * w2) =>
     Exists.intro (w1 + w2)
       (calc a + b
         _ = 2 * w1 + 2 * w2 := by rw [hw1, hw2]
         _ = 2 * (w1 + w2)   := by rw [Nat.mul_add])))
+
+theorem even_plus_even2 : ∀ a b : Nat, is_even a → is_even b → is_even (a + b) :=
+  fun a : Nat =>
+  fun b : Nat => 
+  fun ⟨(w1 : Nat), (hw1 : a = 2 * w1)⟩ =>
+  fun ⟨(w2 : Nat), (hw2 : b = 2 * w2)⟩ =>
+    have hw3 : a + b = 2 * (w1 + w2) :=
+      calc a + b
+        _ = 2 * w1 + 2 * w2 := by rw [hw1, hw2]
+        _ = 2 * (w1 + w2)   := by rw [Nat.mul_add]
+    ⟨(w1 + w2 : Nat), (hw3 : a + b = 2 * (w1 + w2))⟩
 ```
 
-Using the various gadgets described in this chapter --- the match
-statement, anonymous constructors, and the ``rewrite`` tactic, we can
-write this proof concisely as follows:
+マッチ文、匿名コンストラクタ、``rewrite`` タクティク……、この章で説明した様々な小道具を使ってこの証明を簡潔に書くと次のようになる:
 
 ```lean
 # def is_even (a : Nat) := ∃ b, a = 2 * b
@@ -737,16 +582,12 @@ theorem even_plus_even (h1 : is_even a) (h2 : is_even b) : is_even (a + b) :=
   | ⟨w1, hw1⟩, ⟨w2, hw2⟩ => ⟨w1 + w2, by rw [hw1, hw2, Nat.mul_add]⟩
 ```
 
-Just as the constructive "or" is stronger than the classical "or," so,
-too, is the constructive "exists" stronger than the classical
-"exists". For example, the following implication requires classical
-reasoning because, from a constructive standpoint, knowing that it is
-not the case that every ``x`` satisfies ``¬ p`` is not the same as
-having a particular ``x`` that satisfies ``p``.
+構成的(構成的論理の)「または」が古典的「または」よりも強いように、構成的「存在する」も古典的「存在する」より強い。次の例に挙げるような含意命題を証明するためには、古典論理的な推論を必要とする。なぜなら、構成的論理では、「全ての ``x`` が ``¬ p`` を満たす」の否定が真であることと、「``p`` を満たす ``x`` が存在する」が真であることは同じではないからである。
 
 ```lean
 open Classical
-variable (p : α → Prop)
+universe u
+variable (α : Sort u) (p : α → Prop)
 
 example (h : ¬ ∀ x, ¬ p x) : ∃ x, p x :=
   byContradiction
@@ -759,10 +600,7 @@ example (h : ¬ ∀ x, ¬ p x) : ∃ x, p x :=
       show False from h h2)
 ```
 
-What follows are some common identities involving the existential
-quantifier. In the exercises below, we encourage you to prove as many
-as you can. We also leave it to you to determine which are
-nonconstructive, and hence require some form of classical reasoning.
+以下に、練習問題として存在量化子を含む一般的な恒等式を挙げる。ここでは、できる限り多くの命題を証明することを勧める。また、どの命題が非構成的で、古典論理的な推論を必要とするかは、読者の判断に委ねる。
 
 ```lean
 open Classical
@@ -785,10 +623,9 @@ example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := sorry
 example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := sorry
 ```
 
-Notice that the second example and the last two examples require the
-assumption that there is at least one element ``a`` of type ``α``.
+2番目の例と最後の2つの例は、型 ``α`` には少なくとも1つの要素 ``a`` が存在するという前提を必要とすることに注意してほしい。
 
-Here are solutions to two of the more difficult ones:
+以下は2つの難しい問題への解答である:
 
 ```lean
 open Classical
@@ -816,7 +653,7 @@ example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
     (fun h1 : (∀ x, p x) → r =>
      show ∃ x, p x → r from
        byCases
-         (fun hap : ∀ x, p x => ⟨a, λ h' => h1 hap⟩)
+         (fun hap : ∀ x, p x => ⟨a, fun h' : p a => h1 hap⟩)
          (fun hnap : ¬ ∀ x, p x =>
           byContradiction
             (fun hnex : ¬ ∃ x, p x → r =>
@@ -824,22 +661,16 @@ example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
                 fun x =>
                 byContradiction
                   (fun hnp : ¬ p x =>
-                    have hex : ∃ x, p x → r := ⟨x, (fun hp => absurd hp hnp)⟩
+                    have hex : ∃ x, p x → r := ⟨x, (fun hp : p x => absurd hp hnp)⟩
                     show False from hnex hex)
               show False from hnap hap)))
 ```
 
-More on the Proof Language
---------------------------
+## More on the Proof Language (証明言語の詳細)
 
-We have seen that keywords like ``fun``, ``have``, and ``show`` make
-it possible to write formal proof terms that mirror the structure of
-informal mathematical proofs. In this section, we discuss some
-additional features of the proof language that are often convenient.
+``fun``、``have``、``show`` などのキーワードにより、非形式的な数学的証明の構造を反映した形式的証明項を書くことができることを見てきた。この節では、証明言語の他の便利な機能について説明する。
 
-To start with, we can use anonymous "have" expressions to introduce an
-auxiliary goal without having to label it. We can refer to the last
-expression introduced in this way using the keyword ``this``:
+まず、ラベルを付けることなく補助ゴールを導入するために、無名の「have」式を使うことができる。``this`` キーワードを用いると、無名の「have」式を使って導入された最後の項を参照することができる:
 
 ```lean
 variable (f : Nat → Nat)
@@ -851,11 +682,9 @@ example : f 0 ≤ f 3 :=
   show f 0 ≤ f 3 from Nat.le_trans this (h 2)
 ```
 
-Often proofs move from one fact to the next, so this can be effective
-in eliminating the clutter of lots of labels.
+証明の中ではいくつもの事実を使い捨てることが多いので、ラベルの付いた項が増えすぎてごちゃごちゃするのを防ぐには無名の「have」式が有効である。
 
-When the goal can be inferred, we can also ask Lean instead to fill in
-the proof by writing ``by assumption``:
+ゴール(今ここで使いたい項の型)が推論できる場合は、``by assumption`` と書くことでLeanに証明を埋めるよう頼むこともできる:
 
 ```lean
 # variable (f : Nat → Nat)
@@ -866,26 +695,15 @@ example : f 0 ≤ f 3 :=
   show f 0 ≤ f 3 from Nat.le_trans (by assumption) (h 2)
 ```
 
-This tells Lean to use the ``assumption`` tactic, which, in turn,
-proves the goal by finding a suitable hypothesis in the local
-context. We will learn more about the ``assumption`` tactic in the
-next chapter.
+``by assumption`` はLeanに ``assumption`` タクティクを使うように指示し、``assumption`` タクティクはローカルなコンテキストで適切な前提命題(の証明項)を見つけることでゴールを証明する。``assumption`` タクティクについては次の章で詳しく説明する。
 
-We can also ask Lean to fill in the proof by writing ``‹p›``, where
-``p`` is the proposition whose proof we want Lean to find in the
-context.  You can type these corner quotes using ``\f<`` and ``\f>``,
-respectively. The letter "f" is for "French," since the unicode
-symbols can also be used as French quotation marks. In fact, the
-notation is defined in Lean as follows:
+``‹p›`` と書くことで、Leanに証明を埋めるよう頼むこともできる。ここで、``‹p›`` はLeanにコンテキストから証明を見つけてもらいたい命題である。この角ばった括弧はそれぞれ ``\f<`` と ``\f>`` と打つと入力できる。"f" は "フランス語" を意味する。なぜならこのunicode記号はフランス語における引用符としても使われるからである。この表記はLeanにおいて次のように定義されている:
 
 ```lean
 notation "‹" p "›" => show p by assumption
 ```
 
-This approach is more robust than using ``by assumption``, because the
-type of the assumption that needs to be inferred is given
-explicitly. It also makes proofs more readable. Here is a more
-elaborate example:
+このアプローチは、推論してほしい前提の型が明示的に与えられるため、``by assumption`` を用いるよりもロバストである。また、証明も読みやすくなる。以下は、より詳細な例である:
 
 ```lean
 variable (f : Nat → Nat)
@@ -899,21 +717,17 @@ example : f 0 ≥ f 1 → f 1 ≥ f 2 → f 0 = f 2 :=
   show f 0 = f 2 from Nat.le_antisymm this ‹f 0 ≥ f 2›
 ```
 
-Keep in mind that you can use the French quotation marks in this way
-to refer to *anything* in the context, not just things that were
-introduced anonymously. Its use is also not limited to propositions,
-though using it for data is somewhat odd:
+フランス語の引用符は、匿名で導入されたものだけでなくコンテキスト中の「あらゆるもの」を参照できることを覚えておこう。フランス語の引用符の適用範囲は命題だけにとどまらないが、これをデータに対して使うのはやや奇妙である:
 
 ```lean
 example (n : Nat) : Nat := ‹Nat›
 ```
 
-Later, we show how you can extend the proof language using the Lean macro system.
+以降の章で、Leanのマクロシステムを使って証明言語を拡張する方法を紹介する。
 
-Exercises
----------
+## Exercises (練習問題)
 
-1. Prove these equivalences:
+1. 以下の命題を証明せよ:
 
 ```lean
 variable (α : Type) (p q : α → Prop)
@@ -923,12 +737,9 @@ example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := sorry
 example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := sorry
 ```
 
-You should also try to understand why the reverse implication is not derivable in the last example.
+最後の例について、逆の命題が導出できないのはなぜかを理解してみよう。
 
-2. It is often possible to bring a component of a formula outside a
-   universal quantifier, when it does not depend on the quantified
-   variable. Try proving these (one direction of the second of these
-   requires classical logic):
+2. 式の一部が全称量化された変数に依存しない場合、それを全称量化子の外側に持ってくることはしばしば可能である。以下の命題を証明してみよう(このうち2つ目の命題の1方向は古典論理を必要とする):
 
 ```lean
 variable (α : Type) (p q : α → Prop)
@@ -939,9 +750,7 @@ example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := sorry
 example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := sorry
 ```
 
-3. Consider the "barber paradox," that is, the claim that in a certain
-   town there is a (male) barber that shaves all and only the men who
-   do not shave themselves. Prove that this is a contradiction:
+3. 「理髪師のパラドックス」について考えてみよう。これは、ある町において、「自分で髭を剃らない男性全員の髭を剃り、自分で髭を剃る男性の髭は一切剃らない男性の理髪師がいる」という主張である。この主張が矛盾することを示せ:
 
 ```lean
 variable (men : Type) (barber : men)
@@ -950,15 +759,7 @@ variable (shaves : men → men → Prop)
 example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := sorry
 ```
 
-4. Remember that, without any parameters, an expression of type
-   ``Prop`` is just an assertion. Fill in the definitions of ``prime``
-   and ``Fermat_prime`` below, and construct each of the given
-   assertions. For example, you can say that there are infinitely many
-   primes by asserting that for every natural number ``n``, there is a
-   prime number greater than ``n``. Goldbach's weak conjecture states
-   that every odd number greater than 5 is the sum of three
-   primes. Look up the definition of a Fermat prime or any of the
-   other statements, if necessary.
+4. パラメータを持たない ``Prop`` 型の項は(それが真か偽かを問わない)単なる主張である。まず以下の ``prime`` と ``Fermat_prime`` の定義を埋め、それらを使って他の定義を構築せよ。例えば、任意の自然数 ``n`` に対して、``n`` より大きな素数が存在すると主張することで、素数は無限に存在すると言うことができる。弱いゴールドバッハ予想は、5より大きい任意の奇数は3つの素数の和で表されることを主張している。必要であれば、フェルマー素数や他の記述の定義を調べてみよう。
 
 ```lean
 def even (n : Nat) : Prop := sorry
@@ -978,5 +779,4 @@ def Goldbach's_weak_conjecture : Prop := sorry
 def Fermat's_last_theorem : Prop := sorry
 ```
 
-5. Prove as many of the identities listed in the Existential
-   Quantifier section as you can.
+5. 存在量化子の節で列挙した恒真式をできるだけ多く証明せよ。

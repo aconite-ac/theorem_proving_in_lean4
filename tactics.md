@@ -1,56 +1,45 @@
-Tactics
-=======
+# Tactics (タクティク)
 
-In this chapter, we describe an alternative approach to constructing
-proofs, using *tactics*.  A proof term is a representation of a
-mathematical proof; tactics are commands, or instructions, that
-describe how to build such a proof. Informally, you might begin a
-mathematical proof by saying "to prove the forward direction, unfold
-the definition, apply the previous lemma, and simplify." Just as these
-are instructions that tell the reader how to find the relevant proof,
-tactics are instructions that tell Lean how to construct a proof
-term. They naturally support an incremental style of writing proofs,
-in which you decompose a proof and work on goals one step at a time.
+この章では、*tactics*(タクティク)を使って証明を構築する方法について説明する。証明項とは数学的証明の表現であり、タクティクは数学的証明を構築する手順を記述するコマンド(指示)である。定理 A ↔ B を証明する際に、非形式的に、「まず A → B を証明する。最初に定義を展開し、次に既存の補題を適用し、それから式を単純化する」という導入から数学の証明を始めることがあるかもしれない。これらの言明が証明を見つける方法を読者に伝える指示であるのと同様に、タクティクは証明項を構築する方法をLeanに伝える指示である。タクティクは、証明を分解し、一歩ずつゴールに向かうという段階的な証明の書き方を自然にサポートする。
 
-We will describe proofs that consist of sequences of tactics as
-"tactic-style" proofs, to contrast with the ways of writing proof
-terms we have seen so far, which we will call "term-style"
-proofs. Each style has its own advantages and disadvantages. For
-example, tactic-style proofs can be harder to read, because they
-require the reader to predict or guess the results of each
-instruction. But they can also be shorter and easier to
-write. Moreover, tactics offer a gateway to using Lean's automation,
-since automated procedures are themselves tactics.
+タクティクの連続からなる証明を「タクティクスタイル」の証明と呼び、これまで見てきた証明項の構築の仕方を「項スタイル」の証明と呼ぶ。それぞれのスタイルには長所と短所がある。例えば、タクティクスタイルの証明は、各タクティクの結果を予測・推測することを読者に要求するため、項スタイルの証明より読みにくいという短所がある。しかし、短くて書きやすいという長所もある。さらに、タクティクはLeanの自動証明を利用するための入り口になる。なぜなら、Leanに自動証明を指示するコマンド自体がタクティクだからである。
 
-Entering Tactic Mode
---------------------
+## 用語に関する注意
 
-Conceptually, stating a theorem or introducing a ``have`` statement
-creates a goal, namely, the goal of constructing a term with the
-expected type. For example, the following creates the goal of
-constructing a term of type ``p ∧ q ∧ p``, in a context with constants
-``p q : Prop``, ``hp : p`` and ``hq : q``:
+この節は翻訳に際して追加した節である。
+
+この章では、含意命題 ``p → q`` あるいはより一般的に依存関数型 ``(x : α) → β`` の中に登場する型 ``p`` や型 ``(x : α)`` を「前件(antecedent)」、型 ``q`` や型 ``β`` を「後件(consequent)」と呼び、一方で「ゴール(Goal)」 ``A ⊢ B`` の中に登場する項の集まり A を「コンテキスト(Context)」または「前提(Premise)」、ゴールにおいて項構築の目標となる型 B を「ターゲット(Target)」または「結論(Conclusion)」と呼び明確に区別する。特に、ゴールが閉じられていない(open)／未達成(not accomplished)／未証明(not proved)／未解決(not solved)のときは「コンテキスト(Context)」「ターゲット(Target)」という用語を使い、ゴールが閉じられている(closed)／達成済み(accomplished)／証明済み(proved)／解決済(solved)のときは「前提(Premise)」「結論(Conclusion)」という用語を使う。
+
+コンテキスト(あるいは前提)に含まれる各項を「仮説(Hypothesis)」と呼ぶ。
+
+ここでいう「ターゲット」を「ゴール」と呼ぶこともあるが、混乱を避けるため本訳ではこのような用語の使い方はしない。
+
+``intro`` タクティクや ``revert`` タクティクの働きを理解する際に、この用語の区別が重要となる。
+
+### 参考記事
+
+- [コンテキストと組織化原理 - (新) 檜山正幸のキマイラ飼育記 メモ編](https://m-hiyama-memo.hatenablog.com/entry/2023/01/30/130823)
+- [証明とリーズニング - (新) 檜山正幸のキマイラ飼育記 メモ編](https://m-hiyama-memo.hatenablog.com/entry/2023/01/22/130943)
+
+
+## Entering Tactic Mode (タクティクモードへの入り方)
+
+定理を述べたり、have文を使うと、ゴール、すなわち期待された型を持つ項を構築するという目標が生成される。例えば、仮説 ``p q : Prop``、``hp : p``、``hq : q`` を持つコンテキストでは、次のような記述は ``p ∧ q ∧ p`` という型の項を構築するというゴールを作成する:
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p :=
   sorry
 ```
 
-You can write this goal as follows:
+このゴールは次のように記述できる:
 
 ```
     p : Prop, q : Prop, hp : p, hq : q ⊢ p ∧ q ∧ p
 ```
 
-Indeed, if you replace the "sorry" by an underscore in the example
-above, Lean will report that it is exactly this goal that has been
-left unsolved.
+実際、上記の例で "sorry" をアンダースコアに置き換えると、Leanはまさにこのゴールが未解決であることを報告する。
 
-Ordinarily, you meet such a goal by writing an explicit term. But
-wherever a term is expected, Lean allows us to insert instead a ``by
-<tactics>`` block, where ``<tactics>`` is a sequence of commands,
-separated by semicolons or line breaks. You can prove the theorem above
-in that way:
+通常は、明示的に証明項を記述することでこのようなゴールを達成する。しかし、Leanでは、項が記述されることが期待される任意の場所に、項の記述の代わりに ``by <tactics>`` ブロックを挿入することができる。ここで、``<tactics>`` はセミコロンまたは改行で区切られたコマンドの列である。``by <tactics>`` ブロックを使って上記の定理を証明することができる:
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p :=
@@ -61,8 +50,7 @@ theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p :=
      exact hp
 ```
 
-We often put the ``by`` keyword on the preceding line, and write the
-example above as:
+つまり、``by`` キーワードを書くことでタクティクモードに入れるのである。しばしば ``by`` キーワードは前の行に書き、上記の例はこのように書かれる:
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -73,12 +61,7 @@ theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
   exact hp
 ```
 
-The ``apply`` tactic applies an expression, viewed as denoting a
-function with zero or more arguments. It unifies the conclusion with
-the expression in the current goal, and creates new goals for the
-remaining arguments, provided that no later arguments depend on
-them. In the example above, the command ``apply And.intro`` yields two
-subgoals:
+``apply`` タクティクは、0個以上の引数をとる関数を表現する項 ``t`` を現在のゴールに適用する。``apply`` タクティクは現在のゴールのターゲット(``⊢`` の後に書かれる型)と関数 ``t`` の出力の型を同一視し、引数(関数 ``t`` の入力の型を持つ項)を構築するという新しいゴールを作る。ただし、後続の引数の型が先行の引数に依存しない場合に限る。上記の例では、コマンド ``apply And.intro`` は2つのサブゴールを生成する:
 
 ```
     case left
@@ -94,16 +77,9 @@ subgoals:
     ⊢ q ∧ p
 ```
 
-The first goal is met with the command ``exact hp``. The ``exact``
-command is just a variant of ``apply`` which signals that the
-expression given should fill the goal exactly. It is good form to use
-it in a tactic proof, since its failure signals that something has
-gone wrong. It is also more robust than ``apply``, since the
-elaborator takes the expected type, given by the target of the goal,
-into account when processing the expression that is being applied. In
-this case, however, ``apply`` would work just as well.
+最初のゴールはコマンド ``exact hp`` で達成される。``exact`` コマンドは ``apply`` コマンドの一種で、「与えられた項がターゲットと同じ型を持つことを確認し、確認できたらゴールを閉じよ」とLeanに指示する。``exact`` コマンドをタクティク証明で使うのは良いことである。なぜなら、``exact`` コマンドの失敗は何かが間違っていることを示すからである。また ``exact`` は ``apply`` よりもロバストである。なぜなら、elaboratorは、与えられた項を処理する際に、今期待されている型(ゴールのターゲット)が何であるかを考慮に入れるからである。しかしながら、上記の例では ``apply`` も同様に機能する。
 
-You can see the resulting proof term with the ``#print`` command:
+``#print`` コマンドを使って最終的に得られた証明項を確認することができる:
 
 ```lean
 # theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -113,21 +89,15 @@ You can see the resulting proof term with the ``#print`` command:
 #  exact hq
 #  exact hp
 #print test
+/-
+theorem test : ∀ (p q : Prop), p → q → p ∧ q ∧ p :=
+fun p q hp hq => { left := hp, right := { left := hq, right := hp } }
+-/
 ```
 
-You can write a tactic script incrementally. In VS Code, you can open
-a window to display messages by pressing ``Ctrl-Shift-Enter``, and
-that window will then show you the current goal whenever the cursor is
-in a tactic block. In Emacs, you can see the goal at the end of any
-line by pressing ``C-c C-g``, or see the remaining goal in an
-incomplete proof by putting the cursor after the first character of
-the last tactic. If the proof is incomplete, the token ``by`` is
-decorated with a red squiggly line, and the error message contains the
-remaining goals.
+タクティク証明は段階的に書くことができる。VS Codeでは、``Ctrl-Shift-Enter`` を押すことでメッセージウィンドウを開くことができる。カーソルがタクティクブロック内にあるときはいつでも、このウィンドウは現在のゴールを表示する。Emacsでは、タクティクブロック内の任意の行末で ``C-c C-g`` を押すことで現在のゴールを見ることができる。また、カーソルを最後のタクティクの1文字目に置くことで、不完全な証明内の残りのゴールを見ることができる。証明が不完全な場合、キーワード ``by`` に赤い波線が引かれ、エラーメッセージには残りのゴールが表示される。
 
-Tactic commands can take compound expressions, not just single
-identifiers. The following is a shorter version of the preceding
-proof:
+タクティクコマンドは単一の項名だけでなく、複合式を受け取ることもできる。以下は、前述の証明の短縮版である:
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -135,7 +105,7 @@ theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
   exact And.intro hq hp
 ```
 
-Unsurprisingly, it produces exactly the same proof term.
+当然のことながら、この証明記述は全く同じ証明項を生成する。
 
 ```lean
 # theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -144,20 +114,14 @@ Unsurprisingly, it produces exactly the same proof term.
 #print test
 ```
 
-Multiple tactic applications can be written in a single line by concatenating with a semicolon.
+複数のタクティク適用をセミコロンで連結して1行で書くことができる。
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
   apply And.intro hp; exact And.intro hq hp
 ```
 
-Tactics that may produce multiple subgoals often tag them. For
-example, the tactic ``apply And.intro`` tagged the first subgoal as
-``left``, and the second as ``right``. In the case of the ``apply``
-tactic, the tags are inferred from the parameters' names used in the
-``And.intro`` declaration. You can structure your tactics using the
-notation ``case <tag> => <tactics>``. The following is a structured
-version of our first tactic proof in this chapter.
+複数のサブゴールを生成する可能性のあるタクティクは、自動的に各サブゴールにタグを付けることが多い。例えば、タクティク ``apply And.intro`` は最初のサブゴールにタグ ``left`` を、2つ目のサブゴールにタグ ``right`` を付ける。この場合において、タグ名は ``And.intro`` の宣言の中で使われた引数の名前から推測される。``case <tag> => <tactics>`` という表記を使うことで、タクティクを構造化することができる。つまり、``<tactics>`` をどのタグ付けされたサブゴールに適用するかを明示することができる。以下は、この章の最初のタクティク証明の構造化されたバージョンである:
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -169,8 +133,7 @@ theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
     case right => exact hp
 ```
 
-You can solve the subgoal ``right`` before ``left`` using the ``case``
-notation:
+``case`` 記法を使うと、サブゴール ``right`` を ``left`` よりも先に解くことができる:
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -182,15 +145,9 @@ theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
   case left => exact hp
 ```
 
-Note that Lean hides the other goals inside the ``case`` block. We say
-it is "focusing" on the selected goal.  Moreover, Lean flags an error
-if the selected goal is not fully solved at the end of the ``case``
-block.
+``case`` ブロック内で、Leanが他のゴールを隠していることに注意してほしい。言わば、Leanは選択されたゴールに「集中」しているのである。さらに、``case`` ブロックの終了時に選択されたゴールが完全には解かれていない場合、Leanはエラーフラグを建てる。
 
-For simple subgoals, it may not be worth selecting a subgoal using its
-tag, but you may still want to structure the proof. Lean also provides
-the "bullet" notation ``. <tactics>`` (or ``· <tactics>``) for
-structuring proof.
+サブゴールが単純である場合、タグを使ってサブゴールを選択する価値はないかもしれないが、その場合でも証明を構造化したい場合は ``case`` が有用である。また、Leanは証明を構造化するための「箇条書き」記法 ``. <tactics>`` (あるいは ``· <tactics>``) を提供する。``. <tactics>`` 記法を使うと、Leanは一番上のゴールに「集中」する。
 
 ```lean
 theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
@@ -201,13 +158,9 @@ theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
     . exact hp
 ```
 
-Basic Tactics
--------------
+## Basic Tactics (基本的なタクティク)
 
-In addition to ``apply`` and ``exact``, another useful tactic is
-``intro``, which introduces a hypothesis. What follows is an example
-of an identity from propositional logic that we proved in a previous
-chapter, now proved using tactics.
+``apply`` と ``exact`` に加えて、もう一つの便利なタクティクが ``intro`` である。``intro`` タクティクはゴールのターゲットの前件(ゴールのターゲットの ``→`` の前にある命題)をゴールのコンテキスト(ゴールの ``⊢`` の前)に移動させる。以降、この ``intro`` タクティクの機能を「ターゲットの前件をコンテキストに導入する」または単に「導入する」と表現する。以下は、3章で証明した命題論理の恒真式を今一度タクティクを使って証明した例である。
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -238,7 +191,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
         exact And.right hpr
 ```
 
-The ``intro`` command can more generally be used to introduce a variable of any type:
+``intro`` タクティクはより一般的に任意の型の項をコンテキストに導入できる:
 
 ```lean
 example (α : Type) : α → α := by
@@ -250,7 +203,7 @@ example (α : Type) : ∀ x : α, x = x := by
   exact Eq.refl x
 ```
 
-You can use it to introduce several variables:
+``intro`` タクティクは複数の項を一度に導入できる:
 
 ```lean
 example : ∀ a b c : Nat, a = b → a = c → c = b := by
@@ -258,11 +211,7 @@ example : ∀ a b c : Nat, a = b → a = c → c = b := by
   exact Eq.trans (Eq.symm h₂) h₁
 ```
 
-As the ``apply`` tactic is a command for constructing function
-applications interactively, the ``intro`` tactic is a command for
-constructing function abstractions interactively (i.e., terms of the
-form ``fun x => e``).  As with lambda abstraction notation, the
-``intro`` tactic allows us to use an implicit ``match``.
+``apply`` タクティクが対話的に関数適用を構築するためのコマンドであるように、``intro`` タクティクは対話的に関数抽象(つまり ``fun x => e`` の形の項)を構築するためのコマンドである。ラムダ抽象記法と同様に、``intro`` タクティクでは暗黙の ``match`` を使うことができる。
 
 ```lean
 example (α : Type) (p q : α → Prop) : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x := by
@@ -270,22 +219,23 @@ example (α : Type) (p q : α → Prop) : (∃ x, p x ∧ q x) → ∃ x, q x �
   exact ⟨w, hqw, hpw⟩
 ```
 
-You can also provide multiple alternatives like in the ``match`` expression.
+また、``intro`` タクティクは ``match`` 式のようにコンテキストに導入した項を場合分けすることもできる(詳しくは[8章 Induction and Recursion (帰納と再帰)](./induction_and_recursion.md)を参照のこと)。
 
 ```lean
 example (α : Type) (p q : α → Prop) : (∃ x, p x ∨ q x) → ∃ x, q x ∨ p x := by
   intro
   | ⟨w, Or.inl h⟩ => exact ⟨w, Or.inr h⟩
   | ⟨w, Or.inr h⟩ => exact ⟨w, Or.inl h⟩
+
+example (α : Type) (p q : α → Prop) : (∃ x, p x ∨ q x) → ∃ x, q x ∨ p x := by
+  intro h
+  let ⟨w, hpq⟩ := h
+  exact Or.elim hpq (fun hp : p w => ⟨w, Or.inr hp⟩) (fun hq : q w => ⟨w, Or.inl hq⟩)
 ```
 
-The ``intros`` tactic can be used without any arguments, in which
-case, it chooses names and introduces as many variables as it can. You
-will see an example of this in a moment.
+``intros`` タクティクは引数を与えずに使うことができる。その場合、``intros`` タクティクはできる限り多くの項を一度に導入し、導入した各項に自動で名前を付ける。その例はすぐ後に紹介する。
 
-The ``assumption`` tactic looks through the assumptions in context of
-the current goal, and if there is one matching the conclusion, it
-applies it.
+``assumption`` タクティクは現在のゴールの仮説たちに目を通し、それらの中にゴールの結論と合致するものがあればそれを適用する。
 
 ```lean
 example (x y z w : Nat) (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := by
@@ -294,7 +244,7 @@ example (x y z w : Nat) (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := 
   assumption   -- applied h₃
 ```
 
-It will unify metavariables in the conclusion if necessary:
+``assumption`` タクティクは、必要に応じてゴールのターゲットにメタ変数( ``?b`` など、具体的な項名が未決定の変数)を導入する:
 
 ```lean
 example (x y z w : Nat) (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := by
@@ -305,7 +255,7 @@ example (x y z w : Nat) (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := 
   assumption      -- solves z = w with h₃
 ```
 
-The following example uses the ``intros`` command to introduce the three variables and two hypotheses automatically:
+次の例では、``intros`` タクティクを用いて3つの変数と2つの命題の証明を自動的にコンテキストに導入している:
 
 ```lean
 example : ∀ a b c : Nat, a = b → a = c → c = b := by
@@ -316,9 +266,7 @@ example : ∀ a b c : Nat, a = b → a = c → c = b := by
   assumption
 ```
 
-Note that names automatically generated by Lean are inaccessible by default. The motivation is to
-ensure your tactic proofs do not rely on automatically generated names, and are consequently more robust.
-However, you can use the combinator ``unhygienic`` to disable this restriction.
+デフォルトでは、Leanが自動生成した名前( ``a✝`` など)にはアクセスできないことに注意してほしい。この仕様はタクティク証明の成否が自動生成された名前に依存しないようにするためにあり、この仕様があるおかげで証明はよりロバストになる。ただし、キーワード ``unhygienic`` を ``by`` の後に書くことでこの制限を無効にすることができる(証明のロバスト性は低下する)。
 
 ```lean
 example : ∀ a b c : Nat, a = b → a = c → c = b := by unhygienic
@@ -329,9 +277,7 @@ example : ∀ a b c : Nat, a = b → a = c → c = b := by unhygienic
   exact a_1
 ```
 
-You can also use the ``rename_i`` tactic to rename the most recent inaccessible names in your context.
-In the following example, the tactic ``rename_i h1 _ h2`` renames two of the last three hypotheses in
-your context.
+また、``rename_i`` タクティクを用いて、現在のゴール内の最も直近のアクセス不能な名前を変更することができる。次の例では、タクティク ``rename_i h1 _ h2`` がゴール内の最後の3つの仮説のうち2つの名前を変更している。
 
 ```lean
 example : ∀ a b c d : Nat, a = b → a = d → a = c → c = b := by
@@ -343,14 +289,17 @@ example : ∀ a b c d : Nat, a = b → a = d → a = c → c = b := by
   exact h1
 ```
 
-The ``rfl`` tactic is syntactic sugar for ``exact rfl``.
+``rfl`` タクティクは ``exact rfl`` の、つまり ``exact Eq.refl _`` の糖衣構文である。
 
 ```lean
-example (y : Nat) : (fun x : Nat => 0) y = 0 :=
-  by rfl
+example (y : Nat) : (fun x : Nat => 0) y = 0 := by
+  rfl
+
+example (y : Nat) : (fun x : Nat => 0) y = 0 := by
+  exact Eq.refl _
 ```
 
-The ``repeat`` combinator can be used to apply a tactic several times.
+タクティクの前に ``repeat`` キーワードを書くと、そのタクティクは何度か繰り返し適用される。
 
 ```lean
 example : ∀ a b c : Nat, a = b → a = c → c = b := by
@@ -360,8 +309,7 @@ example : ∀ a b c : Nat, a = b → a = c → c = b := by
   repeat assumption
 ```
 
-Another tactic that is sometimes useful is the ``revert`` tactic,
-which is, in a sense, an inverse to ``intro``.
+``revert`` タクティクは時々有用である。これは ``intro`` タクティクの逆の機能を持つ。つまり、指定した項をゴールのコンテキストからゴールのターゲットの前件に移動させる。以降、``revert`` タクティクの機能を「コンテキストの一部をターゲットに戻す」または単に「戻す」と表現する。
 
 ```lean
 example (x : Nat) : x = x := by
@@ -372,7 +320,7 @@ example (x : Nat) : x = x := by
   rfl
 ```
 
-Moving a hypothesis into the goal yields an implication:
+(この章の最初に書いたように用語の区別をしていれば明らかなことだが、)コンテキスト(の一部)をターゲットに移すと含意命題が得られる:
 
 ```lean
 example (x y : Nat) (h : x = y) : y = x := by
@@ -384,10 +332,7 @@ example (x y : Nat) (h : x = y) : y = x := by
   assumption
 ```
 
-But ``revert`` is even more clever, in that it will revert not only an
-element of the context but also all the subsequent elements of the
-context that depend on it. For example, reverting ``x`` in the example
-above brings ``h`` along with it:
+しかし、``revert`` はさらに賢く、指定した項だけでなく、指定した項に依存する型を持つ要素も全てゴールのターゲットに移動させる。例えば、上の例で ``x`` を戻すと、``h`` も一緒に戻される:
 
 ```lean
 example (x y : Nat) (h : x = y) : y = x := by
@@ -398,7 +343,7 @@ example (x y : Nat) (h : x = y) : y = x := by
   assumption
 ```
 
-You can also revert multiple elements of the context at once:
+また、コンテキスト内の複数の仮説を一度に戻すこともできる:
 
 ```lean
 example (x y : Nat) (h : x = y) : y = x := by
@@ -409,10 +354,7 @@ example (x y : Nat) (h : x = y) : y = x := by
   assumption
 ```
 
-You can only ``revert`` an element of the local context, that is, a
-local variable or hypothesis. But you can replace an arbitrary
-expression in the goal by a fresh variable using the ``generalize``
-tactic.
+``revert`` で戻せるのは現在のゴールのコンテキスト内の項(仮説)だけである。しかし、タクティク ``generalize e = x`` を使えば、ゴールのターゲットに登場する任意の式 ``e`` を新しい変数 ``x`` に置き換えることができる。また、タクティク ``generalize e = x at h₁`` を使えば、ゴールの仮説 ``h₁`` に登場する任意の式 ``e`` を新しい変数 ``x`` に置き換えることができる。
 
 ```lean
 example : 3 = 3 := by
@@ -425,11 +367,7 @@ example : 3 = 3 := by
   rfl
 ```
 
-The mnemonic in the notation above is that you are generalizing the
-goal by setting ``3`` to an arbitrary variable ``x``. Be careful: not
-every generalization preserves the validity of the goal. Here,
-``generalize`` replaces a goal that could be proved using
-``rfl`` with one that is not provable:
+上記の例において、``generalize 3 = x`` は ``3`` に任意の変数 ``x`` を割り当てることでゴールのターゲットを一般化している。全ての一般化がゴールの証明可能性を保存するわけではないことに注意してほしい。次の例では、``generalize`` が ``rfl`` を使うだけで証明できるゴールを決して証明できないゴールに置き換えている:
 
 ```lean
 example : 2 + 3 = 5 := by
@@ -438,13 +376,7 @@ example : 2 + 3 = 5 := by
   admit
 ```
 
-In this example, the ``admit`` tactic is the analogue of the ``sorry``
-proof term. It closes the current goal, producing the usual warning
-that ``sorry`` has been used. To preserve the validity of the previous
-goal, the ``generalize`` tactic allows us to record the fact that
-``3`` has been replaced by ``x``. All you need to do is to provide a
-label, and ``generalize`` uses it to store the assignment in the local
-context:
+``admit`` タクティクは ``exact sorry`` の糖衣構文である。これは現在のゴールを閉じ、``sorry`` が使われたという警告を出す。一般化以前のゴールの証明可能性を保存するために、``generalize`` タクティクを使う際に ``3`` が ``x`` に置き換えられたという事実を記録することができる。そのためには、置き換えの事実を保存するためのラベルを ``generalize`` に与えるだけでよい:
 
 ```lean
 example : 2 + 3 = 5 := by
@@ -453,17 +385,11 @@ example : 2 + 3 = 5 := by
   rw [← h]
 ```
 
-Here the ``rewrite`` tactic, abbreviated ``rw``, uses ``h`` to replace
-``x`` by ``3`` again. The ``rewrite`` tactic will be discussed below.
+ここでは、``rewrite`` タクティク(略称は ``rw``)が ``h`` を用いて ``x`` を ``3`` で再び置き換えている。``rewrite`` タクティクについては後述する。
 
-More Tactics
-------------
+## More Tactics (他のタクティク)
 
-Some additional tactics are useful for constructing and destructing
-propositions and data. For example, when applied to a goal of the form
-``p ∨ q``, you use tactics such as ``apply Or.inl`` and ``apply
-Or.inr``.  Conversely, the ``cases`` tactic can be used to decompose a
-disjunction.
+命題やデータを構築したり分解したりするには、他のいくつかのタクティクが有用である。例えば、``p ∨ q`` の形のターゲットに対して ``apply`` タクティクを使う場合は、タクティク ``apply Or.inl`` や ``apply Or.inr`` を使うだろう。逆に、``cases`` タクティクは選言命題型(など)の仮説を分解する。
 
 ```lean
 example (p q : Prop) : p ∨ q → q ∨ p := by
@@ -473,8 +399,7 @@ example (p q : Prop) : p ∨ q → q ∨ p := by
   | inr hq => apply Or.inl; exact hq
 ```
 
-Note that the syntax is similar to the one used in `match` expressions.
-The new subgoals can be solved in any order.
+``cases`` タクティクの構文は ``match`` 式の構文と似ていることに注意。新しいサブゴールは好きな順番で解くことができる。
 
 ```lean
 example (p q : Prop) : p ∨ q → q ∨ p := by
@@ -484,8 +409,7 @@ example (p q : Prop) : p ∨ q → q ∨ p := by
   | inl hp => apply Or.inr; exact hp
 ```
 
-You can also use a (unstructured) ``cases`` without the ``with`` and a tactic
-for each alternative.
+``with`` と後続のタクティクを書かずに(構造化されていない) ``cases`` を使うこともできる。この場合、複数のサブゴールが生成される。
 
 ```lean
 example (p q : Prop) : p ∨ q → q ∨ p := by
@@ -497,8 +421,7 @@ example (p q : Prop) : p ∨ q → q ∨ p := by
   assumption
 ```
 
-The (unstructured) ``cases`` is particularly useful when you can close several
-subgoals using the same tactic.
+(構造化されていない) ``cases`` は、同じタクティクを使って複数のサブゴールを閉じられる場合に特に便利である。
 
 ```lean
 example (p : Prop) : p ∨ p → p := by
@@ -507,8 +430,7 @@ example (p : Prop) : p ∨ p → p := by
   repeat assumption
 ```
 
-You can also use the combinator ``tac1 <;> tac2`` to apply ``tac2`` to each
-subgoal produced by tactic ``tac1``.
+``tac1 <;> tac2`` という結合子を使えば、タクティク ``tac1`` により生成された各サブゴールに ``tac2`` を適用することもできる。
 
 ```lean
 example (p : Prop) : p ∨ p → p := by
@@ -516,7 +438,7 @@ example (p : Prop) : p ∨ p → p := by
   cases h <;> assumption
 ```
 
-You can combine the unstructured ``cases`` tactic with the ``case`` and ``.`` notation.
+構造化されていない ``cases`` タクティクと ``case`` 記法や ``.`` 記法を組み合わせることができる。
 
 ```lean
 example (p q : Prop) : p ∨ q → q ∨ p := by
@@ -547,21 +469,21 @@ example (p q : Prop) : p ∨ q → q ∨ p := by
     assumption
 ```
 
-The ``cases`` tactic can also be used to
-decompose a conjunction.
+``cases`` タクティクは連言命題を分解することもできる。
 
 ```lean
 example (p q : Prop) : p ∧ q → q ∧ p := by
   intro h
   cases h with
   | intro hp hq => constructor; exact hq; exact hp
+
+example (p q : Prop) : p ∧ q → q ∧ p := by
+  intro h
+  cases h with
+  | intro hp hq => apply And.intro; exact hq; exact hp
 ```
 
-In this example, there is only one goal after the ``cases`` tactic is
-applied, with ``h : p ∧ q`` replaced by a pair of assumptions,
-``hp : p`` and ``hq : q``. The ``constructor`` tactic applies the unique
-constructor for conjunction, ``And.intro``. With these tactics, an
-example from the previous section can be rewritten as follows:
+この例では、``cases`` タクティクにより ``h : p ∧ q`` が一対の項 ``hp : p`` と ``hq : q`` に置き換えられた。``constructor`` タクティクは、連言のための唯一のコンストラクタ ``And.intro`` をターゲットに適用する。これらのタクティクにより、前節の例は以下のように書き換えられる:
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -582,26 +504,21 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
       | intro hp hr => constructor; exact hp; apply Or.inr; exact hr
 ```
 
-You will see in [Chapter Inductive Types](./inductive_types.md) that
-these tactics are quite general. The ``cases`` tactic can be used to
-decompose any element of an inductively defined type; ``constructor``
-always applies the first applicable constructor of an inductively defined type.
-For example, you can use ``cases`` and ``constructor`` with an existential quantifier:
+これらのタクティクを非常に一般的に用いることができることは、[7章 Inductive Types (帰納型)](./inductive_types.md)で説明する。端的に説明すると、``cases`` タクティクは帰納的に定義された型の任意の項を分解することができる。``constructor`` タクティクは常に、帰納的に定義された型の適用可能な最初のコンストラクタを適用する。例えば、``cases`` と ``constructor`` は存在量化子に対して使うことができる:
 
 ```lean
 example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
   intro h
   cases h with
   | intro x px => constructor; apply Or.inl; exact px
+
+example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
+  intro h
+  cases h with
+  | intro x px => apply Exists.intro; apply Or.inl; exact px
 ```
 
-Here, the ``constructor`` tactic leaves the first component of the
-existential assertion, the value of ``x``, implicit. It is represented
-by a metavariable, which should be instantiated later on. In the
-previous example, the proper value of the metavariable is determined
-by the tactic ``exact px``, since ``px`` has type ``p x``. If you want
-to specify a witness to the existential quantifier explicitly, you can
-use the ``exists`` tactic instead:
+ここでは、``constructor`` タクティクは ``Exists.intro`` の最初の引数である ``x`` の値を暗黙のままにしている。これは一旦メタ変数で表され、後でインスタンス化される。前の例では、メタ変数の適切な値はタクティク ``exact px`` が使われた時点で決定される。なぜなら、``px`` は型 ``p x`` を持つからである。存在量化子に対する証人を明示的に指定したい場合は、代わりに ``exists`` タクティクを使うことができる:
 
 ```lean
 example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
@@ -610,7 +527,7 @@ example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
   | intro x px => exists x; apply Or.inl; exact px
 ```
 
-Here is another example:
+これは他の例である:
 
 ```lean
 example (p q : Nat → Prop) : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x := by
@@ -622,9 +539,7 @@ example (p q : Nat → Prop) : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x := by
       exists x
 ```
 
-These tactics can be used on data just as well as propositions. In the
-next example, they are used to define functions which swap the
-components of the product and sum types:
+``cases`` タクティクや``constructor`` タクティクは命題だけでなくデータにも使える。次の例では、直積型の項の成分を入れ替える関数と直和型の項の成分を入れ替える関数を定義するためにこれらのタクティクが使われている:
 
 ```lean
 def swap_pair : α × β → β × α := by
@@ -637,12 +552,22 @@ def swap_sum : Sum α β → Sum β α := by
   cases p
   . apply Sum.inr; assumption
   . apply Sum.inl; assumption
+
+theorem swap_and : a ∧ b → b ∧ a := by
+  intro p
+  cases p
+  constructor <;> assumption
+
+theorem swap_or : a ∨ b → b ∨ a := by
+  intro p
+  cases p
+  . apply Or.inr; assumption
+  . apply Or.inl; assumption
 ```
 
-Note that up to the names we have chosen for the variables, the
-definitions are identical to the proofs of the analogous propositions
-for conjunction and disjunction. The ``cases`` tactic will also do a
-case distinction on a natural number:
+上2つの関数定義の記述と、下2つの定理の証明が、わずかな差を除いて同じであることに注意してほしい。
+
+``cases`` タクティクは自然数を「場合分け」することもできる:
 
 ```lean
 open Nat
@@ -652,10 +577,9 @@ example (P : Nat → Prop) (h₀ : P 0) (h₁ : ∀ n, P (succ n)) (m : Nat) : P
   | succ m' => exact h₁ m'
 ```
 
-The ``cases`` tactic, and its companion, the ``induction`` tactic, are discussed in greater detail in
-the [Tactics for Inductive Types](./inductive_types.md#tactics-for-inductive-types) section.
+``cases`` タクティクとその仲間である ``induction`` タクティクについては、[Tactics for Inductive Types (帰納型のためのタクティク)](./inductive_types.md#tactics-for-inductive-types-帰納型のためのタクティク)節で詳しく説明する。
 
-The ``contradiction`` tactic searches for a contradiction among the hypotheses of the current goal:
+``contradiction`` タクティクは現在のゴールのコンテキストの中から矛盾を探す:
 
 ```lean
 example (p q : Prop) : p ∧ ¬ p → q := by
@@ -664,7 +588,7 @@ example (p q : Prop) : p ∧ ¬ p → q := by
   contradiction
 ```
 
-You can also use ``match`` in tactic blocks.
+``match`` はタクティクブロック内でも使うことができる。
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -679,7 +603,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
     | Or.inr ⟨hp, hr⟩ => constructor; exact hp; apply Or.inr; exact hr
 ```
 
-You can "combine" ``intro h`` with ``match h ...`` and write the previous examples as follows
+``intro h`` を ``match h ...`` と「組み合わせる」と、上記の例は次のように書ける:
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -692,22 +616,11 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
     | Or.inr ⟨hp, hr⟩ => constructor; assumption; apply Or.inr; assumption
 ```
 
-Structuring Tactic Proofs
--------------------------
+## Structuring Tactic Proofs (タクティク証明の構造化)
 
-Tactics often provide an efficient way of building a proof, but long
-sequences of instructions can obscure the structure of the
-argument. In this section, we describe some means that help provide
-structure to a tactic-style proof, making such proofs more readable
-and robust.
+タクティクはしばしば証明を構築する効率的な方法を提供するが、長いタクティクの列は証明の構造を不明瞭にすることがある。このセクションでは、タクティクスタイルの証明をより読みやすくよりロバストにするために、タクティクスタイルの証明を構造化する方法を説明する。
 
-One thing that is nice about Lean's proof-writing syntax is that it is
-possible to mix term-style and tactic-style proofs, and pass between
-the two freely. For example, the tactics ``apply`` and ``exact``
-expect arbitrary terms, which you can write using ``have``, ``show``,
-and so on. Conversely, when writing an arbitrary Lean term, you can
-always invoke the tactic mode by inserting a ``by``
-block. The following is a somewhat toy example:
+Leanの証明記述構文の優れている点のひとつは、項スタイルの証明とタクティクスタイルの証明をミックスさせて、その間を自由に行き来できることだ。例えば、``apply`` タクティクや ``exact`` タクティクは ``have`` や ``show`` などを使って書かれた任意の型の項を受け取ることができる。逆に、Leanで任意の項を書くときは、``by`` キーワードを挿入することで、いつでもタクティクモードを呼び出すことができる。以下はその例である:
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
@@ -721,7 +634,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
       | inr hr => exact Or.inr ⟨hp, hr⟩
 ```
 
-The following is a more natural example:
+次はより自然な例である:
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -736,10 +649,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
     | inr hpr => exact ⟨hpr.left, Or.inr hpr.right⟩
 ```
 
-In fact, there is a ``show`` tactic, which is similar to the
-``show`` expression in a proof term. It simply declares the type of the
-goal that is about to be solved, while remaining in tactic
-mode.
+実際、``show`` タクティクというものがあり、これは項スタイルの証明の ``show`` 式に似ている。これは、タクティクモードの中で、解こうとしているゴールのターゲットの型を宣言するだけのタクティクである。
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -762,15 +672,21 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
       exact ⟨hpr.left, Or.inr hpr.right⟩
 ```
 
-The ``show`` tactic can actually be used to rewrite a goal to something definitionally equivalent:
+実は、``show`` タクティクは、ゴールのターゲットをdefinitionally equalな他の表現に書き換えるために使うことができる:
 
 ```lean
 example (n : Nat) : n + 1 = Nat.succ n := by
+  -- goal is n: Nat ⊢ n + 1 = Nat.succ n
   show Nat.succ n = Nat.succ n
+  -- goal is n: Nat ⊢ Nat.succ n = Nat.succ n
+  rfl
+
+example (n : Nat) : n + 1 = Nat.succ n := by
+  -- goal is n: Nat ⊢ n + 1 = Nat.succ n
   rfl
 ```
 
-There is also a ``have`` tactic, which introduces a new subgoal, just as when writing proof terms:
+項スタイルの証明のときと同様に、``have`` タクティクは、宣言した型の項を作るというサブゴールを導入する:
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
@@ -787,8 +703,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
     exact hpr
 ```
 
-As with proof terms, you can omit the label in the ``have`` tactic, in
-which case, the default label ``this`` is used:
+項スタイルの証明のときと同様に、``have`` タクティクでは項に付けるラベルを省略することもできる。その場合、デフォルトのラベル ``this`` が使われる:
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
@@ -805,10 +720,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
     exact this
 ```
 
-The types in a ``have`` tactic can be omitted, so you can write ``have
-hp := h.left`` and ``have hqr := h.right``.  In fact, with this
-notation, you can even omit both the type and the label, in which case
-the new fact is introduced with the label ``this``.
+``have`` タクティクでは型も省略することができる。したがって、``have hp := h.left`` や ``have hqr := h.right`` と書くことができる。これらの省略記法を用いると、``have`` タクティクにおいて型とラベルの両方を省略することさえできる。その場合、新しい項にはデフォルトのラベル ``this`` が使われる。
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
@@ -822,10 +734,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
     apply Or.inr; exact this
 ```
 
-Lean also has a ``let`` tactic, which is similar to the ``have``
-tactic, but is used to introduce local definitions instead of
-auxiliary facts. It is the tactic analogue of a ``let`` in a proof
-term.
+Leanには ``let`` タクティクもある。これは ``have`` タクティクに似ているが、``have`` タクティクが補助的な事実を導入するのに対して、``let`` タクティクは局所的な定義を導入する。これは項スタイルの証明における ``let`` に類似したタクティクである。
 
 ```lean
 example : ∃ x, x + 2 = 8 := by
@@ -833,18 +742,9 @@ example : ∃ x, x + 2 = 8 := by
   exists a
 ```
 
-As with ``have``, you can leave the type implicit by writing ``let a
-:= 3 * 2``. The difference between ``let`` and ``have`` is that
-``let`` introduces a local definition in the context, so that the
-definition of the local declaration can be unfolded in the proof.
+``have`` と同様に、``let a := 3 * 2`` と書くことで、型を暗黙のままにすることができる。``let`` と ``have`` の違いは、``let`` はコンテキストの中でローカルな定義を導入することである。ローカルに宣言された定義はその証明の中で展開することができる。
 
-We have used ``.`` to create nested tactic blocks.  In a nested block,
-Lean focuses on the first goal, and generates an error if it has not
-been fully solved at the end of the block. This can be helpful in
-indicating the separate proofs of multiple subgoals introduced by a
-tactic. The notation ``.`` is whitespace sensitive and relies on the indentation
-to detect whether the tactic block ends. Alternatively, you can
-define tactic blocks using curly braces and semicolons.
+先ほど、``.`` を使って入れ子のタクティクブロックを作成した。入れ子のブロックの中では、Leanは最初のゴールに注目し、そのブロックの最後でそのゴールが完全に解決されていなければエラーを生成する。これは、タクティクによって導入された複数のサブゴールを一つ一つ証明するのに便利である。``.`` 記法はインデントに敏感である。なぜなら、インデントを見て各タクティクブロックが終了したかどうかを検知するからである。あるいは、波括弧とセミコロンを使ってタクティクブロックを表すこともできる。
 
 ```lean
 example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
@@ -865,11 +765,7 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
       exact ⟨hpr.left, Or.inr hpr.right⟩ } }
 ```
 
-It is useful to use indentation to structure proof: every time a tactic
-leaves more than one subgoal, we separate the remaining subgoals by
-enclosing them in blocks and indenting.  Thus if the application of
-theorem ``foo`` to a single goal produces four subgoals, one would
-expect the proof to look like this:
+証明を構造化するためにインデントを使うと便利である: タクティクが2つ以上のサブゴールを残すたびに、残りのサブゴールをブロックで囲んでインデントして分離するとよい。もし定理 ``foo`` の適用が1つのゴールから4つのサブゴールを生成するなら、証明の見た目は次のようになるだろう:
 
 ```
   apply foo
@@ -879,7 +775,7 @@ expect the proof to look like this:
   . <proof of final goal>
 ```
 
-or
+あるいは
 
 ```
   apply foo
@@ -889,7 +785,7 @@ or
   case <tag of final goal>  => <proof of final goal>
 ```
 
-or
+あるいは
 
 ```
   apply foo
@@ -899,34 +795,27 @@ or
   { <proof of final goal>  }
 ```
 
-Tactic Combinators
-------------------
+## Tactic Combinators (タクティク結合子)
 
-*Tactic combinators* are operations that form new tactics from old
-ones. A sequencing combinator is already implicit in the ``by`` block:
+*Tactic combinators*(タクティク結合子) は既存のタクティクから新しいタクティクを作る。逐次結合子 ``;`` は ``by`` ブロックの中で既に暗黙のうちに使われている:
 
 ```lean
 example (p q : Prop) (hp : p) : p ∨ q :=
   by apply Or.inl; assumption
 ```
 
-Here, ``apply Or.inl; assumption`` is functionally equivalent to a
-single tactic which first applies ``apply Or.inl`` and then applies
-``assumption``.
+ここで、``apply Or.inl; assumption`` はまず単一のタクティク ``apply Or.inl`` を使ってから ``assumption`` を使うのと機能的に同等である。
 
-In ``t₁ <;> t₂``, the ``<;>`` operator provides a *parallel* version of the sequencing operation:
-``t₁`` is applied to the current goal, and then ``t₂`` is applied to *all* the resulting subgoals:
+``t₁ <;> t₂`` において、結合子 ``<;>`` は逐次結合子の「パラレル」版である: まず ``t₁`` が現在のゴールに適用される。それから ``t₂`` がサブゴール「全て」に適用される。
 
 ```lean
 example (p q : Prop) (hp : p) (hq : q) : p ∧ q :=
   by constructor <;> assumption
 ```
 
-This is especially useful when the resulting goals can be finished off
-in a uniform way, or, at least, when it is possible to make progress
-on all of them uniformly.
+この方法は、``t₁`` の適用の結果得られるサブゴールが一様の形式を持つ場合、あるいは少なくとも、全てのゴールを一様な方法で進めることができる場合に特に有効である。
 
-The ``first | t₁ | t₂ | ... | tₙ`` applies each `tᵢ` until one succeeds, or else fails:
+``first | t₁ | t₂ | ... | tₙ`` はどれか一つが成功するまで各 ``tᵢ`` を適用する。その全てが成功しなかったら失敗する:
 
 ```lean
 example (p q : Prop) (hp : p) : p ∨ q := by
@@ -936,8 +825,7 @@ example (p q : Prop) (hq : q) : p ∨ q := by
   first | apply Or.inl; assumption | apply Or.inr; assumption
 ```
 
-In the first example, the left branch succeeds, whereas in the second one, it is the right one that succeeds.
-In the next three examples, the same compound tactic succeeds in each case.
+最初の例では左のタクティクが成功し、2番目の例では右のタクティクが成功している。次の3つの例では、いずれも同じ複合タクティクにより証明が成功している。
 
 ```lean
 example (p q r : Prop) (hp : p) : p ∨ q ∨ r :=
@@ -948,35 +836,34 @@ example (p q r : Prop) (hq : q) : p ∨ q ∨ r :=
 
 example (p q r : Prop) (hr : r) : p ∨ q ∨ r :=
   by repeat (first | apply Or.inl; assumption | apply Or.inr | assumption)
+
+/- repeat と first を使わなかった場合 -/
+
+example (p q r : Prop) (hp : p) : p ∨ q ∨ r :=
+  by apply Or.inl; assumption
+
+example (p q r : Prop) (hq : q) : p ∨ q ∨ r :=
+  by apply Or.inr
+     apply Or.inl; assumption
+
+example (p q r : Prop) (hr : r) : p ∨ q ∨ r :=
+  by apply Or.inr
+     apply Or.inr
+     assumption
 ```
 
-The tactic tries to solve the left disjunct immediately by assumption;
-if that fails, it tries to focus on the right disjunct; and if that
-doesn't work, it invokes the assumption tactic.
+このタクティクはまず選言命題の左側をターゲットにし、それを ``assumption`` で解こうとする。それが失敗したら、選言命題の右側に注目する。もしそれも失敗したら、``assumption`` タクティクを呼び出す。
 
-You will have no doubt noticed by now that tactics can fail. Indeed,
-it is the "failure" state that causes the *first* combinator to
-backtrack and try the next tactic. The ``try`` combinator builds a
-tactic that always succeeds, though possibly in a trivial way:
-``try t`` executes ``t`` and reports success, even if ``t`` fails. It is
-equivalent to ``first | t | skip``, where ``skip`` is a tactic that does
-nothing (and succeeds in doing so). In the next example, the second
-``constructor`` succeeds on the right conjunct ``q ∧ r`` (remember that
-disjunction and conjunction associate to the right) but fails on the
-first. The ``try`` tactic ensures that the sequential composition
-succeeds.
+もう気付いているだろうが、タクティクは失敗することがある。実際、``first`` 結合子がバックトラックして次のタクティクを試すのは、一番最初のタクティクが「失敗」したときである。``try`` 結合子は、つまらないかもしれない方法によって、常に成功するタクティクを構築する: ``try t`` は ``t`` を実行し、たとえ ``t`` が失敗しても成功したと報告する。``try t`` は ``first | t | skip`` と等価である。ここで、``skip`` は何もせず、そして何もしないことで成功するタクティクである。次の例では、2番目の ``constructor`` は連言の右側 ``q ∧ r`` については成功するが、連言の左側 ``p`` については失敗する (連言と選言は右結合的であることを覚えておこう)。``try`` タクティクは逐次結合されたタクティクが成功することを保証する。
 
 ```lean
 example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
   constructor <;> (try constructor) <;> assumption
 ```
 
-Be careful: ``repeat (try t)`` will loop forever, because the inner tactic never fails.
+注意: ``try t`` は決して失敗しないため、``repeat (try t)`` は無限にループする。
 
-In a proof, there are often multiple goals outstanding. Parallel
-sequencing is one way to arrange it so that a single tactic is applied
-to multiple goals, but there are other ways to do this. For example,
-``all_goals t`` applies ``t`` to all open goals:
+証明では、複数のゴールが未解決であることがよくある。並列逐次結合子 ``<;>`` は1つのタクティクを複数のゴールに適用する1つの方法だが、他にも方法はある。例えば、``all_goals t`` は全ての未解決のゴールに ``t`` を適用する:
 
 ```lean
 example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
@@ -985,9 +872,7 @@ example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
   all_goals assumption
 ```
 
-In this case, the ``any_goals`` tactic provides a more robust solution.
-It is similar to ``all_goals``, except it succeeds if its argument
-succeeds on at least one goal.
+この例では、``any_goals`` タクティクはよりロバストな解を提供する。タクティク ``any_goals t``は ``all_goals t`` に似ているが、``any_goals t`` は ``t`` が少なくとも1つのゴールで成功すれば成功する。
 
 ```lean
 example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
@@ -996,8 +881,7 @@ example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
   any_goals assumption
 ```
 
-The first tactic in the ``by`` block below repeatedly splits
-conjunctions:
+次の例において、最初のタクティクは連言命題を繰り返し分解する:
 
 ```lean
 example (p q r : Prop) (hp : p) (hq : q) (hr : r) :
@@ -1006,7 +890,7 @@ example (p q r : Prop) (hp : p) (hq : q) (hr : r) :
   all_goals assumption
 ```
 
-In fact, we can compress the full tactic down to one line:
+実際、上記の例の全てのタクティクを一行に詰め込むことができる:
 
 ```lean
 example (p q r : Prop) (hp : p) (hq : q) (hr : r) :
@@ -1014,28 +898,13 @@ example (p q r : Prop) (hp : p) (hq : q) (hr : r) :
   repeat (any_goals (first | constructor | assumption))
 ```
 
-The combinator ``focus t`` ensures that ``t`` only effects the current
-goal, temporarily hiding the others from the scope. So, if ``t``
-ordinarily only effects the current goal, ``focus (all_goals t)`` has
-the same effect as ``t``.
+タクティク ``focus t`` は、他のゴールを一時的にスコープから隠し、``t`` を現在のゴール(一番上のゴール)だけに作用させる。したがって、通常は ``t`` が現在のゴールだけに作用する場合、``focus (all_goals t)`` は ``all_goals`` の機能を打ち消して ``t`` と同じ作用を持つ。
 
-Rewriting
----------
+## Rewriting (書き換え)
 
-The ``rewrite`` tactic (abbreviated ``rw``) and the ``simp`` tactic
-were introduced briefly in [Calculational Proofs](./quantifiers_and_equality.md#calculational-proofs). In this
-section and the next, we discuss them in greater detail.
+[Calculational Proofs (計算的証明)](./quantifiers_and_equality.md#calculational-proofs-計算的証明)の節で、``rewrite`` タクティク(省略版: ``rw``)と ``simp`` タクティクを簡単に紹介した。本節と次節では、これらについてさらに詳しく説明する。
 
-The ``rewrite`` tactic provides a basic mechanism for applying
-substitutions to goals and hypotheses, providing a convenient and
-efficient way of working with equality. The most basic form of the
-tactic is ``rewrite [t]``, where ``t`` is a term whose type asserts an
-equality. For example, ``t`` can be a hypothesis ``h : x = y`` in the
-context; it can be a general lemma, like
-``add_comm : ∀ x y, x + y = y + x``, in which the rewrite tactic tries to find suitable
-instantiations of ``x`` and ``y``; or it can be any compound term
-asserting a concrete or general equation. In the following example, we
-use this basic form to rewrite the goal using a hypothesis.
+``rewrite`` タクティクはターゲットとコンテキストに置換を適用するための基本的なメカニズムであり、等式を扱う便利で効率的な方法を提供する。ことtくてぃくの最も基本的な構文は ``rewrite [t]`` である。ここで、``t`` はある等式が成立することを主張する型である。例えば、仮説 ``h : x = y`` を ``t`` として採用することができる。``t`` は ``add_comm : ∀ x y, x + y = y + x`` のような全称命題でもよい。その場合、``rewrite`` タクティクは ``x`` と ``y`` に対して適切なインスタンスを見つけようとする。あるいは、それが具体的な等式あるいは等式に関する全称命題であれば、``t`` は複合的な項であってもよい。次の例では、仮説を用いてターゲットを書き換えるために基本的な構文 ``rewrite [t]`` を使う。
 
 ```lean
 example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
@@ -1043,10 +912,7 @@ example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 :=
   rw [h₁] -- replace f 0 with 0
 ```
 
-In the example above, the first use of ``rw`` replaces ``k`` with
-``0`` in the goal ``f k = 0``. Then, the second one replaces ``f 0``
-with ``0``. The tactic automatically closes any goal of the form
-``t = t``. Here is an example of rewriting using a compound expression:
+上記の例では、最初の ``rw`` はターゲット ``f k = 0`` 内の ``k`` を ``0`` に置き換え、2番目の ``rw`` はターゲット ``f 0 = 0`` 内の ``f 0`` を ``0`` に置き換えている。このタクティクは ``t = t`` という形の任意のゴールを(``rfl`` を使うまでもなく)自動的に閉じる。次は複合的な項を使った書き換えの例である:
 
 ```lean
 example (x y : Nat) (p : Nat → Prop) (q : Prop) (h : q → x = y)
@@ -1054,35 +920,25 @@ example (x y : Nat) (p : Nat → Prop) (q : Prop) (h : q → x = y)
   rw [h hq]; assumption
 ```
 
-Here, ``h hq`` establishes the equation ``x = y``.
+ここで ``h hq`` は ``x = y`` の証明を構築している。
 
-Multiple rewrites can be combined using the notation ``rw [t_1, ..., t_n]``,
-which is just shorthand for ``rw [t_1]; ...; rw [t_n]``. The previous example can be written as follows:
+``rw [t_1, ..., t_n]`` という記法を使って、複数回の書き換えを1つにまとめることができる。これは ``rw [t_1]; ...; rw [t_n]`` の略記である。この記法を用いると、先ほどの例は次のように書ける:
 
 ```lean
 example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
   rw [h₂, h₁]
 ```
 
-By default, ``rw`` uses an equation in the forward direction, matching
-the left-hand side with an expression, and replacing it with the
-right-hand side. The notation ``←t`` can be used to instruct the
-tactic to use the equality ``t`` in the reverse direction.
+デフォルトでは、``rw`` は等式を順方向に用いる。つまり、書き換え対象の中で ``t`` の左辺とマッチした(全ての)部分項を ``t`` の右辺で置き換える。記法 ``←t`` を使うと、等式 ``t`` を逆向きに使うように指示することができる。つまり、書き換え対象の中で ``t`` の右辺とマッチした部分項を ``t`` の左辺で置き換えることができる。
 
 ```lean
 example (f : Nat → Nat) (a b : Nat) (h₁ : a = b) (h₂ : f a = 0) : f b = 0 := by
   rw [←h₁, h₂]
 ```
 
-In this example, the term ``←h₁`` instructs the rewriter to replace
-``b`` with ``a``. In the editors, you can type the backwards arrow as
-``\l``. You can also use the ascii equivalent, ``<-``.
+この例では、項 ``←h₁`` は ``b`` を ``a`` に置き換えるよう書き換え器に指示する。エディターでは、``\l`` と打つと ``←`` を入力することができる。また、これと等価なアスキー文字列 ``<-`` を使うこともできる。
 
-Sometimes the left-hand side of an identity can match more than one
-subterm in the pattern, in which case the ``rw`` tactic chooses the
-first match it finds when traversing the term. If that is not the one
-you want, you can use additional arguments to specify the appropriate
-subterm.
+用いる等式が全称命題の場合、等式の左辺が書き換え対象内の複数の部分項とマッチすることがある。例えば、書き換え対象が ``a + b + c = a + c + b`` であるとき、``rw [Nat.add_comm]`` は ``a + b`` とも ``a + c`` とも ``a + b + c`` とも ``a + c + b`` ともマッチしうる。その場合、``rw`` タクティクは書き換え対象を走査したときに最初にマッチした部分項を書き換える。それが希望するものではない場合は、追加の引数を与えることでマッチさせたい部分項を指定することができる。
 
 ```lean
 example (a b c : Nat) : a + b + c = a + c + b := by
@@ -1095,19 +951,9 @@ example (a b c : Nat) : a + b + c = a + c + b := by
   rw [Nat.add_assoc, Nat.add_assoc, Nat.add_comm _ b]
 ```
 
-In the first example above, the first step rewrites ``a + b + c`` to
-``a + (b + c)``. The next step applies commutativity to the term
-``b + c``; without specifying the argument, the tactic would instead rewrite
-``a + (b + c)`` to ``(b + c) + a``. Finally, the last step applies
-associativity in the reverse direction, rewriting ``a + (c + b)`` to
-``a + c + b``. The next two examples instead apply associativity to
-move the parenthesis to the right on both sides, and then switch ``b``
-and ``c``. Notice that the last example specifies that the rewrite
-should take place on the right-hand side by specifying the second
-argument to ``Nat.add_comm``.
+上記の最初の例では、最初のステップで ``a + b + c`` を ``a + (b + c)`` に書き換えている。次のステップでは、項 ``b + c`` に可換性を適用している。ここで、引数 ``b`` を指定しなければ、``a + (b + c)`` が ``(b + c) + a`` に書き換えられていただろう。最後に、結合性を逆向きに使うことで ``a + (c + b)`` を ``a + c + b`` に書き換えている。次の2つの例では、まず結合性を2回使って両辺の括弧を右に寄せ、それから ``b`` と ``c`` を入れ替えている。最後の例では、``Nat.add_comm`` の第2引数を指定することで、左辺ではなく右辺の書き換えを指示していることに注意してほしい。
 
-By default, the ``rewrite`` tactic affects only the goal. The notation
-``rw [t] at h`` applies the rewrite ``t`` at hypothesis ``h``.
+デフォルトでは、``rw`` タクティクはゴールのターゲットだけに影響する。``rw [t] at h`` という記法は、仮説 ``h`` に ``t`` による書き換えを適用する。
 
 ```lean
 example (f : Nat → Nat) (a : Nat) (h : a + 0 = 0) : f a = f 0 := by
@@ -1115,11 +961,9 @@ example (f : Nat → Nat) (a : Nat) (h : a + 0 = 0) : f a = f 0 := by
   rw [h]
 ```
 
-The first step, ``rw [Nat.add_zero] at h``, rewrites the hypothesis ``a + 0 = 0`` to ``a = 0``.
-Then the new hypothesis ``a = 0`` is used to rewrite the goal to ``f 0 = f 0``.
+最初のステップでは、``rw [Nat.add_zero] at h`` が仮説 ``h`` の型を ``a + 0 = 0`` から ``a = 0`` に書き換えている。それからターゲットを ``f 0 = f 0`` に書き換えるために ``h : a = 0`` が用いられている。
 
-The ``rewrite`` tactic is not restricted to propositions.
-In the following example, we use ``rw [h] at t`` to rewrite the hypothesis ``t : Tuple α n`` to ``t : Tuple α 0``.
+``rewrite`` タクティクは命題だけにとどまらず変数の型を書き換えることもできる。次の例では、``rw [h] at t`` が仮説 ``t : Tuple α n`` の型を ``t : Tuple α 0`` に書き換えている。
 
 ```lean
 def Tuple (α : Type) (n : Nat) :=
@@ -1130,14 +974,9 @@ example (n : Nat) (h : n = 0) (t : Tuple α n) : Tuple α 0 := by
   exact t
 ```
 
-Using the Simplifier
---------------------
+## Using the Simplifier (単純化器の使用)
 
-Whereas ``rewrite`` is designed as a surgical tool for manipulating a
-goal, the simplifier offers a more powerful form of automation. A
-number of identities in Lean's library have been tagged with the
-``[simp]`` attribute, and the ``simp`` tactic uses them to iteratively
-rewrite subterms in an expression.
+``rewrite`` タクティクがゴールを操作するために特化したツールとして設計されているのに対し、*simplifier*(単純化器) はより強力な自動化を提供する。Leanのライブラリには、``[simp]`` 属性が付けられた恒等式が多数収載されており、``simp`` タクティクはそれらを使って単純化対象内の部分項を繰り返し書き換える。
 
 ```lean
 example (x y z : Nat) : (x + 0) * (0 + y * 1 + z * 0) = x * y := by
@@ -1148,13 +987,7 @@ example (x y z : Nat) (p : Nat → Prop) (h : p (x * y))
   simp; assumption
 ```
 
-In the first example, the left-hand side of the equality in the goal
-is simplified using the usual identities involving 0 and 1, reducing
-the goal to ``x * y = x * y``. At that point, ``simp`` applies
-reflexivity to finish it off. In the second example, ``simp`` reduces
-the goal to ``p (x * y)``, at which point the assumption ``h``
-finishes it off. Here are some more examples
-with lists:
+最初の例では、ターゲットの等式の左辺は、0と1を含む普通の恒等式を使って単純化され、ターゲットは ``x * y = x * y`` となる。この時点で、``simp`` は反射律を用いてゴールを閉じる。2番目の例では、``simp`` がゴールを ``p (x * y)`` に簡約し、その時点で ``h`` がゴールを閉じる。次はリストに関する例である:
 
 ```lean
 open List
@@ -1168,7 +1001,9 @@ example (xs ys : List α)
   simp [Nat.add_comm]
 ```
 
-As with ``rw``, you can use the keyword ``at`` to simplify a hypothesis:
+ここで、``simp [t]`` は ``[simp]`` 属性が付けられた恒等式に加えて ``t`` を用いて単純化対象を書き換える。
+
+``rw`` と同様に、キーワード ``at`` を使うとコンテキスト内の仮説を単純化することができる:
 
 ```lean
 example (x y z : Nat) (p : Nat → Prop)
@@ -1176,7 +1011,7 @@ example (x y z : Nat) (p : Nat → Prop)
   simp at h; assumption
 ```
 
-Moreover, you can use a "wildcard" asterisk to simplify all the hypotheses and the goal:
+さらに、「ワイルドカード」``*`` を使うと、コンテキスト内の全ての仮説とターゲットを単純化することができる:
 
 ```lean
 attribute [local simp] Nat.mul_comm Nat.mul_assoc Nat.mul_left_comm
@@ -1192,43 +1027,23 @@ example (x y z : Nat) (p : Nat → Prop)
   simp at * <;> constructor <;> assumption
 ```
 
-For operations that are commutative and associative, like
-multiplication on the natural numbers, the simplifier uses these two
-facts to rewrite an expression, as well as *left commutativity*. In
-the case of multiplication the latter is expressed as follows:
-``x * (y * z) = y * (x * z)``. The ``local`` modifier tells the simplifier
-to use these rules in the current file (or section or namespace, as
-the case may be). It may seem that commutativity and
-left-commutativity are problematic, in that repeated application of
-either causes looping. But the simplifier detects identities that
-permute their arguments, and uses a technique known as *ordered
-rewriting*. This means that the system maintains an internal ordering
-of terms, and only applies the identity if doing so decreases the
-order. With the three identities mentioned above, this has the effect
-that all the parentheses in an expression are associated to the right,
-and the expressions are ordered in a canonical (though somewhat
-arbitrary) way. Two expressions that are equivalent up to
-associativity and commutativity are then rewritten to the same
-canonical form.
+自然数の乗法のような可換性と結合性を満たす演算の場合、単純化器は可換性と結合性に加えて *left commutativity*(左結合性) を用いて式を書き換える。乗法の場合、左結合性は次のように表される: ``x * (y * z) = y * (x * z)``。``local`` 修飾子は、現在のファイル(あるいはセクションや名前空間)内でこれらの規則を使用するように単純化器に指示する。可換性と左可換性は、どちらか片方を繰り返し適用するとループが生じるという点で問題があるように思えるかもしれない。しかし、単純化器は引数を並べ替える恒等式を検出し、*ordered rewriting*(順序付き書き換え) として知られるテクニックを使用する。これは、システムが項の内部的な順序を保持し、項の順序が小さくなる場合にのみ恒等式を適用することを意味する。上記の可換性、結合性、左結合性の恒等式は全て、部分項中の括弧を右に寄せるという効果を持つ。そのため、項を(多少恣意的ではあるが)正規化された順序で並べることができる。したがって、結合性と可換性の下で等価な式は、同じ正規形に書き換えられる。
 
 ```lean
-# attribute [local simp] Nat.mul_comm Nat.mul_assoc Nat.mul_left_comm
-# attribute [local simp] Nat.add_assoc Nat.add_comm Nat.add_left_comm
-example (w x y z : Nat) (p : Nat → Prop)
+attribute [local simp] Nat.mul_comm Nat.mul_assoc Nat.mul_left_comm
+attribute [local simp] Nat.add_assoc Nat.add_comm Nat.add_left_comm
+example (w x y z : Nat)
         : x * y + z * w * x = x * w * z + y * x := by
   simp
 
 example (w x y z : Nat) (p : Nat → Prop)
         (h : p (x * y + z * w * x)) : p (x * w * z + y * x) := by
-  simp; simp at h; assumption
+  simp        -- ⊢ p (x * y + w * (x * z))
+  simp at h   -- h: p (x * y + w * (x * z))
+  assumption
 ```
 
-As with ``rewrite``, you can send ``simp`` a list of facts to use,
-including general lemmas, local hypotheses, definitions to unfold, and
-compound expressions. The ``simp`` tactic also recognizes the ``←t``
-syntax that ``rewrite`` does. In any case, the additional rules are
-added to the collection of identities that are used to simplify a
-term.
+``rewrite`` と同様に、``simp [t_1, ..., t_n]`` と書くことで、単純化の際に使用する恒等式のリストに ``t_1`` ... ``t_n`` を追加することができる。追加するものは一般的な補題でも仮説でも定義の展開でも複合的な項でもよい。``simp`` タクティクも ``rewrite`` と同様に ``←t`` 構文を認識する。
 
 ```lean
 def f (m n : Nat) : Nat :=
@@ -1238,22 +1053,21 @@ example {m n : Nat} (h : n = 1) (h' : 0 = m) : (f m n) = n := by
   simp [h, ←h', f]
 ```
 
-A common idiom is to simplify a goal using local hypotheses:
+仮説を用いてゴールを単純化するのがよくある使い方である:
 
 ```lean
 example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
   simp [h₁, h₂]
 ```
 
-To use all the hypotheses present in the local context when
-simplifying, we can use the wildcard symbol, ``*``:
+単純化の際に全ての仮説を使いたい場合は、ワイルドカード記号 ``*`` を使う:
 
 ```lean
 example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
   simp [*]
 ```
 
-Here is another example:
+次は他の例である:
 
 ```lean
 example (u w x y z : Nat) (h₁ : x = y + z) (h₂ : w = u + x)
@@ -1261,10 +1075,7 @@ example (u w x y z : Nat) (h₁ : x = y + z) (h₂ : w = u + x)
   simp [*, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
 ```
 
-The simplifier will also do propositional rewriting. For example,
-using the hypothesis ``p``, it rewrites ``p ∧ q`` to ``q`` and ``p ∨
-q`` to ``true``, which it then proves trivially. Iterating such
-rewrites produces nontrivial propositional reasoning.
+単純化器は命題の書き換えも行う。例えば、仮説 ``hp : p`` を用いて、``p ∧ q`` を ``q`` に、``p v q`` を ``true`` に書き換え、最終的に自明な命題に書き換えられたゴールを閉じる。命題の書き換えを繰り返すことで、非自明な命題推論を行うことができる。
 
 ```lean
 example (p q : Prop) (hp : p) : p ∧ q ↔ q := by
@@ -1277,7 +1088,7 @@ example (p q r : Prop) (hp : p) (hq : q) : p ∧ (q ∨ r) := by
   simp [*]
 ```
 
-The next example simplifies all the hypotheses, and then uses them to prove the goal.
+次の例では、単純化器はコンテキスト内の全ての仮説を単純化し、それらをターゲットに適用しゴールを閉じている。
 
 ```lean
 example (u w x x' y y' z : Nat) (p : Nat → Prop)
@@ -1287,18 +1098,14 @@ example (u w x x' y y' z : Nat) (p : Nat → Prop)
   simp [*]
 ```
 
-One thing that makes the simplifier especially useful is that its
-capabilities can grow as a library develops. For example, suppose we
-define a list operation that symmetrizes its input by appending its
-reversal:
+単純化器の特に便利なところは、ライブラリが発展するにつれてその機能が成長していくところだ。例えば、リスト ``xs`` を受け取ると、``xs`` に反転 ``xs.reverse`` を追加して ``xs`` を対称化するリスト演算 ``mk_symm`` を定義したとしよう:
 
 ```lean
 def mk_symm (xs : List α) :=
   xs ++ xs.reverse
 ```
 
-Then for any list ``xs``, ``reverse (mk_symm xs)`` is equal to ``mk_symm xs``,
-which can easily be proved by unfolding the definition:
+このとき、任意のリスト ``xs`` に対して、``List.reverse (mk_symm xs)`` が ``mk_symm xs`` と等しいことが、定義を展開することで容易に証明できる:
 
 ```lean
 # def mk_symm (xs : List α) :=
@@ -1308,7 +1115,7 @@ theorem reverse_mk_symm (xs : List α)
   simp [mk_symm]
 ```
 
-We can now use this theorem to prove new results:
+``reverse_mk_symm`` が証明された今、新しい定理を証明するために ``reverse_mk_symm`` を使った単純化を用いることができる:
 
 ```lean
 # def mk_symm (xs : List α) :=
@@ -1326,10 +1133,7 @@ example (xs ys : List Nat) (p : List Nat → Prop)
   simp [reverse_mk_symm] at h; assumption
 ```
 
-But using ``reverse_mk_symm`` is generally the right thing to do, and
-it would be nice if users did not have to invoke it explicitly. You can
-achieve that by marking it as a simplification rule when the theorem
-is defined:
+``simp [reverse_mk_symm]`` を使うのは一般的に決して悪いことではないが、ユーザーが明示的にこれを呼び出す必要がない方がなおよいだろう。定理を定義する際に、「これは単純化の際に使う定理だ」とマークすることで明示的な呼び出しの省略を実現できる:
 
 ```lean
 # def mk_symm (xs : List α) :=
@@ -1348,8 +1152,7 @@ example (xs ys : List Nat) (p : List Nat → Prop)
   simp at h; assumption
 ```
 
-The notation ``@[simp]`` declares ``reverse_mk_symm`` to have the
-``[simp]`` attribute, and can be spelled out more explicitly:
+記法 ``@[simp]`` は ``reverse_mk_symm`` が ``[simp]`` 属性を持つことを宣言する。この宣言はより明示的に記述することができる:
 
 ```lean
 # def mk_symm (xs : List α) :=
@@ -1370,7 +1173,7 @@ example (xs ys : List Nat) (p : List Nat → Prop)
   simp at h; assumption
 ```
 
-The attribute can also be applied any time after the theorem is declared:
+定理が宣言された後なら、いつでもその定理に属性を付与することができる:
 
 ```lean
 # def mk_symm (xs : List α) :=
@@ -1391,11 +1194,7 @@ example (xs ys : List Nat) (p : List Nat → Prop)
   simp at h; assumption
 ```
 
-Once the attribute is applied, however, there is no way to permanently
-remove it; it persists in any file that imports the one where the
-attribute is assigned. As we will discuss further in
-[Attributes](./interacting_with_lean.md#attributes), one can limit the scope of an attribute to the
-current file or section using the ``local`` modifier:
+しかし、一度属性が付与されると、それを永続的に削除する方法は**ない**。そして、属性は、その属性が割り当てられているファイルをインポートする全てのファイルに適用される。[Attributes (属性)](./interacting_with_lean.md#attributes-属性)の節で詳しく説明するが、``local`` 修飾子を使えば、属性の適用範囲を現在のファイルやセクションに限定することができる:
 
 ```lean
 # def mk_symm (xs : List α) :=
@@ -1418,21 +1217,11 @@ example (xs ys : List Nat) (p : List Nat → Prop)
 end
 ```
 
-Outside the section, the simplifier will no longer use
-``reverse_mk_symm`` by default.
+``local`` を使った場合、そのセクションの外では、単純化器はデフォルトで ``reverse_mk_symm`` を使わなくなる。
 
-Note that the various ``simp`` options we have discussed --- giving an
-explicit list of rules, and using ``at`` to specify the location --- can be combined,
-but the order they are listed is rigid. You can see the correct order
-in an editor by placing the cursor on the ``simp`` identifier to see
-the documentation string that is associated with it.
+これまで説明してきた様々な ``simp`` のオプション (ルールの明示的なリストを与える、``at`` を使って適用対象を指定するなど) は組み合わせることができるが、オプションを記述する順序は厳格であることに注意してほしい。エディタの中では、``simp`` キーワードにカーソルを合わせて、``simp`` に関連するドキュメントを読むことで、オプションの正しい順序を確認することができる。
 
-There are two additional modifiers that are useful. By default,
-``simp`` includes all theorems that have been marked with the
-attribute ``[simp]``. Writing ``simp only`` excludes these defaults,
-allowing you to use a more explicitly crafted list of
-rules. In the examples below, the minus sign and
-``only`` are used to block the application of ``reverse_mk_symm``.
+さらに2つの便利な修飾子がある。デフォルトでは、``simp`` は属性 ``[simp]`` でマークされた全ての定理を利用する。``simp only`` と書くと、デフォルトで使われる定理は全て除外され、より明確に作られた定理のリストを使うことができる。以下の例では、マイナス記号 ``-`` と ``only`` が ``reverse_mk_symm`` の適用をブロックするために使われている。
 
 ```lean
 def mk_symm (xs : List α) :=
@@ -1457,34 +1246,30 @@ example (xs ys : List Nat) (p : List Nat → Prop)
   simp only [List.reverse_append] at h; assumption
 ```
 
-The `simp` tactic has many configuration options. For example, we can enable contextual simplifications as follows.
+``simp`` タクティクには多くの設定オプションがある。例えば、次のように文脈的な単純化(ターゲットの前件を用いた単純化)を有効にすることができる。
 
 ```lean
 example : if x = 0 then y + x = y else x ≠ 0 := by
   simp (config := { contextual := true })
 ```
 
-when `contextual := true`, `simp` uses the fact that `x = 0` when simplifying `y + x = y`, and
-`x ≠ 0` when simplifying the other branch. Here is another example.
+``contextual := true`` のとき、 ``simp`` は ``y + x = y`` を単純化する際は ``x = 0`` という事実を使い、``x ≠ 0`` を単純化する際には ``x ≠ 0`` を用いる。次は他の例である:
 
 ```lean
 example : ∀ (x : Nat) (h : x = 0), y + x = y := by
   simp (config := { contextual := true })
 ```
 
-Another useful configuration option is `arith := true` which enables arithmetical simplifications. It is so useful
-that `simp_arith` is a shorthand for `simp (config := { arith := true })`.
+もうひとつの便利な設定オプションは、算術的な単純化を可能にする ``arith := true`` である。これは非常に便利なので、``simp_arith`` は ``simp (config := { arith := true })`` の省略形になっている。
 
 ```lean
 example : 0 < 1 + x ∧ x + y + 2 ≥ y + 1 := by
   simp_arith
 ```
 
-Split Tactic
-------------
+## Split Tactic (Splitタクティク)
 
-The ``split`` tactic is useful for breaking nested `if-then-else` and `match` expressions in cases.
-For a `match` expression with `n` cases, the `split` tactic generates at most `n` subgoals. Here is an example.
+``split`` タクティクは、入れ子の ``if-then-else`` 式や ``match`` 式を場合分けするのに便利である。``n`` 個の場合分けを持つ ``match`` 式に対して、``split`` タクティクは最大 ``n`` 個のサブゴールを生成する。次に例を示す:
 
 ```lean
 def f (x y z : Nat) : Nat :=
@@ -1504,7 +1289,7 @@ example (x y z : Nat) : x ≠ 5 → y ≠ 5 → z ≠ 5 → z = w → f x y w = 
   . rfl
 ```
 
-We can compress the tactic proof above as follows.
+上記の例のタクティク証明は次のように短縮することができる。
 
 ```lean
 # def f (x y z : Nat) : Nat :=
@@ -1517,9 +1302,7 @@ example (x y z : Nat) : x ≠ 5 → y ≠ 5 → z ≠ 5 → z = w → f x y w = 
   intros; simp [f]; split <;> first | contradiction | rfl
 ```
 
-The tactic `split <;> first | contradiction | rfl` first applies the `split` tactic,
-and then for each generated goal it tries `contradiction`, and then `rfl` if `contradiction` fails.
-Like `simp`, we can apply `split` to a particular hypothesis.
+タクティク ``split <;> first | contradiction | rfl`` は、まず ``split`` タクティクを適用し、次に生成された各サブゴールに対して ``contradiction`` を試し、それが失敗したら ``rfl`` を試す。``simp`` のように、``split`` をコンテキスト内の特定の仮説に適用することもできる。
 
 ```lean
 def g (xs ys : List Nat) : Nat :=
@@ -1532,16 +1315,12 @@ example (xs ys : List Nat) (h : g xs ys = 0) : False := by
   simp [g] at h; split at h <;> simp_arith at h
 ```
 
-Extensible Tactics
------------------
+## Extensible Tactics (拡張可能なタクティク)
 
-In the following example, we define the notation `triv` using the command `syntax`.
-Then, we use the command `macro_rules` to specify what should
-be done when `triv` is used. You can provide different expansions, and the tactic
-interpreter will try all of them until one succeeds.
+次の例では、コマンド ``syntax`` を使って ``triv`` という記法を定義する。次に、``macro_rules`` コマンドを使って、``triv`` が使われたときの処理を指定する(``triv`` のマクロ展開を指定する)。``triv`` に対して複数のマクロ展開を指定することができ、タクティク解釈器はどれかが成功するまで全てのマクロ展開を試す。
 
 ```lean
--- Define a new tactic notation
+-- 新しい記法を定義する
 syntax "triv" : tactic
 
 macro_rules
@@ -1550,12 +1329,12 @@ macro_rules
 example (h : p) : p := by
   triv
 
--- You cannot prove the following theorem using `triv`
+-- 現時点では、`triv` を使って次の定理を証明することはできない
 -- example (x : α) : x = x := by
 --  triv
 
--- Let's extend `triv`. The tactic interpreter
--- tries all possible macro extensions for `triv` until one succeeds
+-- `triv` を拡張しよう。タクティク解釈器はどれかが成功するまで
+-- `triv` のための全てのマクロ展開を試す
 macro_rules
   | `(tactic| triv) => `(tactic| rfl)
 
@@ -1565,23 +1344,18 @@ example (x : α) : x = x := by
 example (x : α) (h : p) : x = x ∧ p := by
   apply And.intro <;> triv
 
--- We now add a (recursive) extension
+-- (再帰的な)マクロ展開を追加する
 macro_rules | `(tactic| triv) => `(tactic| apply And.intro <;> triv)
 
 example (x : α) (h : p) : x = x ∧ p := by
   triv
 ```
 
-Exercises
----------
+## Exercises (練習問題)
 
-1. Go back to the exercises in [Chapter Propositions and
-Proofs](./propositions_and_proofs.md) and
-[Chapter Quantifiers and Equality](./quantifiers_and_equality.md) and
-redo as many as you can now with tactic proofs, using also ``rw``
-and ``simp`` as appropriate.
+1. [3章 Propositions and Proofs (命題と証明)](./propositions_and_proofs.md) と [4章 Quantifiers and Equality (量化子と等号)](./quantifiers_and_equality.md) に戻り、タクティク証明を用いて出来るだけ多くの練習問題を解き直せ。``rw`` と ``simp`` も適切に使うこと。
 
-2. Use tactic combinators to obtain a one line proof of the following:
+2. タクティク結合子を使って、次の定理の証明を1行で書け:
 
 ```lean
 example (p q r : Prop) (hp : p)

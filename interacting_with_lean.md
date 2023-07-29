@@ -1,62 +1,28 @@
-Interacting with Lean
-=====================
+# Interacting with Lean (Leanとの対話)
 
-You are now familiar with the fundamentals of dependent type theory,
-both as a language for defining mathematical objects and a language
-for constructing proofs. The one thing you are missing is a mechanism
-for defining new data types. We will fill this gap in the next
-chapter, which introduces the notion of an *inductive data type*. But
-first, in this chapter, we take a break from the mechanics of type
-theory to explore some pragmatic aspects of interacting with Lean.
+数学的オブジェクトを定義するための言語としての、そして証明を構築するための言語としての依存型理論の基本は理解していただけただろう。読者がまだ手にしていないのは、新しいデータ型を定義する方法である。このギャップを埋めるため、次の章では*inductive data type*(帰納データ型)の概念を紹介する。その前に、この章では型理論そのものの説明は一旦お休みして、Leanのコードを書く際の実用的な機能について学ぶ。
 
-Not all of the information found here will be useful to you right
-away. We recommend skimming this section to get a sense of Lean's
-features, and then returning to it as necessary.
+ここに掲載されている情報の全てが、すぐ役に立つとは限らない。この章は軽く読んでLeanの特徴を掴み、後で必要に応じて戻ってくることをお勧めする。
 
-Importing Files
----------------
+## Importing Files (ファイルのインポート)
 
-The goal of Lean's front end is to interpret user input, construct
-formal expressions, and check that they are well formed and type
-correct. Lean also supports the use of various editors, which provide
-continuous checking and feedback. More information can be found on the
-Lean [documentation pages](http://leanprover.github.io/documentation/).
+Leanのフロントエンドの目的は、ユーザーの入力を解釈し、形式的な式を構築し、そしてそれらが正しい構文規則に従っており、正しく片付けされることをチェックすることである。Leanは様々なエディタでの使用をサポートしており、ユーザーはエディタ上で継続的なチェックとフィードバックを受けることができる。詳しくはLeanの[documentation pages](http://leanprover.github.io/documentation/)を参照してほしい。
 
-The definitions and theorems in Lean's standard library are spread
-across multiple files. Users may also wish to make use of additional
-libraries, or develop their own projects across multiple files. When
-Lean starts, it automatically imports the contents of the library
-``Init`` folder, which includes a number of fundamental definitions
-and constructions. As a result, most of the examples we present here
-work "out of the box."
+Leanの標準ライブラリの定義と定理は複数のファイルに散在している。ユーザーは追加のライブラリを使用したり、複数のファイルからなる独自のプロジェクトを開発することができる。Leanが起動すると、ライブラリの ``Init`` フォルダの内容が自動的にインポートされる。``Init`` フォルダには基本的な定義や構文が多数含まれている。その結果、ここで紹介する例のほとんどは追加設定なしでそのまま動作する。
 
-If you want to use additional files, however, they need to be imported
-manually, via an ``import`` statement at the beginning of a file. The
-command
+しかし、追加ファイルを使いたい場合は、ファイルの先頭に ``import`` 文を書いて手動でインポートする必要がある。コマンド
 
 ```
 import Bar.Baz.Blah
 ```
 
-imports the file ``Bar/Baz/Blah.olean``, where the descriptions are
-interpreted relative to the Lean *search path*. Information as to how
-the search path is determined can be found on the
-[documentation pages](http://leanprover.github.io/documentation/).
-By default, it includes the standard library directory, and (in some contexts)
-the root of the user's local project. One can also specify imports relative to the current directory; for example,
-importing is transitive. In other words, if you import ``Foo`` and ``Foo`` imports ``Bar``,
-then you also have access to the contents of ``Bar``, and do not need to import it explicitly.
+は ``Bar/Baz/Blah.olean`` ファイルを読み込む(``.olean`` はコンパイル済のLeanファイルの拡張子である)。このコマンドにおいて、``Bar.Baz.Blah`` はLeanの*search path*(検索パス)からの相対パスとして解釈される。検索パスがどのように決定されるかについては、[documentation pages](http://leanprover.github.io/documentation/)を参照してほしい。デフォルトでは、標準ライブラリディレクトリと、場合によってはユーザーのローカルプロジェクトのルートが検索パスに含まれる。カレントディレクトリからの相対パスでインポートファイルを指定することもできる。
 
-More on Sections
-----------------
+インポートは「推移的」である。言い換えれば、``Foo`` をインポートして、``Foo`` が ``Bar`` をインポートする場合、``Bar`` の内容にもアクセスできるようになる。したがって、``Bar`` を明示的にインポートする必要はない。
 
-Lean provides various sectioning mechanisms to help structure a
-theory. You saw in [Variables and Sections](./dependent_type_theory.md#variables_and_sections) that the
-``section`` command makes it possible not only to group together
-elements of a theory that go together, but also to declare variables
-that are inserted as arguments to theorems and definitions, as
-necessary. Remember that the point of the `variable` command is to
-declare variables for use in theorems, as in the following example:
+## More on Sections (セクションの詳細)
+
+Leanは理論の構造化を手助けするために、様々なセクション分けの仕組みを提供している。[Variables and Sections (変数とセクション)](./dependent_type_theory.md#variables-and-sections-変数とセクション)の節で、``section`` コマンドを使うことで、理論の要素をグループ化できるだけでなく、必要に応じて定理や定義の引数として挿入される変数のスコープを区切ることができることを説明した。``variable`` コマンドのポイントは、次の例のように、定理で使う変数を宣言できることであることを思い出してほしい:
 
 ```lean
 section
@@ -81,23 +47,11 @@ theorem t2 : double (x * y) = double x * y := by
 end
 ```
 
-The definition of ``double`` does not have to declare ``x`` as an
-argument; Lean detects the dependence and inserts it
-automatically. Similarly, Lean detects the occurrence of ``x`` in
-``t1`` and ``t2``, and inserts it automatically there, too.
-Note that ``double`` does *not* have ``y`` as argument. Variables are only
-included in declarations where they are actually used.
+``variable (x y : Nat)`` が書かれていれば、``double`` の定義において ``x`` を引数として宣言する必要はない。Leanは ``double`` の定義の中で ``x`` が使われていることを検出し、``(x : Nat)`` を定義の引数に自動的に挿入する。同様に、Leanは ``t1`` と ``t2`` の中に ``x`` と ``y`` が現れることを検出し、 ``(x : Nat)`` と ``(y : Nat)`` を自動的に挿入する。``double`` の定義の中に ``y`` は現れていないため、``double`` は ``y`` を引数として持た**ない**ことに注意してほしい。``variable`` コマンドで宣言された変数は、それらが実際に使用される定義宣言にのみ引数として挿入される。
 
-More on Namespaces
-------------------
+## More on Namespaces (名前空間の詳細)
 
-In Lean, identifiers are given by hierarchical *names* like
-``Foo.Bar.baz``. We saw in [Namespaces](./dependent_type_theory.md#namespaces) that Lean provides
-mechanisms for working with hierarchical names. The command
-``namespace foo`` causes ``foo`` to be prepended to the name of each
-definition and theorem until ``end foo`` is encountered. The command
-``open foo`` then creates temporary *aliases* to definitions and
-theorems that begin with prefix ``foo``.
+Leanでは、識別子(定義や定理や定数の名前)は ``Foo.Bar.baz`` のような*hierarchical names*(階層名)で与えられる。Leanが階層名を扱うためのメカニズムを提供していることは、[Namespaces (名前空間)](./dependent_type_theory.md#namespaces-名前空間)の節で説明した。コマンド ``namespace foo`` は、``end foo``に行き当たるまで、各定義と定理の名前の前に ``foo`` を付加する。コマンド ``open foo`` は、接頭辞 ``foo`` で始まる各定義と定理に、元の「フルネーム」に加えて接頭辞 ``foo`` を除いた一時的な「別名」を与える。
 
 ```lean
 namespace Foo
@@ -110,13 +64,13 @@ open Foo
 #check Foo.bar
 ```
 
-The following definition
+次のような定義
 
 ```lean
 def Foo.bar : Nat := 1
 ```
 
-is treated as a macro, and expands to
+はマクロとして扱われ、次のように展開される。
 
 ```lean
 namespace Foo
@@ -124,12 +78,7 @@ def bar : Nat := 1
 end Foo
 ```
 
-Although the names of theorems and definitions have to be unique, the
-aliases that identify them do not. When we open a namespace, an
-identifier may be ambiguous. Lean tries to use type information to
-disambiguate the meaning in context, but you can always disambiguate
-by giving the full name. To that end, the string ``_root_`` is an
-explicit description of the empty prefix.
+定理や定義の名前は一意でなければならないが、短い「別名」は一意でないことがある。名前空間を開いたとき、識別子の指示対象が曖昧になる可能性がある。Leanは型情報を使って文脈上の意味を曖昧でなくしようとするが、フルネームを記すことで常に曖昧さをなくすことができる。全ての識別子にフルネームを与えるため、空の接頭辞を明示的に記述するための文字列 ``_root_`` が存在する。
 
 ```lean
 def String.add (a b : String) : String :=
@@ -142,7 +91,7 @@ def add (α β : Type) : Type := Sum α β
 
 open Bool
 open String
--- #check add -- ambiguous
+-- #check add -- これは曖昧である
 #check String.add           -- String → String → String
 #check Bool.add             -- Bool → Bool → Bool
 #check _root_.add           -- Type → Type → Type
@@ -152,7 +101,7 @@ open String
 #check add Nat Nat          -- Type
 ```
 
-We can prevent the shorter alias from being created by using the ``protected`` keyword:
+``protected`` キーワードを使って定義を宣言することで、短い別名が作られることを防ぐことができる:
 
 ```lean
 protected def Foo.bar : Nat := 1
@@ -163,10 +112,9 @@ open Foo
 #check Foo.bar
 ```
 
-This is often used for names like ``Nat.rec`` and ``Nat.recOn``, to prevent
-overloading of common names.
+一般的な名前のオーバーロードを防ぐため、``protected`` キーワードは ``Nat.rec`` や ``Nat.recOn`` のような名前にも用いられる。
 
-The ``open`` command admits variations. The command
+``open`` コマンドにはバリエーションがある。コマンド ``open Nat (succ zero gcd)`` は列挙された識別子 ``succ zero gcd`` に対してのみ短い別名を生成する:
 
 ```lean
 open Nat (succ zero gcd)
@@ -174,7 +122,7 @@ open Nat (succ zero gcd)
 #eval gcd 15 6  -- 3
 ```
 
-creates aliases for only the identifiers listed. The command
+コマンド ``open Nat hiding succ gcd`` は、  ``Nat`` 名前空間内の列挙された識別子 ``succ gcd`` を**除く**全てに対して短い別名を生成する:
 
 ```lean
 open Nat hiding succ gcd
@@ -183,47 +131,41 @@ open Nat hiding succ gcd
 #eval Nat.gcd 15 6  -- 3
 ```
 
-creates aliases for everything in the ``Nat`` namespace *except* the identifiers listed.
+コマンド ``open Nat renaming mul → times, add → plus`` は、``Nat.mul`` を ``times`` に、``Nat.add`` を ``plus`` にリネームした上で短い別名を生成する:
 
 ```lean
 open Nat renaming mul → times, add → plus
 #eval plus (times 2 2) 3  -- 7
+-- #eval mul 1 2          -- error
+#eval Nat.mul 1 2         -- 2
 ```
 
-creates aliases renaming ``Nat.mul`` to ``times`` and ``Nat.add`` to ``plus``.
-
-It is sometimes useful to ``export`` aliases from one namespace to another, or to the top level. The command
+ある名前空間から別の名前空間へ、あるいはルートレベルへ別名を ``export`` することは時に便利である。現在の名前空間 ``Foo`` の中で、コマンド ``export Nat (succ add sub)`` は、``Nat.succ``、``Nat.add``、``Nat.sub`` に対して別名 ``Foo.succ``、``Foo.succ``、``Foo.sub`` を生成する。したがって、名前空間が開かれているときは、いつでもこれらの別名を使うことができる。名前空間の外で ``export`` コマンドが使われたときは、短い別名がルートレベルにエクスポートされる。
 
 ```lean
-export Nat (succ add sub)
+namespace Foo
+export And (intro left right)
+
+#check And.intro  -- And.intro {a b : Prop} (left : a) (right : b) : a ∧ b
+#check Foo.intro  -- And.intro {a b : Prop} (left : a) (right : b) : a ∧ b
+#check intro      -- And.intro {a b : Prop} (left : a) (right : b) : a ∧ b
+#check left       -- And.left {a b : Prop} (self : a ∧ b) : a
+end Foo
+
+-- #check intro   -- error
+
+export And (intro left right)
+#check intro      -- And.intro {a b : Prop} (left : a) (right : b) : a ∧ b
+-- #check _root_.intro  -- error
 ```
 
-creates aliases for ``succ``, ``add``, and ``sub`` in the current
-namespace, so that whenever the namespace is open, these aliases are
-available. If this command is used outside a namespace, the aliases
-are exported to the top level.
+``export`` コマンドが上手く機能しない場合は、``protected`` キーワードや属性によって保護されている可能性を考えよう。
 
-Attributes
-----------
+## Attributes (属性)
 
-The main function of Lean is to translate user input to formal
-expressions that are checked by the kernel for correctness and then
-stored in the environment for later use. But some commands have other
-effects on the environment, either assigning attributes to objects in
-the environment, defining notation, or declaring instances of type
-classes, as described in [Chapter Type Classes](./type_classes.md). Most of
-these commands have global effects, which is to say, that they remain
-in effect not only in the current file, but also in any file that
-imports it. However, such commands often support the ``local`` modifier,
-which indicates that they only have effect until
-the current ``section`` or ``namespace`` is closed, or until the end
-of the current file.
+Leanの主な機能はユーザーの入力を形式的な式に翻訳することであり、その形式的な式はカーネルによって正しさがチェックされ、後で使用するために環境に保存される。しかし、いくつかのコマンドは、環境内のオブジェクトに属性を割り当てたり、記法を定義したり、[10章 Type Classes (型クラス)](./type_classes.md)で説明される型クラスのインスタンスを宣言したりと、環境に別の影響を与える。そのようなコマンドのほとんどはグローバルな効果を持つ、つまり現在のファイル内だけでなく、現在のファイルをインポートした任意のファイル内でその効果が持続する。しかしながら、このようなコマンドは ``local`` 修飾子をサポートしていることが多い。``local`` 修飾子を使えば、コマンドの効果を現在のセクションや名前空間が閉じられるまで、あるいは現在のファイルの終わりまでに限定することができる。
 
-In [Section Using the Simplifier](./tactics.md#_using_the_simp),
-we saw that theorems can be annotated with the ``[simp]`` attribute,
-which makes them available for use by the simplifier.
-The following example defines the prefix relation on lists,
-proves that this relation is reflexive, and assigns the ``[simp]`` attribute to that theorem.
+[Using the Simplifier (単純化器の使用)](./tactics.md#using-the-simplifier-単純化器の使用)の節では、定理に ``[simp]`` 属性を付与することで、単純化器がそれらの定理を使用できるようになることを説明した。次の例では、リストの「接頭辞関係」を定義し、この関係が反射的であることを証明し、その定理に ``[simp]`` 属性を割り当てている。
 
 ```lean
 def isPrefix (l₁ : List α) (l₂ : List α) : Prop :=
@@ -236,9 +178,9 @@ example : isPrefix [1, 2, 3] [1, 2, 3] := by
   simp
 ```
 
-The simplifier then proves ``isPrefix [1, 2, 3] [1, 2, 3]`` by rewriting it to ``True``.
+それから、単純化器は ``isPrefix [1, 2, 3] [1, 2, 3]`` を ``True`` に書き換えることでこれを証明している。
 
-One can also assign the attribute any time after the definition takes place:
+定義がなされた後ならいつでも、その定義に属性を割り当てることができる:
 
 ```lean
 # def isPrefix (l₁ : List α) (l₂ : List α) : Prop :=
@@ -249,9 +191,7 @@ theorem List.isPrefix_self (as : List α) : isPrefix as as :=
 attribute [simp] List.isPrefix_self
 ```
 
-In all these cases, the attribute remains in effect in any file that
-imports the one in which the declaration occurs. Adding the ``local``
-modifier restricts the scope:
+``local`` 修飾子を付けなかった場合、属性は、属性の宣言が行われたファイルをインポートするどのファイルにおいても有効である。``local`` 修飾子を付加すると、属性のスコープは制限される:
 
 ```lean
 # def isPrefix (l₁ : List α) (l₂ : List α) : Prop :=
@@ -273,10 +213,7 @@ end
 --  simp
 ```
 
-For another example, we can use the ``instance`` command to assign the
-notation ``≤`` to the `isPrefix` relation. That command, which will
-be explained in [Chapter Type Classes](./type_classes.md), works by
-assigning an ``[instance]`` attribute to the associated definition.
+他の例として、``instance`` コマンドを使うと ``isPrefix`` 関係に ``≤`` という表記を割り当てることができる。[10章 Type Classes (型クラス)](./type_classes.md)で説明するが、``instance`` コマンドは関連する定義に ``[instance]`` 属性を割り当てることで機能する。
 
 ```lean
 def isPrefix (l₁ : List α) (l₂ : List α) : Prop :=
@@ -289,7 +226,7 @@ theorem List.isPrefix_self (as : List α) : as ≤ as :=
   ⟨[], by simp⟩
 ```
 
-That assignment can also be made local:
+``instance`` を用いた表記の割り当てもローカルにすることができる:
 
 ```lean
 # def isPrefix (l₁ : List α) (l₂ : List α) : Prop :=
@@ -310,39 +247,15 @@ end
 --  ⟨[], by simp⟩
 ```
 
-In [Section Notation](#notation) below, we will discuss Lean's
-mechanisms for defining notation, and see that they also support the
-``local`` modifier. However, in [Section Setting Options](#setting_options), we will
-discuss Lean's mechanisms for setting options, which does *not* follow
-this pattern: options can *only* be set locally, which is to say,
-their scope is always restricted to the current section or current
-file.
+後述の[Notation (記法)](#notation-記法)の節では、Leanの記法を定義するメカニズムについて説明し、このメカニズムが ``local`` 修飾子もサポートしていることを確認する。しかし、以下の[Setting Options (オプションの設定)](#setting-options-オプションの設定)の節でLeanのオプション設定のメカニズムを説明するが、これは今までのパターンに従って**いない**: オプションはローカルに設定すること**しかできない**。つまり、オプション設定のスコープは常に現在のセクションかファイルに限定される。
 
-More on Implicit Arguments
---------------------------
+## More on Implicit Arguments (暗黙の引数の詳細)
 
-In [Section Implicit Arguments](./dependent_type_theory.md#implicit_arguments),
-we saw that if Lean displays the type
-of a term ``t`` as ``{x : α} → β x``, then the curly brackets
-indicate that ``x`` has been marked as an *implicit argument* to
-``t``. This means that whenever you write ``t``, a placeholder, or
-"hole," is inserted, so that ``t`` is replaced by ``@t _``. If you
-don't want that to happen, you have to write ``@t`` instead.
+[Implicit Arguments (暗黙の引数)](./dependent_type_theory.md#implicit-arguments-暗黙の引数)の節で、Leanにおいて項 ``t`` の型を ``{x : α} → β x`` と表すとき、波括弧は ``x`` が ``t`` の暗黙の引数であることを表す、と説明した。これは、``t`` が記述されたときは常にその後にプレースホルダー(穴)が挿入されることを、つまり ``t`` が ``@t _`` に置換されることを意味する。それを望まない場合は、 ``t`` の代わりに ``@t`` と書く必要がある。
 
-Notice that implicit arguments are inserted eagerly. Suppose we define
-a function ``f (x : Nat) {y : Nat} (z : Nat)`` with the arguments
-shown. Then, when we write the expression ``f 7`` without further
-arguments, it is parsed as ``f 7 _``. Lean offers a weaker annotation,
-``{{y : Nat}}``, which specifies that a placeholder should only be added
-*before* a subsequent explicit argument. This annotation can also be
-written using as ``⦃y : Nat⦄``, where the unicode brackets are entered
-as ``\{{`` and ``\}}``, respectively. With this annotation, the
-expression ``f 7`` would be parsed as is, whereas ``f 7 3`` would be
-parsed as ``f 7 _ 3``, just as it would be with the strong annotation.
+暗黙の引数は貪欲に、可能な限り挿入されることに注意してほしい。``y`` だけを暗黙の引数にして関数 ``f (x : Nat) {y : Nat} (z : Nat)`` を定義したとする。このとき、2番目以降の引数を書かずに ``f 7`` と書くと、これは構文解析器(パーサ)により ``f 7 _`` とパースされる。Leanは弱い暗黙の引数(より控えめに挿入される暗黙の引数)を指定する記法 ``{{y : Nat}}`` を提供している。これは当該引数の後ろに明示的な引数がある場合にのみ、その明示的な引数の**前に**プレースホルダーを追加することを指定する。この記法は ``⦃y : Nat⦄`` と書くこともでき、このunicode括弧はそれぞれ ``\{{`` と ``\}}`` と打つと入力できる。``f (x : Nat) ⦃y : Nat⦄ (z : Nat)`` と書いた場合、``f 7`` はそのままパースされ、``f 7 3`` は ``f 7 _ 3`` とパースされる。
 
-To illustrate the difference, consider the following example, which
-shows that a reflexive euclidean relation is both symmetric and
-transitive.
+この違いを説明するために、反射的ユークリッド関係が対称的かつ推移的であることを示す次の例を考えてみよう。
 
 ```lean
 def reflexive {α : Type u} (r : α → α → Prop) : Prop :=
@@ -362,33 +275,28 @@ theorem th1 {α : Type u} {r : α → α → Prop}
             : symmetric r :=
   fun {a b : α} =>
   fun (h : r a b) =>
-  show r b a from euclr h (reflr _)
+  show r b a from euclr h (reflr a)
 
 theorem th2 {α : Type u} {r : α → α → Prop}
             (symmr : symmetric r) (euclr : euclidean r)
             : transitive r :=
   fun {a b c : α} =>
   fun (rab : r a b) (rbc : r b c) =>
-  euclr (symmr rab) rbc
+  show r a c from euclr (symmr rab) rbc
 
 theorem th3 {α : Type u} {r : α → α → Prop}
             (reflr : reflexive r) (euclr : euclidean r)
             : transitive r :=
- @th2 _ _ (@th1 _ _ reflr @euclr) @euclr
+ th2 (th1 reflr @euclr) @euclr
 
 variable (r : α → α → Prop)
 variable (euclr : euclidean r)
 
-#check euclr  -- r ?m1 ?m2 → r ?m1 ?m3 → r ?m2 ?m3
+#check @euclr  -- euclidean r
+#check euclr   -- r ?m1 ?m2 → r ?m1 ?m3 → r ?m2 ?m3
 ```
 
-The results are broken down into small steps: ``th1`` shows that a
-relation that is reflexive and euclidean is symmetric, and ``th2``
-shows that a relation that is symmetric and euclidean is
-transitive. Then ``th3`` combines the two results. But notice that we
-have to manually disable the implicit arguments in ``th1``, ``th2``,
-and ``euclr``, because otherwise too many implicit arguments are
-inserted. The problem goes away if we use weak implicit arguments:
+この例は3つの小さなステップからなっている: ``th1`` は反射的かつユークリッド的な関係が対称的であることを示す。``th2`` は対称的かつユークリッド的な関係が推移的であることを示す。そして ``th3`` は2つの定理を組み合わせ、反射的かつユークリッド的な関係が推移的であることを示している。しかし、``th3`` の証明において、``euclr`` の暗黙の引数を手動で無効にしなければならない。そうしなければ、証明中の ``euclr`` に必要以上に多くの暗黙の引数が挿入されてしまうからである。つまり、証明内の ``@euclr`` は命題 ``∀ {a b c : α}, r a b → r a c → r b c`` の証明項である一方で、証明内の ``euclr`` は暗黙の引数 ``a b c : α`` が挿入されてインスタンス化された後の命題 ``r ?m1 ?m2 → r ?m1 ?m3 → r ?m2 ?m3`` の証明項なのである。弱い暗黙の引数を使えばこの問題は解決する:
 
 ```lean
 def reflexive {α : Type u} (r : α → α → Prop) : Prop :=
@@ -408,120 +316,75 @@ theorem th1 {α : Type u} {r : α → α → Prop}
             : symmetric r :=
   fun {a b : α} =>
   fun (h : r a b) =>
-  show r b a from euclr h (reflr _)
+  show r b a from euclr h (reflr a)
 
 theorem th2 {α : Type u} {r : α → α → Prop}
             (symmr : symmetric r) (euclr : euclidean r)
             : transitive r :=
   fun {a b c : α} =>
   fun (rab : r a b) (rbc : r b c) =>
-  euclr (symmr rab) rbc
+  show r a c from euclr (symmr rab) rbc
 
 theorem th3 {α : Type u} {r : α → α → Prop}
             (reflr : reflexive r) (euclr : euclidean r)
             : transitive r :=
-  th2 (th1 reflr euclr) euclr
+ th2 (th1 reflr euclr) euclr
 
 variable (r : α → α → Prop)
 variable (euclr : euclidean r)
 
-#check euclr  -- euclidean r
+#check @euclr  -- euclidean r
+#check euclr   -- euclidean r
 ```
 
-There is a third kind of implicit argument that is denoted with square
-brackets, ``[`` and ``]``. These are used for type classes, as
-explained in [Chapter Type Classes](./type_classes.md).
+角括弧 ``[`` と ``]`` で表される3種類目の暗黙の引数がある。[10章 Type Classes (型クラス)](./type_classes.md)で説明するように、これらは型クラスのために用いられる。
 
-Notation
---------
+## Notation (記法)
 
-Identifiers in Lean can include any alphanumeric characters, including
-Greek characters (other than ∀ , Σ , and λ , which, as we have seen,
-have a special meaning in the dependent type theory). They can also
-include subscripts, which can be entered by typing ``\_`` followed by
-the desired subscripted character.
+Leanの識別子には、ギリシャ文字を含む任意の英数字(依存型理論で特別な意味を持つ∀、Σ、λは除く)を使うことができる。また、``\_`` と打った後に希望の添字を打つことで、添字を入力することもできる。
 
-Lean's parser is extensible, which is to say, we can define new notation.
+Leanのパーサは拡張可能である、つまり、ユーザーは新しい記法を定義することができる。
 
-Lean's syntax can be extended and customized by users at every level,
-ranging from basic "mixfix" notations to custom elaborators.  In fact,
-all builtin syntax is parsed and processed using the same mechanisms
-and APIs open to users.  In this section, we will describe and explain
-the various extension points.
+ユーザーは、Leanの構文を、基本的な*mixfix*記法からユーザーカスタムのelaboratorまで、あらゆるレベルで拡張したりカスタマイズできる。実際、全てのビルトイン構文は、ユーザー向けに提供されているメカニズムやAPIと同じものを使ってパースされ、処理される。この節では、様々な拡張方法について記述し、説明する。
 
-While introducing new notations is a relatively rare feature in
-programming languages and sometimes even frowned upon because of its
-potential to obscure code, it is an invaluable tool in formalization
-for expressing established conventions and notations of the respective
-field succinctly in code.  Going beyond basic notations, Lean's
-ability to factor out common boilerplate code into (well-behaved)
-macros and to embed entire custom domain specific languages (DSLs) to
-textually encode subproblems efficiently and readably can be of great
-benefit to both programmers and proof engineers alike.
+新しい記法を導入することは、プログラミング言語では比較的まれなことであり、コードを不明瞭にする可能性があるため時には嫌われることさえあるが、形式化においては、各分野で確立された慣習や記法をコードで簡潔に表現するための非常に貴重なツールである。基本的な記法にとどまらず、よくある定型的なコードを抽出して(うまく機能する)マクロに落とし込んだり、カスタムされたドメイン固有言語(DSL)全体を組み込んで部分問題を効率的かつ読みやすくテキストにエンコードするLeanの機能は、プログラマーと証明エンジニアの双方にとって大きなベネフィットとなる。
 
-### Notations and Precedence
+### Notations and Precedence (記法と優先順位)
 
-The most basic syntax extension commands allow introducing new (or
-overloading existing) prefix, infix, and postfix operators.
+最も基本的な構文拡張コマンドを使うと、新しい(あるいはオーバーロードされた)前置演算子、中置演算子、後置演算子を導入することができる。
 
 ```lean
-infixl:65   " + " => HAdd.hAdd  -- left-associative
-infix:50    " = " => Eq         -- non-associative
-infixr:80   " ^ " => HPow.hPow  -- right-associative
-prefix:100  "-"   => Neg.neg
-# set_option quotPrecheck false
-postfix:max "⁻¹"  => Inv.inv
+infixl:65   " + " => HAdd.hAdd  -- 左結合的な中置演算子
+infix:50    " = " => Eq         -- 非結合的な中置演算子
+infixr:80   " ^ " => HPow.hPow  -- 右結合的な中置演算子
+prefix:100  "-"   => Neg.neg    -- 前置演算子
+set_option quotPrecheck false
+postfix:max "⁻¹"  => Inv.inv    -- 後置演算子
 ```
 
-After the initial command name describing the operator kind (its
-"fixity"), we give the *parsing precedence* of the operator preceded
-by a colon `:`, then a new or existing token surrounded by double
-quotes (the whitespace is used for pretty printing), then the function
-this operator should be translated to after the arrow `=>`.
+演算子の種類(その「固定位置」)を表す最初のコマンド名とコロン ``:`` の後に、演算子の*parsing precedence*(パース優先順位)を与える。次に新規または既存の記号を二重引用符で囲み(空白はコードの見た目を整えるために使われる)、矢印 ``=>`` の後にこの演算子の変換先の関数を指定する。
 
-The precedence is a natural number describing how "tightly" an
-operator binds to its arguments, encoding the order of operations.  We
-can make this more precise by looking at the commands the above unfold to:
+優先順位とは演算子と引数の結びつきの「強さ」を表す自然数で、演算の順序を表す。上記がマクロ展開されてできるコマンドを見ることで、これらをより正確に理解することができる:
 
 ```lean
 notation:65 lhs:65 " + " rhs:66 => HAdd.hAdd lhs rhs
 notation:50 lhs:51 " = " rhs:51 => Eq lhs rhs
 notation:80 lhs:81 " ^ " rhs:80 => HPow.hPow lhs rhs
 notation:100 "-" arg:100 => Neg.neg arg
-# set_option quotPrecheck false
-notation:1024 arg:1024 "⁻¹" => Inv.inv arg  -- `max` is a shorthand for precedence 1024
+set_option quotPrecheck false
+notation:1024 arg:1024 "⁻¹" => Inv.inv arg  -- ``max`` は優先度1024の略記
 ```
 
-It turns out that all commands from the first code block are in fact
-command *macros* translating to the more general `notation` command.
-We will learn about writing such macros below.  Instead of a single
-token, the `notation` command accepts a mixed sequence of tokens and
-named term placeholders with precedences, which can be referenced on
-the right-hand side of `=>` and will be replaced by the respective
-term parsed at that position.  A placeholder with precedence `p`
-accepts only notations with precedence at least `p` in that place.
-Thus the string `a + b + c` cannot be parsed as the equivalent of
-`a + (b + c)` because the right-hand side operand of an `infixl` notation
-has precedence one greater than the notation itself.  In contrast,
-`infixr` reuses the notation's precedence for the right-hand side
-operand, so `a ^ b ^ c` *can* be parsed as `a ^ (b ^ c)`.  Note that
-if we used `notation` directly to introduce an infix notation like
+最初のコードブロックの全てのコマンドは、実際にはより一般的な ``notation`` コマンドに変換するコマンドマクロであることがわかった。このようなマクロの書き方は後の節で学ぶ。``notation`` コマンドは、単一の記号の代わりに、記号と「優先順位を持つ名前付き項プレースホルダー」を組み合わせたシーケンスを受け付ける。このシーケンスは ``=>`` の右辺で参照され、右辺にあるプレースホルダーはシーケンス内の位置に基づいてパースされた各項によって置換される。優先順位 ``p`` を持つプレースホルダーは、その場所で ``p`` 以上の優先順位を持つ表記のみを受け付ける。したがって、文字列 ``a + b + c`` を ``a + (b + c)`` とパースすることはできない。なぜなら、``infixl`` コマンドの演算子の右辺は、演算子自体よりも優先順位が1大きいからである。対照的に、``infixr`` コマンドの演算子の右辺は、演算子と同じ優先順位を持つ。そのため、``a ^ b ^ c`` は ``a ^ (b ^ c)`` とパースされる。優先順位が結合性を明確に決定しない場合、``notation`` コマンドを直接使って次のような中置演算子を導入すると、Leanはこの演算子をデフォルトで右結合的にパースすることに注意してほしい:
 
 ```lean
 # set_option quotPrecheck false
 notation:65 lhs:65 " ~ " rhs:65 => wobble lhs rhs
 ```
 
-where the precedences do not sufficiently determine associativity,
-Lean's parser will default to right associativity.  More precisely,
-Lean's parser follows a local *longest parse* rule in the presence of
-ambiguous grammars: when parsing the right-hand side of `a ~` in
-`a ~ b ~ c`, it will continue parsing as long as possible (as the current
-precedence allows), not stopping after `b` but parsing `~ c` as well.
-Thus the term is equivalent to `a ~ (b ~ c)`.
+より正確には、曖昧な文法が存在する場合、Leanのパーサはローカルな*longest parse rule*(最長構文解析ルール)に従う: ``a ~ b ~ c`` の中の ``a ~`` の右辺をパースするとき、パーサは(優先順位が許す限り)最も長くパースを続ける。つまり ``b`` をパースした後に停止せず、``~ c`` もパースする。したがって、項 ``a ~ b ~ c`` は ``a ~ (b ~ c)`` と等価である。(Leanのパーサは、あくまで最も左側に位置する演算子から順にパースを試みることに注意してほしい。)
 
-As mentioned above, the `notation` command allows us to define
-arbitrary *mixfix* syntax freely mixing tokens and placeholders.
+上記で言及したように、``notation`` コマンドを使うと、記号とプレースホルダーを自由にミックスした任意の*mixfix*構文を定義することができる。
 
 ```lean
 # set_option quotPrecheck false
@@ -529,28 +392,18 @@ notation:max "(" e ")" => e
 notation:10 Γ " ⊢ " e " : " τ => Typing Γ e τ
 ```
 
-Placeholders without precedence default to `0`, i.e. they accept notations of any precedence in their place.
-If two notations overlap, we again apply the longest parse rule:
+優先順位が明記されていないプレースホルダーの優先順位はデフォルトで ``0`` であり、つまりその位置にある任意の項を受け入れる。2つの記法が重なる場合、再び最長構文解析ルールを適用する。
 
 ```lean
 notation:65 a " + " b:66 " + " c:66 => a + b - c
 #eval 1 + 2 + 3  -- 0
 ```
 
-The new notation is preferred to the binary notation since the latter,
-before chaining, would stop parsing after `1 + 2`.  If there are
-multiple notations accepting the same longest parse, the choice will
-be delayed until elaboration, which will fail unless exactly one
-overload is type correct.
+新しい記法は2項記法よりも優先される。なぜなら後者はパースが連鎖せず、``1 + 2`` をパースしたところで構文解析をやめてしまうからである。最長のパースを受け入れる記法が複数ある場合、どちらが選択されるかはelaborationまで遅延され、ただ1つのオーバーロード記法が正しい型を持つ場合のみ成功し、それ以外の場合は曖昧さを解決できず失敗する。
 
-Coercions
----------
+## Coercions (型強制)
 
-In Lean, the type of natural numbers, ``Nat``, is different from the
-type of integers, ``Int``. But there is a function ``Int.ofNat`` that
-embeds the natural numbers in the integers, meaning that we can view
-any natural number as an integer, when needed. Lean has mechanisms to
-detect and insert *coercions* of this sort.
+Leanでは、自然数の型 ``Nat`` と整数の型 ``Int`` は異なる。しかし、自然数を整数の中に埋め込む ``Int.ofNat`` という関数があり、これを使うと必要なときに自然数を整数に変換することができる。Leanはこの種の型変換の必要性を検出して型変換を実行するメカニズムを持っている。このような自動的な型変換を*coercions*(強制)と呼ぶ。
 
 ```lean
 variable (m n : Nat)
@@ -561,19 +414,9 @@ variable (i j : Int)
 #check i + m + n  -- i + Int.ofNat m + Int.ofNat n : Int
 ```
 
-Displaying Information
-----------------------
+## Displaying Information (情報の表示)
 
-There are a number of ways in which you can query Lean for information
-about its current state and the objects and theorems that are
-available in the current context. You have already seen two of the
-most common ones, ``#check`` and ``#eval``. Remember that ``#check``
-is often used in conjunction with the ``@`` operator, which makes all
-of the arguments to a theorem or definition explicit. In addition, you
-can use the ``#print`` command to get information about any
-identifier. If the identifier denotes a definition or theorem, Lean
-prints the type of the symbol, and its definition. If it is a constant
-or an axiom, Lean indicates that fact, and shows the type.
+Leanに現在の状態や、現在のコンテキストで利用可能なオブジェクトや定理に関する情報を問い合わせる方法はいくつもある。最も一般的なコマンド ``#check`` と ``#eval`` は既に紹介した。``#check`` は ``@`` 記号と一緒に使われることが多く、こうすると定理や定義の引数を暗黙の引数を含めて全て明示することができる。さらに、``#print`` コマンドを使うと、任意の識別子に関する情報を得ることができる。識別子が定義や定理を表す場合、``#print`` コマンドはその識別子の型と定義式を表示する。識別子が定数や公理である場合、``#print`` コマンドは「この識別子は定数(または公理)である」という事実を示し、その型を表示する。
 
 ```lean
 -- examples with equality
@@ -595,29 +438,34 @@ def foo {α : Type u} (x : α) : α := x
 #check foo
 #check @foo
 #print foo
+
+-- axiom example
+#print propext
 ```
 
-Setting Options
----------------
+## Setting Options (オプションの設定)
 
-Lean maintains a number of internal variables that can be set by users
-to control its behavior. The syntax for doing so is as follows:
+Leanは、Leanの動作を制御するためにユーザーが設定することができる内部変数をいくつも保持している。そのための構文は次の通り:
 
 ```
 set_option <name> <value>
 ```
 
-One very useful family of options controls the way Lean's *pretty- printer* displays terms. The following options take an input of true or false:
+非常に便利なオプション群の1つは、Leanの*pretty-printer*(プリティプリンタ)が項を表示する方法を制御する。以下のオプションはtrueかfalseを入力として受け取る:
 
 ```
-pp.explicit  : display implicit arguments
-pp.universes : display hidden universe parameters
-pp.notation  : display output using defined notations
+pp.explicit  : 暗黙の引数を表示する
+pp.universes : 隠れた宇宙パラメータを表示する
+pp.notation  : 定義された記法を用いて出力を表示する
 ```
 
-As an example, the following settings yield much longer output:
+例として、次のように設定すると、かなり長い出力が得られる:
 
 ```lean
+#check 2 + 2 = 4
+#reduce (fun x => x + 2) = (fun x => x + 3)
+#check (fun x => x + 1) 1
+
 set_option pp.explicit true
 set_option pp.universes true
 set_option pp.notation false
@@ -627,83 +475,54 @@ set_option pp.notation false
 #check (fun x => x + 1) 1
 ```
 
-The command ``set_option pp.all true`` carries out these settings all
-at once, whereas ``set_option pp.all false`` reverts to the previous
-values. Pretty printing additional information is often very useful
-when you are debugging a proof, or trying to understand a cryptic
-error message. Too much information can be overwhelming, though, and
-Lean's defaults are generally sufficient for ordinary interactions.
+コマンド ``set_option pp.all true`` はこれらの設定を一度に実行し、``set_option pp.all false`` はこれらのオプションを元の値に戻す。証明をデバッグするときや、不可解なエラーメッセージを理解しようとするときに、付加的な情報を表示させることはしばしば非常に役に立つ。しかし、情報が多すぎると圧倒されるかもしれない。普通にLeanを使う場合はデフォルトの情報表示で一般的には十分である。
 
 <!--
-Elaboration Hints
------------------
+## Elaboration Hints (elaborationのヒント)
 
-When you ask Lean to process an expression like ``λ x y z, f (x + y) z``, you are leaving information implicit. For example, the types of ``x``, ``y``, and ``z`` have to be inferred from the context, the notation ``+`` may be overloaded, and there may be implicit arguments to ``f`` that need to be filled in as well. Moreover, we will see in :numref:`Chapter %s <type_classes>` that some implicit arguments are synthesized by a process known as *type class resolution*. And we have also already seen in the last chapter that some parts of an expression can be constructed by the tactic framework.
+Leanに ``λ x y z, f (x + y) z`` のような式の処理を依頼する場合、暗黙の情報を残していることになる。例えば、``x``、``y``、``z`` の型は文脈から推論する必要があり、``+`` という記法はオーバーロードされている可能性があり、``f`` にも埋める必要のある暗黙の引数があるかもしれない。さらに、[10章 Type Classes (型クラス)](./type_classes.md)では、いくつかの暗黙の引数は*type class resolution*(型クラス解決)として知られているプロセスによって合成されていることが分かる。また、項のいくつかの部分がタクティクフレームワークによって構築されうることも、すでに前章で見てきた。
 
-Inferring some implicit arguments is straightforward. For example, suppose a function ``f`` has type ``Π {α : Type*}, α → α → α`` and Lean is trying to parse the expression ``f n``, where ``n`` can be inferred to have type ``nat``. Then it is clear that the implicit argument ``α`` has to be ``nat``. However, some inference problems are *higher order*. For example, the substitution operation for equality, ``eq.subst``, has the following type:
+いくつかの暗黙の引数を推論するのは簡単である。例えば、ある関数 ``f`` が ``Π {α : Type*}, α → α → α`` という型を持ち、Leanが ``f n`` という項を構文解析しようとしているとする。ここで、``n`` は ``nat`` 型を持つと推論できるとすると、暗黙の引数 ``α`` が ``nat`` でなければならないことは明らかである。しかしながら、いくつかの推論問題は*higher order*(高階)である。例えば、等号の置換演算 ``Eq.subst`` は以下の型を持っている:
 
 .. code-block:: text
 
-    eq.subst : ∀ {α : Sort u} {p : α → Prop} {a b : α},
+    Eq.subst : ∀ {α : Sort u} {p : α → Prop} {a b : α},
                  a = b → p a → p b
 
-Now suppose we are given ``a b : ℕ`` and ``h₁ : a = b`` and ``h₂ : a * b > a``. Then, in the expression ``eq.subst h₁ h₂``, ``P`` could be any of the following:
+ここで、``a b : ℕ`` かつ ``h₁ : a = b`` かつ ``h₂ : a * b > a`` だとすると、``eq.subst h₁ h₂``において、``p`` は以下のいずれにもなりうる:
 
 -  ``λ x, x * b > x``
 -  ``λ x, x * b > a``
 -  ``λ x, a * b > x``
 -  ``λ x, a * b > a``
 
-In other words, our intent may be to replace either the first or second ``a`` in ``h₂``, or both, or neither. Similar ambiguities arise in inferring induction predicates, or inferring function arguments. Even second-order unification is known to be undecidable. Lean therefore relies on heuristics to fill in such arguments, and when it fails to guess the right ones, they need to be provided explicitly.
+言い換えれば、ユーザーの意図は、``h₂`` の1番目か2番目の ``a`` だけを置き換えること、あるいは両方を置き換えること、あるいはどちらも置き換えないことかもしれない。同様の曖昧さは、帰納述語の推論や関数の引数の推論でも生じる。2階のユニフィケーションでさえ決定不可能であることが知られている。したがって、Leanはヒューリスティクスに依存してそのような引数を推論する。そしてLeanが正しい引数を推論できないときは、引数を明示的に与える必要がある。
 
-To make matters worse, sometimes definitions need to be unfolded, and sometimes expressions need to be reduced according to the computational rules of the underlying logical framework. Once again, Lean has to rely on heuristics to determine what to unfold or reduce, and when.
+さらに悪いことに、定義を展開する必要がある場合もあれば、基礎となる論理フレームワークの計算ルールに従って式を簡約化する必要がある場合もある。もう一度言うが、何をいつ展開し、簡約化するかを決めるために、Leanはヒューリスティクスに頼らなければならない。
 
-There are attributes, however, that can be used to provide hints to the elaborator. One class of attributes determines how eagerly definitions are unfolded: constants can be marked with the attribute ``[reducible]``, ``[semireducible]``, or ``[irreducible]``. Definitions are marked ``[semireducible]`` by default. A definition with the ``[reducible]`` attribute is unfolded eagerly; if you think of a definition as serving as an abbreviation, this attribute would be appropriate. The elaborator avoids unfolding definitions with the ``[irreducible]`` attribute. Theorems are marked ``[irreducible]`` by default, because typically proofs are not relevant to the elaboration process.
+しかしながら、elaboratorにヒントを提供するために使用できる属性がある。ある属性群は、定義がどの程度熱心に展開されるかを決定する: 定義・定数(定義された項)には ``[reducible]``、``[semireducible]``、``[irreducible]`` という属性を付けることができる。定義はデフォルトで ``[semireducible]`` とマークされる。``[reducible]`` 属性を付けられた定義は熱心に展開される。もしその定義を省略形として考えるのであれば、``[reducible]`` 属性を付けるのが適切だろう。elaborator は ``[irreducible]`` 属性を持つ定義の展開を避ける。定理はデフォルトで ``[irreducible]`` とマークされる。なぜなら、*proof irrelevance*(証明無関係)の原則により、一般的に証明の中身はelaborationのプロセスに関係ないからである。
 
-It is worth emphasizing that these attributes are only hints to the elaborator. When checking an elaborated term for correctness, Lean's kernel will unfold whatever definitions it needs to unfold. As with other attributes, the ones above can be assigned with the ``local`` modifier, so that they are in effect only in the current section or file.
+これらの属性は、elaboratorへのヒントに過ぎないことを強調しておく。elaborateされた項の正しさをチェックするとき、Leanのカーネルは展開する必要のある定義全てを展開する。他の属性と同様に、上記の属性群は ``local`` 修飾子を付けて指定することができる。そうすれば、これらの属性が現在のセクションまたはファイル内だけで有効になる。
 
-Lean also has a family of attributes that control the elaboration strategy. A definition or theorem can be marked ``[elab_with_expected_type]``, ``[elab_simple]``. or ``[elab_as_eliminator]``. When applied to a definition ``f``, these bear on elaboration of an expression ``f a b c ...`` in which ``f`` is applied to arguments. With the default attribute, ``[elab_with_expected_type]``, the arguments ``a``, ``b``, ``c``, ... are elaborating using information about their expected type, inferred from ``f`` and the previous arguments. In contrast, with ``[elab_simple]``, the arguments are elaborated from left to right without propagating information about their types. The last attribute, ``[elab_as_eliminator]``, is commonly used for eliminators like recursors, induction principles, and ``eq.subst``. It uses a separate heuristic to infer higher-order parameters. We will consider such operations in more detail in the next chapter.
+Leanはelaborationの戦略をコントロールする属性も持っている。定義や定理には ``[elab_with_expected_type]``、``[elab_simple]``、``[elab_as_eliminator]`` のいずれかの属性を付けることができる。これらの属性を定義 ``f`` に付けると、引数に ``f`` を適用した式 ``f a b c ...`` のelaborationを行うことができる。デフォルトの属性である ``[elab_with_expected_type]`` では、引数 ``a``、``b``、``c``、... は、 ``f`` と前の引数から推論される、期待される型に関する情報を使ってelaborateされる。一方、``[elab_simple]`` では、各引数の型に関する情報を後続の引数に伝搬することなく、単に左から右へと引数をelaborateしていく。最後の属性である ``[elab_as_eliminator]`` は、帰納器や帰納法原理、``eq.subst`` などの簡約器のためによく使われる。これは高階のパラメータを推論するために別のヒューリスティクスを使用する。このような操作については、次の章で詳しく説明する。
 
-Once again, these attributes can be assigned and reassigned after an object is defined, and you can use the ``local`` modifier to limit their scope. Moreover, using the ``@`` symbol in front of an identifier in an expression instructs the elaborator to use the ``[elab_simple]`` strategy; the idea is that, when you provide the tricky parameters explicitly, you want the elaborator to weigh that information heavily. In fact, Lean offers an alternative annotation, ``@@``, which leaves parameters before the first higher-order parameter implicit. For example, ``@@eq.subst`` leaves the type of the equation implicit, but makes the context of the substitution explicit.
+繰り返しになるが、これらの属性はオブジェクトが定義された後ならいつでも割り当てや再割り当てが可能であり、``local`` 修飾子を使ってその範囲を制限することができる。さらに、式の中で識別子の前に ``@`` 記号を書くと、Leanは自動でelaboratorに ``[elab_simple]`` 戦略を使うように指示する。これは、トリッキーなパラメータを明示的に提供する場合は、elaboratorにその情報を重視してもらいたいという考え方である。実際、Leanには ``@@`` という代替記号があり、これは最初の高階引数より前の引数を暗黙のままにしておくものである。例えば、``@@Eq.subst`` は等式の型を暗黙のままにするが、代入のコンテキストは明示する。
 
 -->
 
-Using the Library
------------------
+## Using the Library (ライブラリの使用)
 
-To use Lean effectively you will inevitably need to make use of
-definitions and theorems in the library. Recall that the ``import``
-command at the beginning of a file imports previously compiled results
-from other files, and that importing is transitive; if you import
-``Foo`` and ``Foo`` imports ``Bar``, then the definitions and theorems
-from ``Bar`` are available to you as well. But the act of opening a
-namespace, which provides shorter names, does not carry over. In each
-file, you need to open the namespaces you wish to use.
+Leanを効率的に使おうと思ったら、必然的にライブラリにある定義や定理を利用する必要が出てくるだろう。ファイルの先頭に ``import`` コマンドを書くと他のファイルから既にコンパイルされた結果をインポートできることと、インポートは推移的であることを思い出してほしい。現在のファイルが ``Foo`` をインポートし、``Foo`` が ``Bar`` をインポートしているなら、現在のファイルで ``Foo`` のみならず ``Bar`` の定義や定理も利用できる。しかし、名前空間を開くという行為(これによりより短い名前が提供される)はインポート先に引き継がれない。各ファイルで、使用したい名前空間を開く必要がある。
 
-In general, it is important for you to be familiar with the library
-and its contents, so you know what theorems, definitions, notations,
-and resources are available to you. Below we will see that Lean's
-editor modes can also help you find things you need, but studying the
-contents of the library directly is often unavoidable. Lean's standard
-library can be found online, on GitHub:
+一般に、ライブラリとその内容に詳しくなることは重要である。そうすれば、どのような定理、定義、記法、リソースが利用できるかを知ることができる。Leanのエディタモードも必要なものを見つけるのに役に立つが、ライブラリの内容を直接勉強することはしばしば避けられない。Leanの標準ライブラリはGitHubにあり、オンラインで見ることができる:
 
 - [https://github.com/leanprover/lean4/tree/master/src/Init](https://github.com/leanprover/lean4/tree/master/src/Init)
 
 - [https://github.com/leanprover/std4/tree/main/Std](https://github.com/leanprover/std4/tree/main/Std)
 
-You can see the contents of these directories and files using GitHub's
-browser interface. If you have installed Lean on your own computer,
-you can find the library in the ``lean`` folder, and explore it with
-your file manager. Comment headers at the top of each file provide
-additional information.
+GitHubのブラウザインターフェースを使えば、これらのディレクトリやファイルの内容を見ることができる。自分のコンピュータにLeanをインストールした場合は、``lean`` フォルダの中でライブラリ(例えば、``.../.elan/toolchains/leanprover--lean4---nightly/src/lean/Lean``)を見つけて、ファイルマネージャで探索することができる。各ファイルの先頭にあるコメントヘッダは、ファイルに関する追加情報を提供する。
 
-Lean's library developers follow general naming guidelines to make it
-easier to guess the name of a theorem you need, or to find it using
-tab completion in editors with a Lean mode that supports this, which
-is discussed in the next section. Identifiers are generally
-``camelCase``, and types are `CamelCase`. For theorem names,
-we rely on descriptive names where the different components are separated
-by `_`s. Often the name of theorem simply describes the conclusion:
+Leanのライブラリ開発者は一般的な命名ガイドラインに従っている。そのため、ユーザーが必要な定理の名前を推測することや、Leanモードをサポートしているエディタでタブ補完を使って定理を見つけることがより簡単になっている。これらについては次の節で説明する。識別子は通常 ``camelCase`` で、型は ``CamelCase`` で命名される。定理には、異なる構成要素を ``_`` で区切った説明的な名前を宛てている(変数名は省略される)。多くの場合、定理の名前はシンプルに結論だけを表す:
 
 ```lean
 #check Nat.succ_ne_zero
@@ -712,16 +531,7 @@ by `_`s. Often the name of theorem simply describes the conclusion:
 #check Nat.le_of_succ_le_succ
 ```
 
-Remember that identifiers in Lean can be organized into hierarchical
-namespaces. For example, the theorem named ``le_of_succ_le_succ`` in the
-namespace ``Nat`` has full name ``Nat.le_of_succ_le_succ``, but the shorter
-name is made available by the command ``open Nat`` (for names not marked as
-`protected`). We will see in [Chapter Inductive Types](./inductive_types.md)
-and [Chapter Structures and Records](./structures_and_records.md)
-that defining structures and inductive data types in Lean generates
-associated operations, and these are stored in
-a namespace with the same name as the type under definition. For
-example, the product type comes with the following operations:
+Leanにおいて、識別子たちは階層的な名前空間の中で整理できることを覚えてほしい。例えば、名前空間 ``Nat`` の中の ``le_of_succ_le_succ`` という定理は ``Nat.le_of_succ_le_succ`` というフルネームを持っているが、コマンド ``open Nat`` を使うことで、(``protected`` とマークされていない名前については)より短い名前が利用可能になる。Leanにおいて、構造体と帰納データ型を定義すると、定義した型に関連する操作が生成され、それらは定義中の型の名前と同じ名前の名前空間に格納されることは、[7章 Inductive Types (帰納型)](./inductive_types.md)と[9章 Structures and Records (構造体とレコード)](./structures_and_records.md)で説明する。例えば、直積型には以下の操作が付属している:
 
 ```lean
 #check @Prod.mk
@@ -730,16 +540,9 @@ example, the product type comes with the following operations:
 #check @Prod.rec
 ```
 
-The first is used to construct a pair, whereas the next two,
-``Prod.fst`` and ``Prod.snd``, project the two elements. The last,
-``Prod.rec``, provides another mechanism for defining functions on a
-product in terms of a function on the two components. Names like
-``Prod.rec`` are *protected*, which means that one has to use the full
-name even when the ``Prod`` namespace is open.
+``Prod.mk`` はペアを構成するために使われる。一方で、``Prod.fst`` と ``Prod.snd`` はそれぞれ直積の1つ目の要素と2つ目の要素を射影する。``Prod.rec`` は直積の2つの構成要素に対する関数から、直積に対する関数を定義するメカニズムを提供する。``Prod.rec`` のような名前は**保護されて**おり、たとえ ``Prod`` 名前空間が開いているときでもフルネームを使用しなければならない。
 
-With the propositions as types correspondence, logical connectives are
-also instances of inductive types, and so we tend to use dot notation
-for them as well:
+型としての命題対応において、論理的結合子は帰納型のインスタンスである。したがって、論理的結合子に対してドット記法を使うことが多い:
 
 ```lean
 #check @And.intro
@@ -755,12 +558,9 @@ for them as well:
 #check @Eq.subst
 ```
 
-Auto Bound Implicit Arguments
------------------
+## Auto Bound Implicit Arguments (自動束縛暗黙引数)
 
-In the previous section, we have shown how implicit arguments make functions more convenient to use.
-However, functions such as `compose` are still quite verbose to define. Note that the universe
-polymorphic `compose` is even more verbose than the one previously defined.
+以前の節で、暗黙の引数が関数をより便利に使えるようにすることを示した。しかし、``compose`` のような関数はまだ定義が冗長である。宇宙多相的な ``compose`` の定義は2章で定義したものよりもさらに冗長であることに注意してほしい。
 
 ```lean
 universe u v w
@@ -769,7 +569,7 @@ def compose {α : Type u} {β : Type v} {γ : Type w}
   g (f x)
 ```
 
-You can avoid the `universe` command by providing the universe parameters when defining `compose`.
+``compose`` を定義するときに宇宙パラメータ ``.{u, v, w}`` を与えることで、``universe`` コマンドを省略することができる。
 
 ```lean
 def compose.{u, v, w}
@@ -778,10 +578,7 @@ def compose.{u, v, w}
   g (f x)
 ```
 
-Lean 4 supports a new feature called *auto bound implicit arguments*. It makes functions such as
-`compose` much more convenient to write. When Lean processes the header of a declaration,
-any unbound identifier is automatically added as an implicit argument *if* it is a single lower case or
-greek letter. With this feature we can write `compose` as
+Lean 4は、*auto bound implicit arguments*(自動束縛暗黙引数)という新機能をサポートしている。この機能により、``compose`` のような関数をより便利に書くことができる。Leanが定義宣言の前提を処理するとき、まだ束縛されていない識別子が**1文字の小文字かギリシャ文字であれば**、それらが暗黙引数として自動的に追加される。この機能を使うと、 ``compose`` を次のように書くことができる。
 
 ```lean
 def compose (g : β → γ) (f : α → β) (x : α) : γ :=
@@ -791,27 +588,20 @@ def compose (g : β → γ) (f : α → β) (x : α) : γ :=
 -- {β : Sort u_1} → {γ : Sort u_2} → {α : Sort u_3} → (β → γ) → (α → β) → α → γ
 ```
 
-Note that Lean inferred a more general type using `Sort` instead of `Type`.
+``Type`` の代わりに ``Sort`` を用いることで、Leanはより一般的な型を推論したことに注意してほしい。
 
-Although we love this feature and use it extensively when implementing Lean,
-we realize some users may feel uncomfortable with it. Thus, you can disable it using
-the command `set_option autoImplicit false`.
+私たち(原文筆者たち)はこの機能が大好きで、Leanを実装する際に広く使用しているが、一部のユーザーはこの機能を不快に感じるかもしれないことも認識している。そのため、コマンド ``set_option autoImplicit false`` を使ってこの機能を無効にすることができる。
 
 ```lean
 set_option autoImplicit false
-/- The following definition produces `unknown identifier` errors -/
+/- 次の定義は `unknown identifier` エラーを生成する -/
 -- def compose (g : β → γ) (f : α → β) (x : α) : γ :=
 --   g (f x)
 ```
 
-Implicit Lambdas
----------------
+## Implicit Lambdas (暗黙ラムダ式)
 
-In Lean 3 stdlib, we find many
-[instances](https://github.com/leanprover/lean/blob/master/library/init/category/reader.lean#L39) of the dreadful `@`+`_` idiom.
-It is often used when the expected type is a function type with implicit arguments,
-and we have a constant (`reader_t.pure` in the example) which also takes implicit arguments. In Lean 4, the elaborator automatically introduces lambdas
-for consuming implicit arguments. We are still exploring this feature and analyzing its impact, but the experience so far has been very positive. Here is the example from the link above using Lean 4 implicit lambdas.
+Lean 3の標準ライブラリでは、``@`` と ``_`` を多用した怖ろしいイディオム(コードパターン)の[実例](https://github.com/leanprover/lean/blob/master/library/init/category/reader.lean#L39)をよく見かける。このイディオムは、期待される型が暗黙引数を持つ関数型で、さらに暗黙引数を取る定数(実例では ``reader_t.pure``)がある場合によく使われる。Lean 4では、elaboratorにより暗黙引数を消費するためのラムダ式が自動的に導入される。私たちはこの機能を探究し、その影響を分析しているところだが、これまでの経験はとてもポジティブなものである。以下は、上記リンクの実例に対してLean 4の暗黙ラムダ式を使った例である。
 
 ```lean
 # variable (ρ : Type) (m : Type → Type) [Monad m]
@@ -820,20 +610,18 @@ instance : Monad (ReaderT ρ m) where
   bind := ReaderT.bind
 ```
 
-Users can disable the implicit lambda feature by using `@` or writing
-a lambda expression with `{}` or `[]` binder annotations.  Here are
-few examples
+``@`` を使うか、``{}`` または ``[]`` 束縛記法でラムダ式を書くことで、暗黙ラムダ式機能を無効にすることができる。以下はその例である:
 
 ```lean
-# namespace ex2
+namespace ex2
 def id1 : {α : Type} → α → α :=
   fun x => x
 
 def listId : List ({α : Type} → α → α) :=
   (fun x => x) :: []
 
--- In this example, implicit lambda introduction has been disabled because
--- we use `@` before `fun`
+-- 次の例において、``fun`` の前に ``@`` があるときは
+-- 暗黙ラムダ式導入機能は無効になっている
 def id2 : {α : Type} → α → α :=
   @fun α (x : α) => id1 x
 
@@ -843,20 +631,16 @@ def id3 : {α : Type} → α → α :=
 def id4 : {α : Type} → α → α :=
   fun x => id1 x
 
--- In this example, implicit lambda introduction has been disabled
--- because we used the binder annotation `{...}`
+-- 次の例では、束縛記法 ``{...}`` を使っているため、
+-- 暗黙ラムダ式導入機能は無効になっている
 def id5 : {α : Type} → α → α :=
   fun {α} x => id1 x
-# end ex2
+end ex2
 ```
 
-Sugar for Simple Functions
--------------------------
+## Sugar for Simple Functions (単純な関数のための糖衣構文)
 
-In Lean 3, we can create simple functions from infix operators by
-using parentheses. For example, `(+1)` is sugar for `fun x, x + 1`. In
-Lean 4, we generalize this notation using `·` as a placeholder. Here
-are a few examples:
+Lean 3では、括弧を使うことで、中置演算子から簡単な関数を作ることができる。例えば、``(+1)`` は ``fun x, x + 1`` の糖衣構文である。Lean 4では、``·`` をプレースホルダーとして使うことでこの表記を一般化する。以下はその例である:
 
 ```lean
 # namespace ex3
@@ -878,24 +662,16 @@ def f (x y z : Nat) :=
 # end ex3
 ```
 
-As in Lean 3, the notation is activated using parentheses, and the lambda abstraction is created by collecting the nested `·`s.
-The collection is interrupted by nested parentheses. In the following example, two different lambda expressions are created.
+Lean 3と同様、この糖衣構文は括弧を使うことでアクティベートされ、ラムダ抽象は括弧で囲まれた ``·`` を引数として集めることで作られる。引数の収集は、入れ子になった括弧によって中断される。次の例では、2つの異なるラムダ式が生成されている:
 
 ```lean
 #check (Prod.mk · (· + 1))
 -- fun a => (a, fun b => b + 1)
 ```
 
-Named Arguments
----------------
+## Named Arguments (名前付き引数)
 
-Named arguments enable you to specify an argument for a parameter by
-matching the argument with its name rather than with its position in
-the parameter list.  If you don't remember the order of the parameters
-but know their names, you can send the arguments in any order. You may
-also provide the value for an implicit parameter when Lean failed to
-infer it. Named arguments also improve the readability of your code by
-identifying what each argument represents.
+名前付き引数を使うと、引数リスト内の位置と引数をマッチさせるだけでなく、関数定義時に指定された引数名と引数をマッチさせることができる。引数の順番は覚えていないが引数の名前は知っている場合、その名前を使えばどんな順番でもその引数を与えることができる。Leanが暗黙引数を推論できなかった場合、名前付き引数を使ってその暗黙引数の値を指定することもできる。名前付き引数は、各引数が何を表しているのかを明確にすることで、コードの読みやすさも向上させる。
 
 ```lean
 def sum (xs : List Nat) :=
@@ -909,12 +685,12 @@ example {a b : Nat} {p : Nat → Nat → Nat → Prop} (h₁ : p a b b) (h₂ : 
   Eq.subst (motive := fun x => p a x b) h₂ h₁
 ```
 
-In the following examples, we illustrate the interaction between named
-and default arguments.
+以下に、名前付き引数とデフォルト引数の相互作用を例示する。
 
 ```lean
 def f (x : Nat) (y : Nat := 1) (w : Nat := 2) (z : Nat) :=
   x + y + w - z
+-- ``(y : Nat := 1)`` は ``y`` のデフォルトの値が ``1`` であることを表す
 
 example (x z : Nat) : f (z := z) x = x + 1 + 2 - z := rfl
 
@@ -946,8 +722,7 @@ example (x : α) : g x = fun (c : α) => x + c := rfl
 example (x y : α) : g x y = fun (c : α) => x + y + c := rfl
 ```
 
-You can use `..` to provide missing explicit arguments as `_`.
-This feature combined with named arguments is useful for writing patterns. Here is an example:
+``..`` を使えば、足りない明示的引数全てに ``_`` を指定することができる。この機能と名前付き引数を組み合わせると、パターンを書くのに便利である。以下はその例である:
 
 ```lean
 inductive Term where
@@ -965,8 +740,7 @@ def getBinderType : Term → Option Term
   | _ => none
 ```
 
-Ellipses are also useful when explicit arguments can be automatically
-inferred by Lean, and we want to avoid a sequence of `_`s.
+省略記号は、明示的な引数が自動的に推論され、かつ ``_`` の連続を避けたい場合にも便利である。
 
 ```lean
 example (f : Nat → Nat) (a b c : Nat) : f (a + b + c) = f (a + (b + c)) :=

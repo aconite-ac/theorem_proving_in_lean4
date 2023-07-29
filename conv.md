@@ -1,24 +1,18 @@
-The Conversion Tactic Mode
-=========================
+# The Conversion Tactic Mode (変換タクティクモード)
 
-Inside a tactic block, one can use the keyword `conv` to enter
-conversion mode. This mode allows to travel inside assumptions and
-goals, even inside function abstractions and dependent arrows, to apply rewriting or
-simplifying steps.
+タクティクブロックの内部では、``conv`` キーワードを使うと*conversion mode*(変換モード)に入ることができる。このモードでは、仮説やターゲットの内部、さらには関数抽象や依存関数型の内部を移動して、その部分項に書き換えや単純化のステップを適用することができる。
 
-Basic navigation and rewriting
--------
+## 用語に関する注意
 
-As a first example, let us prove example
-`(a b c : Nat) : a * (b * c) = a * (c * b)`
-(examples in this file are somewhat artificial since
-other tactics could finish them immediately). The naive
-first attempt is to enter tactic mode and try `rw [Nat.mul_comm]`. But this
-transforms the goal into `b * c * a = a * (c * b)`, after commuting the
-very first multiplication appearing in the term. There are several
-ways to fix this issue, and one way is to use a more precise tool:
-the conversion mode. The following code block shows the current target
-after each line.
+この節は翻訳に際して追加した節である。
+
+変換モードにおいて、「ターゲット」とは項構築の目標となる型のこと**ではなく**、書き換え・単純化の対象のことである。また、「ゴール」は単に1つのターゲットを保持するためにある。
+
+通常のタクティクモードでは、ターゲットは ``⊢`` の後に書かれる。一方で、変換タクティクモードでは、ターゲットは ``|`` の後に書かれる。
+
+## Basic navigation and rewriting (基本的なナビゲーションと書き換え)
+
+最初の例として、``example (a b c : Nat) : a * (b * c) = a * (c * b)`` を証明してみよう(このページで挙げる例は、他のタクティクを使えばすぐに解ける可能性があるため、多少作為的である)。素朴な最初の一手は、タクティクモードに入って ``rw [Nat.mul_comm]`` を試すことである。しかし、そうするとターゲット内の一番最初に登場する乗法について可換性が適用され、ターゲットが ``b * c * a = a * (c * b)`` に変換されてしまう。この問題を解決する方法はいくつかあるが、より正確なツールである変換モードを使用することは解決法の1つである。次のコードブロックでは、タクティクブロック内の各行の後に現在のターゲットを示している。
 
 ```lean
 example (a b c : Nat) : a * (b * c) = a * (c * b) := by
@@ -33,21 +27,15 @@ example (a b c : Nat) : a * (b * c) = a * (c * b) := by
     rw [Nat.mul_comm]
 ```
 
-The above snippet shows three navigation commands:
+上記のスニペット(小さなコード)では次の3つのナビゲーションコマンドを使っている:
 
-- `lhs` navigates to the left hand side of a relation (here equality), there is also a `rhs` navigating to the right hand side.
-- `congr` creates as many targets as there are (nondependent and explicit) arguments to the current head function
-  (here the head function is multiplication).
-- `rfl` closes target using reflexivity.
+- ``lhs`` は関係(ここでは等号)の左辺にターゲットを絞る。関係の右辺にターゲットを絞る ``rhs`` コマンドもある。
+- 現在のターゲット内の先頭の関数(ここでは乗法)が(非依存的かつ明示的な)引数をとるなら、``congr`` は先頭の関数を分解し、各引数をターゲットとするゴールを引数の数だけ生成する。
+- ``rfl`` は現在のターゲットを反射性を使って閉じ、次のゴールに移る。
 
-Once arrived at the relevant target, we can use `rw` as in normal
-tactic mode.
+目的のターゲットに到着したら、通常のタクティクモードと同様に ``rw`` を使うことができる。
 
-The second main reason to use conversion mode is to rewrite under
-binders. Suppose we want to prove example
-`(fun x : Nat => 0 + x) = (fun x => x)`.
-The naive first attempt is to enter tactic mode and try
-`rw [Nat.zero_add]`. But this fails with a frustrating
+変換モードを使う2つ目の主な理由は、束縛のスコープ内で部分項を書き換えることができるからである。例えば、``(fun x : Nat => 0 + x) = (fun x => x)`` を証明したいとしよう。素朴な最初の一手は、タクティクモードに入って ``rw [Nat.zero_add]`` を試すことである。しかし、これは失敗し、次のようなエラーメッセージを見ていらいらするだろう。
 
 ```
 error: tactic 'rewrite' failed, did not find instance of the pattern
@@ -56,7 +44,7 @@ error: tactic 'rewrite' failed, did not find instance of the pattern
 ⊢ (fun x => 0 + x) = fun x => x
 ```
 
-The solution is:
+正しい解法(の一例)はこうである:
 
 ```lean
 example : (fun x : Nat => 0 + x) = (fun x => x) := by
@@ -66,34 +54,32 @@ example : (fun x : Nat => 0 + x) = (fun x => x) := by
     rw [Nat.zero_add]
 ```
 
-where `intro x` is the navigation command entering inside the `fun` binder.
-Note that this example is somewhat artificial, one could also do:
+ここで、``intro x`` は ``fun`` の束縛スコープ内に入るナビゲーションコマンドである。この例は多少作為的であることを断っておく。この例は次のように解くこともできる:
 
 ```lean
 example : (fun x : Nat => 0 + x) = (fun x => x) := by
   funext x; rw [Nat.zero_add]
 ```
 
-or just
+あるいは、``simp`` を使うだけでよい。
 
 ```lean
 example : (fun x : Nat => 0 + x) = (fun x => x) := by
   simp
 ```
 
-`conv` can also rewrite a hypothesis `h` from the local context, using `conv at h`.
+``conv at h`` を使うと、現在のコンテキスト内の仮説 ``h`` を書き換えることもできる。
 
-Pattern matching
--------
+## Pattern matching (パターンマッチング)
 
-Navigation using the above commands can be tedious. One can shortcut it using pattern matching as follows:
+上記のコマンドを使ったナビゲーションは面倒だと思うかもしれない。パターンマッチングを使えば、次のようにショートカットできる:
 
 ```lean
 example (a b c : Nat) : a * (b * c) = a * (c * b) := by
   conv in b * c => rw [Nat.mul_comm]
 ```
 
-which is just syntax sugar for
+これは次の糖衣構文である:
 
 ```lean
 example (a b c : Nat) : a * (b * c) = a * (c * b) := by
@@ -102,17 +88,16 @@ example (a b c : Nat) : a * (b * c) = a * (c * b) := by
     rw [Nat.mul_comm]
 ```
 
-Of course, wildcards are allowed:
+もちろん、ワイルドカードも使える:
 
 ```lean
 example (a b c : Nat) : a * (b * c) = a * (c * b) := by
   conv in _ * c => rw [Nat.mul_comm]
 ```
 
-Structuring conversion tactics
--------
+## Structuring conversion tactics (変換タクティク証明の構造化)
 
-Curly brackets and `.` can also be used in `conv` mode to structure tactics.
+``conv`` モード中も、タクティク証明を構造化するために波括弧と ``.`` を使うことができる。
 
 ```lean
 example (a b c : Nat) : (0 + a) * (b * c) = a * (c * b) := by
@@ -123,10 +108,9 @@ example (a b c : Nat) : (0 + a) * (b * c) = a * (c * b) := by
     . rw [Nat.mul_comm]
 ```
 
-Other tactics inside conversion mode
-----------
+## Other tactics inside conversion mode (変換モードにおける他のタクティク)
 
-- `arg i` enter the `i`-th nondependent explicit argument of an application.
+- ``arg i`` は現在のターゲットの ``i`` 番目の非依存的明示的引数にターゲットを絞る。
 
 ```lean
 example (a b c : Nat) : a * (b * c) = a * (c * b) := by
@@ -139,9 +123,9 @@ example (a b c : Nat) : a * (b * c) = a * (c * b) := by
     rw [Nat.mul_comm]
 ```
 
-- `args` alternative name for `congr`.
+- ``args`` は ``congr`` の別名である。
 
-- `simp` applies the simplifier to the current goal. It supports the same options available in regular tactic mode.
+- ``simp`` は現在のターゲットに単純化子を適用する。``simp`` は通常のタクティクモードと同様のオプションをサポートする。
 
 ```lean
 def f (x : Nat) :=
@@ -154,7 +138,7 @@ example (g : Nat → Nat) (h₁ : g x = x + 1) (h₂ : x > 0) : g x = f x := by
   exact h₁
 ```
 
-- `enter [1, x, 2, y]` iterate `arg` and `intro` with the given arguments. It is just the macro:
+- ``enter [1, x, 2, y]`` は与えられた引数を使って ``arg`` と ``intro`` を繰り返す。これは単なるマクロである:
 
 ```
 syntax enterArg := ident <|> group("@"? num)
@@ -166,15 +150,13 @@ macro_rules
   | `(conv| enter [$arg:enterArg, $args,*]) => `(conv| (enter [$arg]; enter [$args,*]))
 ```
 
-- `done` fail if there are unsolved goals.
+- ``done`` は、もし未解決のゴールがあるなら失敗する。
 
-- `trace_state` display the current tactic state.
+- ``trace_state`` は現在のゴールの状態を表示する。
 
-- `whnf` put term in weak head normal form.
+- ``whnf`` は現在のターゲットを*Weak Head Normal Form*(WHNF / 弱頭部正規形)に変換する。
 
-- `tactic => <tactic sequence>` go back to regular tactic mode. This
-  is useful for discharging goals not supported by `conv` mode, and
-  applying custom congruence and extensionality lemmas.
+- ``tactic => <tactic sequence>`` を使うと通常のタクティクモードに戻る。これは、``conv`` モードでサポートされていないタクティクでゴールを閉じるときや、従来の合同性や外延性の補題を適用するときに便利である。
 
 ```lean
 example (g : Nat → Nat → Nat)
@@ -192,7 +174,7 @@ example (g : Nat → Nat → Nat)
     . tactic => exact h₂
 ```
 
-- `apply <term>` is syntax sugar for `tactic => apply <term>`
+- ``apply <term>`` は ``tactic => apply <term>`` の糖衣構文である。
 
 ```lean
 example (g : Nat → Nat → Nat)

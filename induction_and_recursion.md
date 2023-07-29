@@ -1,41 +1,40 @@
-Induction and Recursion
-=======================
+# Induction and Recursion (帰納と再帰)
 
-In the previous chapter, we saw that inductive definitions provide a
-powerful means of introducing new types in Lean. Moreover, the
-constructors and the recursors provide the only means of defining
-functions on these types. By the propositions-as-types correspondence,
-this means that induction is the fundamental method of proof.
+前章では、帰納的定義がLeanに新しい型を導入する強力な手段となることを説明した。さらに言えば、コンストラクタと再帰子(エリミネータ)は、帰納型から他の型への関数を定義する唯一の手段である。型としての命題対応により、この事実は帰納法が証明の基本的な方法であることを意味する。
 
-Lean provides natural ways of defining recursive functions, performing
-pattern matching, and writing inductive proofs. It allows you to
-define a function by specifying equations that it should satisfy, and
-it allows you to prove a theorem by specifying how to handle various
-cases that can arise. Behind the scenes, these descriptions are
-"compiled" down to primitive recursors, using a procedure that we
-refer to as the "equation compiler." The equation compiler is not part
-of the trusted code base; its output consists of terms that are
-checked independently by the kernel.
+Leanは再帰関数の定義、パターンマッチングの実行、帰納的証明の記述に対して自然な方法を提供する。関数を定義するには、その関数が満たすべき等式を指定する。定理を証明するには、起こりうる全てのケースをどのように扱うかを指定する。裏では、これらの記述は*equation compiler*(等式コンパイラ)と呼ばれるものを用いて、プリミティブな再帰子へと「コンパイル」される。等式コンパイラはtrusted code base(システムの信頼性保証において最も基礎的で重要なコード)の一部ではない。等式コンパイラの出力はカーネルによって独立にチェックされる項で構成される。
 
-<a name="_pattern_matching"></a>Pattern Matching
-----------------
+## 用語に関する注意
 
-The interpretation of schematic patterns is the first step of the
-compilation process. We have seen that the ``casesOn`` recursor can
-be used to define functions and prove theorems by cases, according to
-the constructors involved in an inductively defined type. But
-complicated definitions may use several nested ``casesOn``
-applications, and may be hard to read and understand. Pattern matching
-provides an approach that is more convenient, and familiar to users of
-functional programming languages.
+この節は翻訳に際して追加した節である。
 
-Consider the inductively defined type of natural numbers. Every
-natural number is either ``zero`` or ``succ x``, and so you can define
-a function from the natural numbers to an arbitrary type by specifying
-a value in each of those cases:
+この章では、次のような定義
 
 ```lean
 open Nat
+def foo : Nat → Nat → Nat
+  | zero  , zero   => 0
+  | zero  , succ y => 1
+  | succ x, zero   => 2
+  | succ x, succ y => 3
+```
+
+があるとき、``zero`` や ``succ y`` などを「パターン(pattern)」、``| zero  , zero   => 0`` などを「ケース(case)」、定義として与えられたケース全てをまとめたものを「ケースリスト(list of cases)」、不足なくケースが与えられたケースリストを用いてパターンマッチングすることを「場合分け(by cases)」あるいは「場合分けする(split on cases)」と呼ぶ。
+
+## Pattern Matching (パターンマッチング)
+
+schematic patternsの解釈は、コンパイルの最初のステップである。帰納型のコンストラクタと ``casesOn`` 再帰子を使って、関数を定義したり、場合分けによる定理の証明が行えることを見てきた。しかし、複雑な定義は、入れ子になった ``casesOn`` 適用をいくつも使うことがあり、そのような記述は読みにくく理解しにくいかもしれない。パターンマッチングはより便利で、関数型プログラミング言語ユーザーに馴染みのあるアプローチを提供する。
+
+帰納的に定義された自然数の型について考える。全ての自然数は ``zero`` か ``succ x`` のどちらかの形をとるため、それぞれのケースにおいて出力の値を指定することで、自然数から任意の型への関数を定義することができる:
+
+```lean
+open Nat
+
+/- 等式コンパイラによるパターンマッチングを使った関数定義の構文
+
+   この構文を使って帰納型から任意の型への関数を定義する場合、
+   `:=` は不要である(書くとコンパイルエラーになる)ことに注意。
+   定義したい項が型Tを持つとき、この構文は型Tの(1つ以上の)前件とパターンマッチングする -/
 
 def sub1 : Nat → Nat
   | zero   => zero
@@ -46,7 +45,7 @@ def isZero : Nat → Bool
   | succ x => false
 ```
 
-The equations used to define these functions hold definitionally:
+以上の関数を定義するために使われる等式の集まり(例えば、``sub1 zero = zero`` は上記の関数定義の一部だとみなせる)はdefinitionallyに成立する:
 
 ```lean
 # open Nat
@@ -66,7 +65,7 @@ example : sub1 7 = 6 := rfl
 example (x : Nat) : isZero (x + 3) = false := rfl
 ```
 
-Instead of ``zero`` and ``succ``, we can use more familiar notation:
+``zero`` や ``succ`` の代わりに、より馴染みのある表記を使うことができる:
 
 ```lean
 def sub1 : Nat → Nat
@@ -78,12 +77,9 @@ def isZero : Nat → Bool
   | x+1 => false
 ```
 
-Because addition and the zero notation have been assigned the
-``[match_pattern]`` attribute, they can be used in pattern matching. Lean
-simply normalizes these expressions until the constructors ``zero``
-and ``succ`` are exposed.
+加法とゼロ表記には ``[match_pattern]`` 属性が割り当てられているため、これらの表記をパターンマッチングで使うことができる。Leanは、コンストラクタ ``zero`` や ``succ`` が出現するまで、加法やゼロ表記を含む式を単純に正規化する。
 
-Pattern matching works with any inductive type, such as products and option types:
+パターンマッチングは直積型や ``Option`` 型など、任意の帰納型に対して機能する:
 
 ```lean
 def swap : α × β → β × α
@@ -97,11 +93,10 @@ def bar : Option Nat → Nat
   | none   => 0
 ```
 
-Here we use it not only to define a function, but also to carry out a
-proof by cases:
+パターンマッチングは関数定義だけでなく、場合分けによる証明にも使うことができる:
 
 ```lean
-# namespace Hidden
+namespace Hidden
 def not : Bool → Bool
   | true  => false
   | false => true
@@ -109,10 +104,14 @@ def not : Bool → Bool
 theorem not_not : ∀ (b : Bool), not (not b) = b
   | true  => rfl  -- proof that not (not true) = true
   | false => rfl  -- proof that not (not false) = false
-# end Hidden
+
+theorem not_not' : (b : Bool) → not (not b) = b
+  | true  => rfl
+  | false => rfl
+end Hidden
 ```
 
-Pattern matching can also be used to destruct inductively defined propositions:
+パターンマッチングは帰納的に定義された命題を分解するためにも使うことができる:
 
 ```lean
 example (p q : Prop) : p ∧ q → q ∧ p
@@ -123,11 +122,9 @@ example (p q : Prop) : p ∨ q → q ∨ p
   | Or.inr hq => Or.inl hq
 ```
 
-This provides a compact way of unpacking hypotheses that make use of logical connectives.
+パターンマッチングは論理的結合子を含む仮説を分解するコンパクトな方法も提供する。
 
-In all these examples, pattern matching was used to carry out a single
-case distinction. More interestingly, patterns can involve nested
-constructors, as in the following examples.
+以上の全ての例で、パターンマッチングは「フラットな」場合分けを実行するために使われている。さらに興味深いことに、パターンは次のように入れ子になったコンストラクタを含むこともある。
 
 ```lean
 def sub2 : Nat → Nat
@@ -136,13 +133,7 @@ def sub2 : Nat → Nat
   | x+2 => x
 ```
 
-The equation compiler first splits on cases as to whether the input is
-``zero`` or of the form ``succ x``.  It then does a case split on
-whether ``x`` is of the form ``zero`` or ``succ x``.  It determines
-the necessary case splits from the patterns that are presented to it,
-and raises an error if the patterns fail to exhaust the cases. Once
-again, we can use arithmetic notation, as in the version below. In
-either case, the defining equations hold definitionally.
+この例において、等式コンパイラはまず入力が ``zero`` か ``succ x`` の形であるかで最初の場合分けを行う。入力が ``zero`` のときは ``0`` を返す。入力が ``succ x`` の形のときは、その ``x`` が ``zero`` か ``succ x`` の形であるかで2回目の場合分けを行う。等式コンパイラは提示されたケースリストから場合分けの方法を決定し、適切な場合分けに失敗したときはエラーを生じる。ここでも、次のように算術の記法を使うことができる。いずれにせよ、関数を定義する等式はdefinitionallyに成立する。
 
 ```lean
 # def sub2 : Nat → Nat
@@ -156,11 +147,7 @@ example : sub2 (x+2) = x := rfl
 example : sub2 5 = 3 := rfl
 ```
 
-You can write ``#print sub2`` to see how the function was compiled to
-recursors. (Lean will tell you that ``sub2`` has been defined in terms
-of an internal auxiliary function, ``sub2.match_1``, but you can print
-that out too.) Lean uses these auxiliary functions to compile `match` expressions.
-Actually, the definition above is expanded to
+``#print sub2`` と書けば、この関数が再帰子を含むどんな式にコンパイルされたかが分かる。(Leanは ``sub2`` が内部の補助関数 ``sub2.match_1`` を使って定義されていることを伝えるかもしれないが、``#print`` コマンドを使って ``sub2.match_1`` の定義を表示させることもできる。)Leanはこれらの補助関数を使って ``match`` 式をコンパイルする。実際には、上記の定義 ``sub2`` は次のように展開される。
 
 ```lean
 def sub2 : Nat → Nat :=
@@ -171,7 +158,7 @@ def sub2 : Nat → Nat :=
     | x+2 => x
 ```
 
-Here are some more examples of nested pattern matching:
+入れ子になったパターンマッチングの例をさらに挙げる:
 
 ```lean
 example (p q : α → Prop)
@@ -185,9 +172,7 @@ def foo : Nat × Nat → Nat
   | (m+1, n+1) => 2
 ```
 
-The equation compiler can process multiple arguments sequentially. For
-example, it would be more natural to define the previous example as a
-function of two arguments:
+等式コンパイラは複数の引数を連続して処理することができる。例えば、一つ上の例 ``foo`` は2つの引数を持つ関数として定義する方が自然だろう:
 
 ```lean
 def foo : Nat → Nat → Nat
@@ -196,9 +181,11 @@ def foo : Nat → Nat → Nat
   | m+1, n+1 => 2
 ```
 
-Here is another example:
+別の例を挙げる:
 
 ```lean
+-- `a :: as` は `cons a as` の糖衣構文
+
 def bar : List Nat → List Nat → Nat
   | [],      []      => 0
   | a :: as, []      => a
@@ -206,11 +193,9 @@ def bar : List Nat → List Nat → Nat
   | a :: as, b :: bs => a + b
 ```
 
-Note that the patterns are separated by commas.
+複数の引数を持つケースは、パターン毎にカンマで区切られることに注意してほしい。
 
-In each of the following examples, splitting occurs on only the first
-argument, even though the others are included among the list of
-patterns.
+以下の各例では、2番目以降の引数がケースに含まれているが、最初の引数での場合分けのみが行われる。
 
 ```lean
 # namespace Hidden
@@ -228,21 +213,9 @@ def cond : Bool → α → α → α
 # end Hidden
 ```
 
-Notice also that, when the value of an argument is not needed in the
-definition, you can use an underscore instead. This underscore is
-known as a *wildcard pattern*, or an *anonymous variable*. In contrast
-to usage outside the equation compiler, here the underscore does *not*
-indicate an implicit argument. The use of underscores for wildcards is
-common in functional programming languages, and so Lean adopts that
-notation. [Section Wildcards and Overlapping Patterns](#_wildcards_and_overlapping_patterns)
-expands on the notion of a wildcard, and [Section Inaccessible Patterns](#_inaccessible_patterns) explains how
-you can use implicit arguments in patterns as well.
+また、ある引数の値が出力を定義するのに必要ない場合は、その引数のパターンにアンダースコアを使うことができることに注意してほしい。このアンダースコアは*wildcard pattern*(ワイルドカードパターン)あるいは*anonymous variable*(匿名変数)として知られている。等式コンパイラ以外での使い方とは違い、ここでアンダースコアは暗黙の引数を表すものでは**ない**。ワイルドカードにアンダースコアを使うのは関数型プログラミング言語では一般的なので、Leanもその表記を採用した。節[Wildcards and Overlapping Patterns (ワイルドカードとケースの重複)](#wildcards-and-overlapping-patterns-ワイルドカードとケースの重複)ではワイルドカードの概念を拡張し、節[Inaccessible Patterns (アクセス不能パターン)](#inaccessible-patterns-アクセス不能パターン)ではパターン内で暗黙の引数を使用する方法を説明する。
 
-As described in [Chapter Inductive Types](./inductive_types.md),
-inductive data types can depend on parameters. The following example defines
-the ``tail`` function using pattern matching. The argument ``α : Type u``
-is a parameter and occurs before the colon to indicate it does not participate in the pattern matching.
-Lean also allows parameters to occur after ``:``, but it cannot pattern match on them.
+[7章 Inductive Types (帰納型)](./inductive_types.md)で説明したように、帰納データ型はパラメータに依存しうる。次の例では、パターンマッチングを用いて ``tail`` 関数を定義している。引数 ``α : Type u`` は帰納データ型のパラメータであり、パターンマッチングに参加しないことを示すために(関数名・引数リストと型名を区切る)コロンの前に置かれる。Leanは ``:`` の後に帰納型のパラメータが来ることも許可するが、パラメータをパターンマッチさせることはできない。
 
 ```lean
 def tail1 {α : Type u} : List α → List α
@@ -254,19 +227,13 @@ def tail2 : {α : Type u} → List α → List α
   | α, a :: as => as
 ```
 
-Despite the different placement of the parameter ``α`` in these two
-examples, in both cases it is treated in the same way, in that it does
-not participate in a case split.
+この2つの例では、パラメータ ``α`` の出現位置が異なるにもかかわらず、どちらの例でも場合分けに参加しないという意味で同じように扱われている。
 
-Lean can also handle more complex forms of pattern matching, in which
-arguments to dependent types pose additional constraints on the
-various cases. Such examples of *dependent pattern matching* are
-considered in the [Section Dependent Pattern Matching](#_dependent_pattern_matching).
+Leanは、依存型の引数が場合分けにおいて「このケースが生じることはない」という追加の制約を与えるような、より複雑な形のパターンマッチングも扱うことができる。このような*dependent pattern matching*(依存パターンマッチング)の例については、[Dependent Pattern Matching (依存パターンマッチング)](#dependent-pattern-matching-依存パターンマッチング)の節で説明する。
 
-<a name="_wildcards_and_overlapping_patterns"></a>Wildcards and Overlapping Patterns
-----------------------------------
+## Wildcards and Overlapping Patterns (ワイルドカードとケースの重複)
 
-Consider one of the examples from the last section:
+前節の例の1つについて考える:
 
 ```lean
 def foo : Nat → Nat → Nat
@@ -275,7 +242,7 @@ def foo : Nat → Nat → Nat
   | m+1, n+1 => 2
 ```
 
-An alternative presentation is:
+この例は次のように表現することもできる:
 
 ```lean
 def foo : Nat → Nat → Nat
@@ -284,24 +251,20 @@ def foo : Nat → Nat → Nat
   | m, n => 2
 ```
 
-In the second presentation, the patterns overlap; for example, the
-pair of arguments ``0 0`` matches all three cases. But Lean handles
-the ambiguity by using the first applicable equation, so in this example
-the net result is the same. In particular, the following equations hold
-definitionally:
+2つ目の表現では、ケースが重複している。例えば、引数のペア ``0 0`` は3つのケース全てにマッチする。しかし、Leanは上のケースから順にパターンマッチングを試し、一番最初にマッチしたケースを使うことで曖昧さを解消するので、この2つの例は結果的に同じ関数を定義している。実際、2つ目の表現について以下の等式がdefinitionallyに成立する:
 
 ```lean
-# def foo : Nat → Nat → Nat
-#   | 0, n => 0
-#   | m, 0 => 1
-#   | m, n => 2
+def foo : Nat → Nat → Nat
+  | 0, n => 0
+  | m, 0 => 1
+  | m, n => 2
 example : foo 0     0     = 0 := rfl
 example : foo 0     (n+1) = 0 := rfl
 example : foo (m+1) 0     = 1 := rfl
 example : foo (m+1) (n+1) = 2 := rfl
 ```
 
-Since the values of ``m`` and ``n`` are not needed, we can just as well use wildcard patterns instead.
+``m`` と ``n`` の値は出力の定義に必要ないので、代わりにワイルドカードパターンを使ってもよい。
 
 ```lean
 def foo : Nat → Nat → Nat
@@ -310,25 +273,11 @@ def foo : Nat → Nat → Nat
   | _, _ => 2
 ```
 
-You can check that this definition of ``foo`` satisfies the same
-definitional identities as before.
+直前の定義と同様に、この ``foo`` の定義が4つの恒等式をdefinitionallyに満たすことは容易に確認できる。
 
-Some functional programming languages support *incomplete
-patterns*. In these languages, the interpreter produces an exception
-or returns an arbitrary value for incomplete cases. We can simulate
-the arbitrary value approach using the ``Inhabited`` type
-class. Roughly, an element of ``Inhabited α`` is a witness to the fact
-that there is an element of ``α``; in the [Chapter Type Classes](./type_classes.md)
-we will see that Lean can be instructed that suitable
-base types are inhabited, and can automatically infer that other
-constructed types are inhabited. On this basis, the
-standard library provides a default element, ``default``, of
-any inhabited type.
+関数型プログラミング言語の中には、*incomplete pattern matching*(不完全なパターンマッチング)をサポートするものがある。これらの言語では、インタプリタはケースリスト内のどのケースともマッチしない入力に対して例外を生成するか、任意の値を返す。Leanでは、``Inhabited`` 型クラスを使うと、「どのケースともマッチしない入力に対して任意の値を返す」アプローチをシミュレートできる。大雑把に言うと、``Inhabited α`` は ``α`` の要素が存在することの証人である。[10章 Type Classes (型クラス)](./type_classes.md)では、Leanに適切な基底型がinhabited(有項)であることを指示でき、Leanはその指示に基づいて、他の構築された型が有項であることを自動的に推論できることを説明する。これに基づいて、標準ライブラリは任意の有項型のデフォルト項 ``default`` を提供する。
 
-We can also use the type ``Option α`` to simulate incomplete patterns.
-The idea is to return ``some a`` for the provided patterns, and use
-``none`` for the incomplete cases. The following example demonstrates
-both approaches.
+型 ``Option α`` を使って不完全なパターンマッチングをシミュレートすることもできる。このアプローチでは、入力が適切に提供されたケースとマッチしたときは ``some a`` を返し、不完全なケースとマッチしたときは ``none`` を返す。次の例は、両方のアプローチを示している。
 
 ```lean
 def f1 : Nat → Nat → Nat
@@ -352,9 +301,7 @@ example : f2 (a+1) 0     = some 2 := rfl
 example : f2 (a+1) (b+1) = none   := rfl
 ```
 
-The equation compiler is clever. If you leave out any of the cases in
-the following definition, the error message will let you know what has
-not been covered.
+等式コンパイラは賢い。以下の定義のどれかのケースを省くと、エラーメッセージでどんなケースがカバーされていないかを知らせてくれる。
 
 ```lean
 def bar : Nat → List Nat → Bool → Nat
@@ -366,7 +313,7 @@ def bar : Nat → List Nat → Bool → Nat
   | a+1, b :: _, _     => a + b
 ```
 
-It will also use an "if ... then ... else" instead of a ``casesOn`` in appropriate situations.
+また、等式コンパイラは適切な状況では ``casesOn`` の代わりに "if ... then ... else" 構文を用いる。
 
 ```lean
 def foo : Char → Nat
@@ -377,18 +324,15 @@ def foo : Char → Nat
 #print foo.match_1
 ```
 
-Structural Recursion and Induction
-----------------------------------
+## Structural Recursion and Induction (構造的再帰と構造的帰納法)
 
-What makes the equation compiler powerful is that it also supports
-recursive definitions. In the next three sections, we will describe,
-respectively:
+再帰的定義もサポートしていることが、等式コンパイラを強力なものにしている。次の3つの節では、ここに挙げる3つの概念それぞれについて説明する:
 
-- structurally recursive definitions
-- well-founded recursive definitions
-- mutually recursive definitions
+- structurally recursive definitions(構造的再帰的定義)
+- well-founded recursive definitions(整礎再帰的定義)
+- mutually recursive definitions(相互再帰的定義)
 
-Generally speaking, the equation compiler processes input of the following form:
+一般的に、等式コンパイラは次の形式の入力を処理する:
 
 ```
 def foo (a : α) : (b : β) → γ
@@ -397,33 +341,9 @@ def foo (a : α) : (b : β) → γ
   | [patternsₙ] => tₙ
 ```
 
-Here ``(a : α)`` is a sequence of parameters, ``(b : β)`` is the
-sequence of arguments on which pattern matching takes place, and ``γ``
-is any type, which can depend on ``a`` and ``b``. Each line should
-contain the same number of patterns, one for each element of ``β``. As we
-have seen, a pattern is either a variable, a constructor applied to
-other patterns, or an expression that normalizes to something of that
-form (where the non-constructors are marked with the ``[match_pattern]``
-attribute). The appearances of constructors prompt case splits, with
-the arguments to the constructors represented by the given
-variables. In [Section Dependent Pattern Matching](#_dependent_pattern_matching),
-we will see that it is sometimes necessary to include explicit terms in patterns that
-are needed to make an expression type check, though they do not play a
-role in pattern matching. These are called "inaccessible patterns" for
-that reason. But we will not need to use such inaccessible patterns
-before [Section Dependent Pattern Matching](#_dependent_pattern_matching).
+ここで、``(a : α)`` はパラメータの列、``(b : β)`` はパターンマッチングが行われる引数の列、``γ`` は任意の型であり、``γ`` は ``a`` と ``b`` に依存することができる。``[patterns₁]`` から ``[patternsₙ]`` は同じ数のパターンを含むべきであり、1つのパターンが ``β`` の各要素と対応する。これまで見てきたように、パターンは変数、他のパターンにコンストラクタを適用したもの、またはそのような形式に正規化される式のいずれかである(ここで、コンストラクタでないものは ``[match_pattern]`` 属性でマークされる)。コンストラクタの出現はケースの分割を促す。ここで、コンストラクタへの引数は与えられた変数で表される。節[Dependent Pattern Matching (依存パターンマッチング)](#dependent-pattern-matching-依存パターンマッチング)では、パターンマッチングでは何の役割も果たさないが、式の型チェックを行うために必要となる明示的な項をパターンに含める必要がある場合があることを説明する。この明示的な項は今述べた理由により*inaccessible patterns*(アクセス不能パターン)と呼ばれる。しかし、節[Dependent Pattern Matching (依存パターンマッチング)](#dependent-pattern-matching-依存パターンマッチング)より前では、アクセス不能パターンを使う必要はない。
 
-As we saw in the last section, the terms ``t₁, ..., tₙ`` can make use
-of any of the parameters ``a``, as well as any of the variables that
-are introduced in the corresponding patterns. What makes recursion and
-induction possible is that they can also involve recursive calls to
-``foo``. In this section, we will deal with *structural recursion*, in
-which the arguments to ``foo`` occurring on the right-hand side of the
-``:=`` are subterms of the patterns on the left-hand side. The idea is
-that they are structurally smaller, and hence appear in the inductive
-type at an earlier stage. Here are some examples of structural
-recursion from the last chapter, now defined using the equation
-compiler:
+前節で見たように、出力を定義する項 ``t₁, ..., tₙ`` は、任意のパラメータ ``a`` だけでなく、対応するパターン内で導入された変数を利用することができる。再帰と帰納が可能なのは、出力を定義する項が ``foo`` への再帰的呼び出しを含むことすら可能だからである。この節では、*structural recursion*(構造的再帰)を扱う。構造的再帰では、``=>`` の右辺に現れる ``foo`` への引数は ``=>`` の左辺のパターンの部分項である。これは、部分項はマッチした引数よりstructurally small(構造的に小さい)であるため、帰納型の項としてマッチした引数より先に構築されるという考え方である。前章の構造的再帰の例を、今度は等式コンパイラを使って定義しよう:
 
 ```lean
 open Nat
@@ -441,21 +361,14 @@ theorem zero_add : ∀ n, add zero n = n
 def mul : Nat → Nat → Nat
   | n, zero   => zero
   | n, succ m => add (mul n m) n
+
+theorem mul_zero (m : Nat)   : mul m zero = zero := rfl
+theorem mul_succ (m n : Nat) : mul m (succ n) = add (mul m n) m := rfl
 ```
 
-The proof of ``zero_add`` makes it clear that proof by induction is
-really a form of recursion in Lean.
+この ``zero_add`` の証明は、Leanにおいて帰納法による証明が再帰の一つの形であることを明らかにしている。
 
-The example above shows that the defining equations for ``add`` hold
-definitionally, and the same is true of ``mul``. The equation compiler
-tries to ensure that this holds whenever possible, as is the case with
-straightforward structural induction. In other situations, however,
-reductions hold only *propositionally*, which is to say, they are
-equational theorems that must be applied explicitly. The equation
-compiler generates such theorems internally. They are not meant to be
-used directly by the user; rather, the `simp` tactic
-is configured to use them when necessary. Thus both of the following
-proofs of `zero_add` work:
+上の例は、``add`` と ``mul`` を定義する式がdefinitionallyに成立することを示している。等式コンパイラは構造的帰納法による証明内でも、可能な限り関数を定義する式がdefinitionallyに成立するようにする。例えば、``zero_add`` の証明において、引数が ``zero`` のケースは ``rfl`` を使うだけで示せる。しかしながら、他の状況では、引数の部分項に関する当該定理(例えば ``zero_add n``)は*propositionally*にしか成立しない。つまり、これは明示的に適用されなければならない等式定理である。等式コンパイラは ``zero_add n`` のような定理を内部的に作成するが、これらの定理はユーザーが直接使うものではなく、``simp`` タクティクが必要に応じて使うように設定されている。したがって、次の ``zero_add`` の証明も機能する:
 
 ```lean
 open Nat
@@ -467,11 +380,7 @@ theorem zero_add : ∀ n, add zero n = n
   | succ n => by simp [add, zero_add]
 ```
 
-As with definition by pattern matching, parameters to a structural
-recursion or induction may appear before the colon. Such parameters
-are simply added to the local context before the definition is
-processed. For example, the definition of addition may also be written
-as follows:
+パターンマッチングによる定義と同様に、構造的再帰や構造的帰納法のパラメータがコロンの前に現れることがある。このようなパラメータは、定義が処理される前にローカルコンテキストに追加される。例えば、加法の定義は次のように書くこともできる:
 
 ```lean
 open Nat
@@ -480,9 +389,12 @@ def add (m : Nat) : Nat → Nat
   | succ n => succ (add m n)
 ```
 
-You can also write the example above using `match`.
+この例を ``match`` を使って書くこともできる。
 
 ```lean
+
+/- `match` を使う場合はもちろん `:=` が必要になる -/
+
 open Nat
 def add (m n : Nat) : Nat :=
   match n with
@@ -490,7 +402,7 @@ def add (m n : Nat) : Nat :=
   | succ n => succ (add m n)
 ```
 
-A more interesting example of structural recursion is given by the Fibonacci function ``fib``.
+構造的再帰のもっと面白い例はフィボナッチ関数 ``fib`` である。
 
 ```lean
 def fib : Nat → Nat
@@ -505,12 +417,7 @@ example : fib (n + 2) = fib (n + 1) + fib n := rfl
 example : fib 7 = 21 := rfl
 ```
 
-Here, the value of the ``fib`` function at ``n + 2`` (which is
-definitionally equal to ``succ (succ n)``) is defined in terms of the
-values at ``n + 1`` (which is definitionally equivalent to ``succ n``)
-and the value at ``n``. This is a notoriously inefficient way of
-computing the Fibonacci function, however, with an execution time that
-is exponential in ``n``. Here is a better way:
+ここで、``n + 2``( ``succ (succ n)`` とdefinitionally equal)における ``fib`` 関数の値は、``n + 1``( ``succ n`` とdefinitionally equal)における値と ``n`` における値で定義される。しかし、これはフィボナッチ関数を計算する方法としてはきわめて非効率的で、実行時間は指数 ``n`` の指数関数となる。もっと良い方法がある:
 
 ```lean
 def fibFast (n : Nat) : Nat :=
@@ -523,7 +430,7 @@ where
 #eval fibFast 100
 ```
 
-Here is the same definition using a `let rec` instead of a `where`.
+``where`` の代わりに ``let rec`` を用いた定義は次の通り:
 
 ```lean
 def fibFast (n : Nat) : Nat :=
@@ -533,13 +440,9 @@ def fibFast (n : Nat) : Nat :=
   (loop n).2
 ```
 
-In both cases, Lean generates the auxiliary function `fibFast.loop`.
+どちらの例でも、Leanは補助関数 ``fibFast.loop`` を生成する。
 
-To handle structural recursion, the equation compiler uses
-*course-of-values* recursion, using constants ``below`` and ``brecOn``
-that are automatically generated with each inductively defined
-type. You can get a sense of how it works by looking at the types of
-``Nat.below`` and ``Nat.brecOn``:
+構造的再帰を処理するために、等式コンパイラは各帰納型の定義時に自動生成される定数 ``below`` と ``brecOn`` を用いて、*course-of-values recursion*(累積再帰)を使用する。``Nat.below`` と ``Nat.brecOn`` の型を見れば、それらがどのように機能するかを知ることができる:
 
 ```lean
 variable (C : Nat → Type u)
@@ -551,16 +454,9 @@ variable (C : Nat → Type u)
 #check (@Nat.brecOn C : (n : Nat) → ((n : Nat) → @Nat.below C n → C n) → C n)
 ```
 
-The type ``@Nat.below C (3 : nat)`` is a data structure that stores elements of ``C 0``, ``C 1``, and ``C 2``.
-The course-of-values recursion is implemented by ``Nat.brecOn``. It enables us to define the value of a dependent
-function of type ``(n : Nat) → C n`` at a particular input ``n`` in terms of all the previous values of the function,
-presented as an element of ``@Nat.below C n``.
+型 ``@Nat.below C (3 : nat)`` は、``C 0``、``C 1``、``C 2`` の項を格納するデータ構造である。累積再帰は ``Nat.brecOn`` によって実装される。``Nat.brecOn`` は型 ``(n : Nat) → C n`` を持つ依存関数の入力 ``m`` における値を、(``@Nat.below C m`` の要素として表される)その関数の以前の全ての値を使って定義することを可能にする。
 
-The use of course-of-values recursion is one of the techniques the equation compiler uses to justify to
-the Lean kernel that a function terminates. It does not affect the code generator which compiles recursive
-functions as other functional programming language compilers. Recall that `#eval fib <n>` is exponential on `<n>`.
-On the other hand, `#reduce fib <n>` is efficient because it uses the definition sent to the kernel that
-is based on the `brecOn` construction.
+累積再帰の利用は、等式コンパイラがLeanのカーネルに対して特定の関数が停止することを正当に主張するために使うテクニックの一つである。他の関数型プログラミング言語のコンパイラと同様、再帰関数をコンパイルするコードジェネレータに影響を与えることはない。``#eval fib n`` の実行時間は指数 ``n`` の指数関数となることを思い出してほしい。一方で、``#reduce fib n`` は ``brecOn`` による構築に基づいた定義を使用するため効率的である。
 
 ```lean
 def fib : Nat → Nat
@@ -574,7 +470,7 @@ def fib : Nat → Nat
 #print fib
 ```
 
-Another good example of a recursive definition is the list ``append`` function.
+再帰的定義のもう一つの良い例がリストの ``append`` 関数である。
 
 ```lean
 def append : List α → List α → List α
@@ -584,7 +480,7 @@ def append : List α → List α → List α
 example : append [1, 2, 3] [4, 5] = [1, 2, 3, 4, 5] := rfl
 ```
 
-Here is another: it adds elements of the first list to elements of the second list, until one of the two lists runs out.
+もう一つ例を挙げる: ``listAdd x y`` は2つのリストのどちらかの要素がなくなるまで、最初のリストの先頭の要素 ``a`` と2番目のリストの先頭の要素 ``b`` を削除して ``a + b`` をリスト ``z`` に追加する操作を繰り返し、最後に ``z`` を返す。
 
 ```lean
 def listAdd [Add α] : List α → List α → List α
@@ -596,12 +492,11 @@ def listAdd [Add α] : List α → List α → List α
 -- [5, 7, 9]
 ```
 
-You are encouraged to experiment with similar examples in the exercises below.
+以下の練習問題で、これに似た例に関して実験してみることをお勧めする。
 
-Local recursive declarations
----------
+## Local Recursive Declarations (ローカルな再帰的定義)
 
-You can define local recursive declarations using the `let rec` keyword.
+``let rec`` キーワードを使うと、ローカルな再帰的定義を宣言することができる。
 
 ```lean
 def replicate (n : Nat) (a : α) : List α :=
@@ -614,13 +509,9 @@ def replicate (n : Nat) (a : α) : List α :=
 -- {α : Type} → α → Nat → List α → List α
 ```
 
-Lean creates an auxiliary declaration for each `let rec`. In the example above,
-it created the declaration `replicate.loop` for the `let rec loop` occurring at `replicate`.
-Note that, Lean "closes" the declaration by adding any local variable occurring in the
-`let rec` declaration as additional parameters. For example, the local variable `a` occurs
-at `let rec loop`.
+Leanは各 ``let rec`` に対して補助定義を作成する。上の例では、``replicate`` の定義内にある ``let rec loop`` のために ``replicate.loop`` の定義を作成している。Leanは、``let rec`` 宣言内で使われたローカル変数を定義中の関数のパラメータに追加することで、宣言を「閉じる」ことに注意してほしい。例えば、ローカル変数 ``a`` は ``let rec loop`` 内で使われている。
 
-You can also use `let rec` in tactic mode and for creating proofs by induction.
+``let rec`` をタクティクモード内で使うこともできる。また、帰納法による証明を作るために ``let rec`` を使うこともできる。
 
 ```lean
 # def replicate (n : Nat) (a : α) : List α :=
@@ -637,8 +528,7 @@ theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
   exact aux n []
 ```
 
-You can also introduce auxiliary recursive declarations using `where` clause after your definition.
-Lean converts them into a `let rec`.
+定義を記述した後に ``where`` キーワードを使って補助再帰的定義を導入することもできる。Leanはこれらを ``let rec`` に変換する。
 
 ```lean
 def replicate (n : Nat) (a : α) : List α :=
@@ -658,18 +548,11 @@ where
     | n+1 => simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
 ```
 
-Well-Founded Recursion and Induction
-------------------------------------
+## Well-Founded Recursion and Induction (整礎再帰と整礎帰納法)
 
-When structural recursion cannot be used, we can prove termination using well-founded recursion.
-We need a well-founded relation and a proof that each recursive application is decreasing with respect to
-this relation. Dependent type theory is powerful enough to encode and justify
-well-founded recursion. Let us start with the logical background that
-is needed to understand how it works.
+構造的再帰が使えない場合は、整礎再帰を使えば再帰的定義中の関数が停止することを証明できる。整礎再帰に必要なのは、整礎関係と、各再帰適用(``f t`` の形をとる)が特定の項 ``t`` をこの関係において「減少させる」ことの証明である。依存型理論は整礎再帰を表現し、その正当性を証明するのに十分強力である。これらの仕組みを理解するために必要な論理的背景の説明から始めよう。
 
-Lean's standard library defines two predicates, ``Acc r a`` and
-``WellFounded r``, where ``r`` is a binary relation on a type ``α``,
-and ``a`` is an element of type ``α``.
+Leanの標準ライブラリは2つの述語 ``Acc r a`` と ``WellFounded r`` を定義している。ここで、``r`` は型 ``α`` 上の二項関係であり、``a`` は型 ``α`` の要素である。
 
 ```lean
 variable (α : Sort u)
@@ -679,22 +562,7 @@ variable (r : α → α → Prop)
 #check (WellFounded r : Prop)
 ```
 
-The first, ``Acc``, is an inductively defined predicate. According to
-its definition, ``Acc r x`` is equivalent to
-``∀ y, r y x → Acc r y``. If you think of ``r y x`` as denoting a kind of order relation
-``y ≺ x``, then ``Acc r x`` says that ``x`` is accessible from below,
-in the sense that all its predecessors are accessible. In particular,
-if ``x`` has no predecessors, it is accessible. Given any type ``α``,
-we should be able to assign a value to each accessible element of
-``α``, recursively, by assigning values to all its predecessors first.
-
-The statement that ``r`` is well founded, denoted ``WellFounded r``,
-is exactly the statement that every element of the type is
-accessible. By the above considerations, if ``r`` is a well-founded
-relation on a type ``α``, we should have a principle of well-founded
-recursion on ``α``, with respect to the relation ``r``. And, indeed,
-we do: the standard library defines ``WellFounded.fix``, which serves
-exactly that purpose.
+1つ目 ``Acc`` は帰納的に定義された述語である。定義(唯一のコンストラクタ ``Acc.intro``)によると、``Acc r x`` は ``∀ y, r y x → Acc r y`` と同値である。``Acc r x`` は ``r`` の下で ``x`` がアクセス可能であることを意味する。``r y x`` が一種の順序関係 ``y ≺ x`` を表すと考えるなら、``Acc r x`` は ``x`` の全ての前者がアクセス可能であることと同値である。特に、``x`` が前者を持たない場合、``x`` はアクセス可能である。任意の型 ``α`` の任意のアクセス可能な項 ``x`` に対して、``x`` の全ての前者に先に値を割り当てることで、``x`` にも値を割り当てることができるはずである。
 
 ```lean
 noncomputable def f {α : Sort u}
@@ -705,30 +573,15 @@ noncomputable def f {α : Sort u}
       : (x : α) → C x := WellFounded.fix h F
 ```
 
-There is a long cast of characters here, but the first block we have
-already seen: the type, ``α``, the relation, ``r``, and the
-assumption, ``h``, that ``r`` is well founded. The variable ``C``
-represents the motive of the recursive definition: for each element
-``x : α``, we would like to construct an element of ``C x``. The
-function ``F`` provides the inductive recipe for doing that: it tells
-us how to construct an element ``C x``, given elements of ``C y`` for
-each predecessor ``y`` of ``x``.
+``f`` の引数が長い列をなしているが、前半はすでに見たとおりである: ``α`` は型、``r`` は二項関係、そして ``h`` は「``r`` が整礎である」という仮説である。変数 ``C`` は再帰的定義の動機を表す: 各項 ``x : α`` について、``C x`` の項を構築したい。関数 ``F`` は ``C x`` の項を構築するための帰納的レシピを提供する: ``F`` は ``x`` の各前者 ``y`` について ``C y`` の項が与えられたとき、要素 ``C x`` を構築する方法を教えてくれる。
 
-Note that ``WellFounded.fix`` works equally well as an induction
-principle. It says that if ``≺`` is well founded and you want to prove
-``∀ x, C x``, it suffices to show that for an arbitrary ``x``, if we
-have ``∀ y ≺ x, C y``, then we have ``C x``.
+``WellFounded.fix`` は帰納法においても同様に機能する。つまり、もし ``≺`` が整礎で、``∀ x, C x`` を証明したいなら、任意の ``x`` に対して「``∀ y ≺ x, C y`` ならば ``C x``」を示せば十分である。
 
-In the example above we use the modifier `noncomputable` because the code
-generator currently does not support `WellFounded.fix`. The function
-`WellFounded.fix` is another tool Lean uses to justify that a function
-terminates.
+上の例では、コードジェネレータが現在 ``WellFounded.fix`` をサポートしていないため、``noncomputable`` という修飾子を使用している。関数 ``WellFounded.fix`` はLeanが関数の停止を正当に主張するために使う(累積再帰とは別の)ツールである。
 
-Lean knows that the usual order ``<`` on the natural numbers is well
-founded. It also knows a number of ways of constructing new well
-founded orders from others, for example, using lexicographic order.
+Leanは、自然数に関する通常の順序 ``<`` が整礎であることを知っている。また、Leanは既存の順序から新しい整礎順序を構築する方法もいくつか知っている。例えば、辞書式順序を使う方法がある。
 
-Here is essentially the definition of division on the natural numbers that is found in the standard library.
+以下は、標準ライブラリ内にある自然数の除法の定義である。
 
 ```lean
 open Nat
@@ -738,7 +591,7 @@ theorem div_lemma {x y : Nat} : 0 < y ∧ y ≤ x → x - y < x :=
 
 def div.F (x : Nat) (f : (x₁ : Nat) → x₁ < x → Nat → Nat) (y : Nat) : Nat :=
   if h : 0 < y ∧ y ≤ x then
-    f (x - y) (div_lemma h) y + 1
+    (f (x - y) (div_lemma h) y) + 1
   else
     zero
 
@@ -747,35 +600,22 @@ noncomputable def div := WellFounded.fix (measure id).wf div.F
 #reduce div 8 2 -- 4
 ```
 
-The definition is somewhat inscrutable. Here the recursion is on
-``x``, and ``div.F x f : Nat → Nat`` returns the "divide by ``y``"
-function for that fixed ``x``. You have to remember that the second
-argument to ``div.F``, the recipe for the recursion, is a function
-that is supposed to return the divide by ``y`` function for all values
-``x₁`` smaller than ``x``.
+この定義はやや分かりにくい。ここで再帰は ``x`` に対して行われ、``div.F x f : Nat → Nat`` はその固定された ``x`` に対する「``y`` で割る」関数を返す。再帰のレシピである ``div.F`` の第2引数 ``f`` は、``x`` より小さい全ての値 ``x₁`` に対して「``y`` で割る」関数を返す(と想定される)関数であることを理解する必要がある。
 
-The elaborator is designed to make definitions like this more
-convenient. It accepts the following:
+elaboratorはこのような定義をより便利に作成できるようにデザインされている。次のような定義の書き方が認められる:
 
 ```lean
 def div (x y : Nat) : Nat :=
   if h : 0 < y ∧ y ≤ x then
     have : x - y < x := Nat.sub_lt (Nat.lt_of_lt_of_le h.1 h.2) h.1
-    div (x - y) y + 1
+    (div (x - y) y) + 1
   else
     0
 ```
 
-When Lean encounters a recursive definition, it first
-tries structural recursion, and only when that fails, does it fall
-back on well-founded recursion. Lean uses the tactic `decreasing_tactic`
-to show that the recursive applications are smaller. The auxiliary
-proposition `x - y < x` in the example above should be viewed as a hint
-for this tactic.
+再帰的な定義に遭遇すると、Leanはまず構造的再帰を試み、それが失敗したときだけ整礎再帰を試みる。Leanは ``decreasing_tactic`` というタクティクを使って、再帰適用後の項が元の項より「小さい」ことを示す。上の例の補助命題 ``x - y < x`` はこのタクティクのためのヒントとみなされる。
 
-The defining equation for ``div`` does *not* hold definitionally, but
-we can unfold `div` using the `unfold` tactic. We use [`conv`](./conv.md) to select which
-`div` application we want to unfold.
+``div`` を定義する等式はdefinitionallyに成立**しない**。しかし、``unfold`` タクティクを使えば ``div`` を展開することはできる。[``conv``](./conv.md)を使うと、展開したい ``div`` 適用後の項を選択できる。
 
 ```lean
 # def div (x y : Nat) : Nat :=
@@ -785,18 +625,14 @@ we can unfold `div` using the `unfold` tactic. We use [`conv`](./conv.md) to sel
 #  else
 #    0
 example (x y : Nat) : div x y = if 0 < y ∧ y ≤ x then div (x - y) y + 1 else 0 := by
-  conv => lhs; unfold div -- unfold occurrence in the left-hand-side of the equation
+  conv => lhs; unfold div -- 等式の左辺の `div` を展開する
 
 example (x y : Nat) (h : 0 < y ∧ y ≤ x) : div x y = div (x - y) y + 1 := by
   conv => lhs; unfold div
   simp [h]
 ```
 
-The following example is similar: it converts any natural number to a
-binary expression, represented as a list of 0's and 1's. We have to
-provide evidence that the recursive call is
-decreasing, which we do here with a ``sorry``. The ``sorry`` does not
-prevent the interpreter from evaluating the function successfully.
+次の例も同様の構文を使って整礎再帰を行う: ``natToBin`` は任意の自然数を0と1のリストとして表される2進表記に変換する。まず、再帰適用後の項が元の項より減少する証拠を示さなければならないが、これは ``sorry`` で行う。``sorry`` はインタプリタが関数を正常に評価することを妨げるものではない。(訳者注: ``#eval`` を使って関数を評価するだけなら証拠は不要ということだと思われる。しかし証拠がない場合、任意の引数 ``n`` に対して ``#eval natToBin n`` が停止する保証はないと思われる。)
 
 ```lean
 def natToBin : Nat → List Nat
@@ -809,12 +645,7 @@ def natToBin : Nat → List Nat
 #eval natToBin 1234567
 ```
 
-As a final example, we observe that Ackermann's function can be
-defined directly, because it is justified by the well foundedness of
-the lexicographic order on the natural numbers. The `termination_by` clause
-instructs Lean to use a lexicographic order. This clause is actually mapping
-the function arguments to elements of type `Nat × Nat`. Then, Lean uses typeclass
-resolution to synthesize an element of type `WellFoundedRelation (Nat × Nat)`.
+最後の例として、Leanではアッカーマン関数が本来の定義をそのまま書くだけで定義できることを見る。なぜなら、この整礎再帰は自然数の辞書式順序の整礎性によって正当化されるからである。``termination_by`` キーワードはLeanに辞書式順序を使うように指示している。実際には、このキーワードは関数の2つの引数を ``Nat × Nat`` 型の項にマッピングしている。そして、Leanは型クラス解決を使って ``WellFoundedRelation (Nat × Nat)`` 型の要素を合成する。
 
 ```lean
 def ack : Nat → Nat → Nat
@@ -822,20 +653,25 @@ def ack : Nat → Nat → Nat
   | x+1, 0   => ack x 1
   | x+1, y+1 => ack x (ack (x+1) y)
 termination_by ack x y => (x, y)
+
+#eval ack 3 5
+-- アッカーマン関数は急速に増加する関数であり、
+-- 例えば `#eval ack 4 1` などはバッファオーバーフロー等のエラーを引き起こす可能性が高いため、
+-- 実行しないことをお勧めする。
 ```
 
-Note that a lexicographic order is used in the example above because the instance
-`WellFoundedRelation (α × β)` uses a lexicographic order. Lean also defines the instance
+インスタンス ``WellFoundedRelation (α × β)`` が辞書式順序を使うため、上の定義の中では辞書式順序が使われていることに注意してほしい。また、Leanは標準ライブラリ内で次のインスタンス ``instWellFoundedRelation`` も定義している。
 
 ```lean
 instance (priority := low) [SizeOf α] : WellFoundedRelation α :=
   sizeOfWFRel
 ```
 
-In the following example, we prove termination by showing that `as.size - i` is decreasing
-in the recursive application.
+次の例では、``as.size - i`` が再帰適用によって減少することを示すことで、``go`` の停止性を証明する。
 
 ```lean
+-- Array `as` を先頭から見て、
+-- `as` の要素 `a` が `p a` を満たす限りArray `r` に `a` を追加し、`r` を返す関数
 def takeWhile (p : α → Bool) (as : Array α) : Array α :=
   go 0 #[]
 where
@@ -849,11 +685,13 @@ where
     else
       r
 termination_by go i r => as.size - i
+
+#eval takeWhile (fun n : Nat => if n % 2 = 1 then true else false) #[1, 3, 5, 6, 7]
 ```
 
-Note that, auxiliary function `go` is recursive in this example, but `takeWhile` is not.
+この例では、補助関数 ``go`` は再帰的だが、``takeWhile`` は再帰的でないことに注意してほしい。
 
-By default, Lean uses the tactic `decreasing_tactic` to prove recursive applications are decreasing. The modifier `decreasing_by` allows us to provide our own tactic. Here is an example.
+デフォルトでは、Leanは ``decreasing_tactic`` タクティクを使って再帰適用後の項が元の項より小さいことを証明する。``decreasing_by`` 修飾子を使うと、独自のタクティクを提供することができる。以下はその例である。
 
 ```lean
 theorem div_lemma {x y : Nat} : 0 < y ∧ y ≤ x → x - y < x :=
@@ -867,7 +705,7 @@ def div (x y : Nat) : Nat :=
 decreasing_by apply div_lemma; assumption
 ```
 
-Note that `decreasing_by` is not replacement for `termination_by`, they complement each other. `termination_by` is used to specify a well-founded relation, and `decreasing_by` for providing our own tactic for showing recursive applications are decreasing. In the following example, we use both of them.
+``decreasing_by`` は ``termination_by`` を置き換えるものではなく、互いに補完し合うものである。``termination_by`` は整礎関係を指定するのに使われ、``decreasing_by`` は再帰適用後の項が元の項より小さいことを示すために独自のタクティクを提供するために使われる。次の例ではその両方を使う。
 
 ```lean
 def ack : Nat → Nat → Nat
@@ -881,7 +719,7 @@ decreasing_by
         | apply Prod.Lex.left; simp_arith
 ```
 
-We can use `decreasing_by sorry` to instruct Lean to "trust" us that the function terminates.
+``decreasing_by sorry`` を使えば、Leanに関数が停止することを「信じ」させることができる。
 
 ```lean
 def natToBin : Nat → List Nat
@@ -893,7 +731,7 @@ decreasing_by sorry
 #eval natToBin 1234567
 ```
 
-Recall that using `sorry` is equivalent to using a new axiom, and should be avoided. In the following example, we used the `sorry` to prove `False`. The command `#print axioms` shows that `unsound` depends on the unsound axiom `sorryAx` used to implement `sorry`.
+``sorry`` を使うことは新しい公理を導入することと同じであり、避けるべきであることを思い出してほしい。次の例では、``sorry`` を使って ``False`` を証明した。コマンド ``#print axioms`` は、``unsound`` が ``sorry`` を実装するために使われている不健全な公理 ``sorryAx`` に依存していることを示す。
 
 ```lean
 def unsound (x : Nat) : False :=
@@ -907,20 +745,19 @@ decreasing_by sorry
 -- 'unsound' depends on axioms: [sorryAx]
 ```
 
-Summary:
+要約:
 
-- If there is no `termination_by`, a well-founded relation is derived (if possible) by selecting an argument and then using typeclass resolution to synthesize a well-founded relation for this argument's type.
+- ``termination_by`` がない場合、Leanはある引数を選択し、型クラス解決を使って選択した引数の型上の整礎関係を合成することで、(可能であれば)整礎関係が導出される。
 
-- If `termination_by` is specified, it maps the arguments of the function to a type `α` and type class resolution is again used. Recall that, the default instance for `β × γ` is a lexicographic order based on the well-founded relations for `β` and `γ`.
+- ``termination_by`` が指定されている場合、``termination_by`` は関数の引数を ``α`` 型にマッピングし、再び型クラス解決が使われる。``β × γ`` に関するデフォルトインスタンスは ``β`` と ``γ`` 上の整礎関係に基づいた辞書式順序であることを思い出してほしい。
 
-- The default well-founded relation instance for `Nat` is `<`.
+- ``Nat`` に関するデフォルトの整礎関係インスタンスは ``<`` である。
 
-- By default, the tactic `decreasing_tactic` is used to show that recursive applications are smaller with respect to the selected well-founded relation. If `decreasing_tactic` fails, the error message includes the remaining goal `... |- G`. Note that, the `decreasing_tactic` uses `assumption`. So, you can include a `have`-expression to prove goal `G`. You can also provide your own tactic using `decreasing_by`.
+- デフォルトでは、選択された整礎関係について、再帰適用後の項が元の項より小さいことを示すために ``decreasing_tactic`` タクティクが使われる。``decreasing_tactic`` が失敗した場合に表示されるエラーメッセージは残りのゴール ``... |- G`` を含む。``decreasing_tactic`` は ``assumption`` タクティクを使うことに注意。つまり、``have`` 式を使ってコンテキストに仮説を追加することがターゲット ``G`` の証明の役に立つことがある。``decreasing_by`` を使って独自のタクティクを提供することもできる。
 
-Mutual Recursion
-----------------
+## Mutual Recursion (相互再帰)
 
-Lean also supports mutual recursive definitions. The syntax is similar to that for mutual inductive types. Here is an example:
+Leanは*mutual recursive definitions*(相互再帰的定義)もサポートしている。その構文は相互帰納型と似ている。以下に例を挙げる:
 
 ```lean
 mutual
@@ -945,9 +782,9 @@ theorem even_eq_not_odd : ∀ a, even a = not (odd a) := by
   . simp [even, odd, *]
 ```
 
-What makes this a mutual definition is that ``even`` is defined recursively in terms of ``odd``, while ``odd`` is defined recursively in terms of ``even``. Under the hood, this is compiled as a single recursive definition. The internally defined function takes, as argument, an element of a sum type, either an input to ``even``, or an input to ``odd``. It then returns an output appropriate to the input. To define that function, Lean uses a suitable well-founded measure. The internals are meant to be hidden from users; the canonical way to make use of such definitions is to use ``simp`` (or `unfold`), as we did above.
+``even`` は ``odd`` を用いて定義され、``odd`` は ``even`` を用いて定義されているため、この定義は相互定義になっている。内部では、この定義は単一の再帰的定義としてコンパイルされる。内部で定義された関数は、直和型の項を引数として取る。直和型の項の片側は ``even`` への入力、もう片側は ``odd`` への入力と解釈される。そして、入力に適した出力を返す。この関数を定義するために、Leanは適切な整礎関係を使用するが、その内部はユーザーから隠されている。このような定義を利用する正規の方法は、前節でやったように ``simp`` または ``unfold`` を使うことである。
 
-Mutual recursive definitions also provide natural ways of working with mutual and nested inductive types. Recall the definition of ``Even`` and ``Odd`` as mutual inductive predicates as presented before.
+また、相互再帰的定義は相互帰納型および入れ子帰納型を扱う自然な方法を提供する。前章で示した、相互帰納述語型としての ``Even`` と ``Odd`` の定義を思い出してほしい。
 
 ```lean
 mutual
@@ -960,7 +797,7 @@ mutual
 end
 ```
 
-The constructors, ``even_zero``, ``even_succ``, and ``odd_succ`` provide positive means for showing that a number is even or odd. We need to use the fact that the inductive type is generated by these constructors to know that zero is not odd, and that the latter two implications reverse. As usual, the constructors are kept in a namespace that is named after the type being defined, and the command ``open Even Odd`` allows us to access them more conveniently.
+コンストラクタ ``even_zero``、``even_succ``、``odd_succ`` はある自然数が偶数か奇数かを示す積極的な手段を提供する。0が奇数でないこと、そして後の2つのコンストラクタの意味が逆であることを知るには、この相互帰納型がこれらのコンストラクタによって生成されたという事実を使う必要がある。いつものように、コンストラクタは定義された型の名前を持つ名前空間に保管されており、コマンド ``open Even Odd`` を使えば、コンストラクタに便利にアクセスできるようになる。
 
 ```lean
 # mutual
@@ -982,7 +819,7 @@ theorem odd_of_even_succ : ∀ n, Even (n + 1) → Odd n
   | _, even_succ n h => h
 ```
 
-For another example, suppose we use a nested inductive type to define a set of terms inductively, so that a term is either a constant (with a name given by a string), or the result of applying a constant to a list of constants.
+別の例を挙げる。入れ子帰納型を使って、型 ``Term`` の項を帰納的に定義することを考える。ここで、``Term`` の項は定数(文字列によって与えられる名前を持つ)か、定数のリストに定数を適用した結果のどちらかになるとする。
 
 ```lean
 inductive Term where
@@ -990,7 +827,7 @@ inductive Term where
   | app   : String → List Term → Term
 ```
 
-We can then use a mutual recursive definition to count the number of constants occurring in a term, as well as the number occurring in a list of terms.
+そして、相互再帰を使って、各項の中に登場する定数の数を数える関数と、項のリストの中に登場する要素の数を数える関数を定義することができる。
 
 ```lean
 # inductive Term where
@@ -1009,13 +846,15 @@ mutual
 end
 
 def sample := app "f" [app "g" [const "x"], const "y"]
+def sample2 := [app "g" [const "x", const "y"], const "y"]
 
 #eval numConsts sample
+#eval numConstsLst sample2
 
 end Term
 ```
 
-As a final example, we define a function `replaceConst a b e` that replaces a constant `a` with `b` in a term `e`, and then prove the number of constants is the same. Note that, our proof uses mutual recursion (aka induction).
+最後の例として、項 ``e`` 内の定数 ``a`` を ``b`` に置き換える関数 ``replaceConst a b e`` を定義し、``e`` が持つ定数の個数と ``replaceConst a b e`` が持つ定数の個数が同じであることを証明する。この証明は、相互帰納法を使っていることに注意してほしい。
 
 ```lean
 # inductive Term where
@@ -1057,20 +896,9 @@ mutual
 end
 ```
 
-Dependent Pattern Matching
---------------------------
+## Dependent Pattern Matching (依存パターンマッチング)
 
-All the examples of pattern matching we considered in
-[Section Pattern Matching](#_pattern_matching) can easily be written using ``cases_on``
-and ``rec_on``. However, this is often not the case with indexed
-inductive families such as ``Vector α n``, since case splits impose
-constraints on the values of the indices. Without the equation
-compiler, we would need a lot of boilerplate code to define very
-simple functions such as ``map``, ``zip``, and ``unzip`` using
-recursors. To understand the difficulty, consider what it would take
-to define a function ``tail`` which takes a vector
-``v : Vector α (succ n)`` and deletes the first element. A first thought might be to
-use the ``casesOn`` function:
+[Pattern Matching (パターンマッチング)](#pattern-matching-パターンマッチング)の節で説明した全ての例は、``cases_on`` と ``rec_on`` を使って簡単に書くことができる。しかし、``Vector α n`` のような添字付き帰納族では、ケース分割が添字の値に制約を課すため、簡単に書けないことがよくある。もし等式コンパイラが無かったら、再帰子だけを使って ``map``、``zip``、``unzip`` などの非常に単純な関数を定義するために、多くの定型的なコードが必要になっただろう。その難しさを理解するために、ベクトル ``v : Vector α (succ n)`` を受け取り、最初の要素を削除したベクトルを返す関数 ``tail`` を定義するためには何が必要かを考えてみよう。まずは、``casesOn`` 関数を使うことが考えられる:
 
 ```lean
 inductive Vector (α : Type u) : Nat → Type u
@@ -1092,11 +920,9 @@ namespace Vector
 end Vector
 ```
 
-But what value should we return in the ``nil`` case? Something funny
-is going on: if ``v`` has type ``Vector α (succ n)``, it *can't* be
-nil, but it is not clear how to tell that to ``casesOn``.
+しかし、入力が ``nil`` の場合は何を返せばいいだろうか。何かおかしなことが起こっている: ``v`` の型が ``Vector α (succ n)`` なら、``v`` が ``nil`` である**はずがない**。しかし、それを ``casesOn`` に伝える方法は明らかではない。
 
-One solution is to define an auxiliary function:
+1つの解決策は、補助関数を定義することである:
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1115,21 +941,11 @@ def tail (v : Vector α (n+1)) : Vector α n :=
 # end Vector
 ```
 
-In the ``nil`` case, ``m`` is instantiated to ``0``, and
-``noConfusion`` makes use of the fact that ``0 = succ n`` cannot
-occur.  Otherwise, ``v`` is of the form ``a :: w``, and we can simply
-return ``w``, after casting it from a vector of length ``m`` to a
-vector of length ``n``.
+補助関数 ``tailAux`` において、``v`` が ``nil`` の場合、``m`` は ``0`` にインスタンス化され、``noConfusion`` は ``0 = succ n`` は成立しえないという事実を使う。そうでなければ、``v`` は ``a :: w`` の形をとり、``w`` を長さ ``m`` のベクトルから長さ ``n`` のベクトルへキャストした後、単純に ``w`` を返すことができる(``h1 ▸ as``)。
 
-The difficulty in defining ``tail`` is to maintain the relationships between the indices.
-The hypothesis ``e : m = n + 1`` in ``tailAux`` is used to communicate the relationship
-between ``n`` and the index associated with the minor premise.
-Moreover, the ``zero = n + 1`` case is unreachable, and the canonical way to discard such
-a case is to use ``noConfusion``.
+``tail`` を定義する上で難しいのは、添字間の関係を維持することである。``tailAux`` 内の仮説 ``e : m = n + 1`` は、``n`` と小前提(``Vector.casesOn`` の4番目と5番目の引数)に関連した添字(``0`` と ``m + 1``)の関係を ``noConfusion`` 等に伝えるために使われる。さらに、``zero = n + 1`` のケースは到達不能である。このようなケースを破棄する正規の方法は ``noConfusion`` を使うことである。
 
-The ``tail`` function is, however, easy to define using recursive
-equations, and the equation compiler generates all the boilerplate
-code automatically for us. Here are a number of similar examples:
+しかし、実際は ``tail`` 関数は再帰を使って簡単に定義できる。そして、等式コンパイラが全ての定型コードを自動的に生成してくれる。似た例をいくつか紹介しよう:
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1155,9 +971,7 @@ def zip : {n : Nat} → Vector α n → Vector β n → Vector (α × β) n
 # end Vector
 ```
 
-Note that we can omit recursive equations for "unreachable" cases such
-as ``head nil``. The automatically generated definitions for indexed
-families are far from straightforward. For example:
+再帰的定義において、``head nil`` のような「到達不能」なケースはケースリストから除外できることに注意してほしい。自動生成される添字付き帰納族の定義は単純とは言いがたいものである。次の例について、``#print`` コマンドの出力を見てほしい:
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1173,42 +987,27 @@ def map (f : α → β → γ) : {n : Nat} → Vector α n → Vector β n → V
 # end Vector
 ```
 
-The ``map`` function is even more tedious to define by hand than the
-``tail`` function. We encourage you to try it, using ``recOn``,
-``casesOn`` and ``noConfusion``.
+``map`` 関数を手で定義するのは ``tail`` 関数よりもさらに面倒である。自信のある人は ``recOn``、``casesOn``、``noConfusion`` を使って ``map`` 関数を手作りしてみてほしい。
 
-Inaccessible Patterns
-------------------
+## Inaccessible Patterns (アクセス不能パターン)
 
-Sometimes an argument in a dependent matching pattern is not essential
-to the definition, but nonetheless has to be included to specialize
-the type of the expression appropriately. Lean allows users to mark
-such subterms as *inaccessible* for pattern matching. These
-annotations are essential, for example, when a term occurring in the
-left-hand side is neither a variable nor a constructor application,
-because these are not suitable targets for pattern matching. We can
-view such inaccessible patterns as "don't care" components of the
-patterns. You can declare a subterm inaccessible by writing
-``.(t)``. If the inaccessible pattern can be inferred, you can also write
-``_``.
+依存パターンマッチングにおいて、項の型を適切に特殊化するために、定義には必要のない引数を含まなければならない場合がある。Leanでは、このような補助項を、パターンマッチングにおいて*inaccessible*(アクセス不能)なものとしてマークすることができる。例えば、左辺に出現する項が変数単体でも変数にコンストラクタを適用したものでもない場合、これらの注釈は不可欠である。なぜなら、それらの項はパターンマッチングにおいて不適切なターゲットだからである。このようなアクセス不能パターンは、ケースの左辺の*don't care*な構成要素とみなすことができる。``.(t)`` と書くことで、補助項へのアクセスが不能であることを宣言することができる。アクセス不能パターンの形が推論できる場合は、``_`` と書いてもよい。
 
-The following example, we declare an inductive type that defines the
-property of "being in the image of ``f``". You can view an element of
-the type ``ImageOf f b`` as evidence that ``b`` is in the image of
-``f``, whereby the constructor ``imf`` is used to build such
-evidence. We can then define any function ``f`` with an "inverse"
-which takes anything in the image of ``f`` to an element that is
-mapped to it. The typing rules forces us to write ``f a`` for the
-first argument, but this term is neither a variable nor a constructor
-application, and plays no role in the pattern-matching definition. To
-define the function ``inverse`` below, we *have to* mark ``f a``
-inaccessible.
+次の例では、「``f`` のimage(像)の中にある」という性質を定義する帰納型を宣言する。型 ``ImageOf f b`` の項は、``b`` が ``f`` の像の中にあることの証拠だと見なすことができる。コンストラクタ ``imf`` はそのような証拠を構築するために使われる。それから、``f`` の像の中にある項 ``b`` を受け取り、証拠 ``imf a`` に基づいて、``f`` によって ``b`` にマップされた要素の1つ ``a`` を返す「逆関数」を持つ関数 ``f`` を定義することができる。型付けのルールに従うと、最初の引数を ``f a`` と書かなければならないが、この項は変数単体でも変数にコンストラクタを適用したものでもないため、パターンマッチングを用いた定義において何の役割も果たさない。以下の逆関数 ``inverse`` を定義するためには、``f a`` にアクセス不能であるとマーク**しなければならない**。
 
 ```lean
 inductive ImageOf {α β : Type u} (f : α → β) : β → Type u where
   | imf : (a : α) → ImageOf f (f a)
 
 open ImageOf
+
+/-
+def bad_inverse {f : α → β} : (b : β) → ImageOf f b → α
+  | b, imf a => a  -- `imf a` has type `ImageOf f (f a)` but is expected to have type `ImageOf f b`
+
+def bad_inverse' {f : α → β} : (b : β) → ImageOf f b → α
+  | f a, imf a => a  -- invalid pattern
+-/
 
 def inverse {f : α → β} : (b : β) → ImageOf f b → α
   | .(f a), imf a => a
@@ -1217,14 +1016,9 @@ def inverse' {f : α → β} : (b : β) → ImageOf f b → α
   | _, imf a => a
 ```
 
-In the example above, the inaccessible annotation makes it clear that
-``f`` is *not* a pattern matching variable.
+上記の例では、アクセス不能注釈は ``f`` がパターンマッチング対象の変数では**ない**ことを明確にしている。
 
-Inaccessible patterns can be used to clarify and control definitions that
-make use of dependent pattern matching. Consider the following
-definition of the function ``Vector.add``, which adds two vectors of
-elements of a type, assuming that type has an associated addition
-function:
+アクセス不能パターンは、依存パターンマッチングを利用する定義を明確にし、制御するために使用することができる。ある型 ``α`` に関連する加法演算があると仮定して、``α`` の項を要素に持つ2つのベクトルを足し合わせる関数 ``Vector.add`` を定義することを考えてみよう:
 
 ```lean
 inductive Vector (α : Type u) : Nat → Type u
@@ -1240,19 +1034,9 @@ def add [Add α] : {n : Nat} → Vector α n → Vector α n → Vector α n
 end Vector
 ```
 
-The argument ``{n : Nat}`` appear after the colon, because it cannot
-be held fixed throughout the definition.  When implementing this
-definition, the equation compiler starts with a case distinction as to
-whether the first argument is ``0`` or of the form ``n+1``.  This is
-followed by nested case splits on the next two arguments, and in each
-case the equation compiler rules out the cases are not compatible with
-the first pattern.
+引数 ``{n : Nat}`` はコロンの後に現れるが、これはパターンマッチングを用いた定義内で ``n`` を固定し続けることができないからである。この定義を実装したとき、等式コンパイラは最初の引数が ``0`` か ``n+1`` の形をとるかのケース判別から始める。続いて、次の2つの引数についてネストされたケース判別がなされる。それぞれのケースについて、等式コンパイラは最初の引数 ``n`` のパターンと整合性のないケースを除外する(例えば、``n+1, nil, nil`` というパターンたちを持つケースを除外する)。
 
-But, in fact, a case split is not required on the first argument; the
-``casesOn`` eliminator for ``Vector`` automatically abstracts this
-argument and replaces it by ``0`` and ``n + 1`` when we do a case
-split on the second argument. Using inaccessible patterns, we can prompt
-the equation compiler to avoid the case split on ``n``
+しかし、実際には最初の引数 ``n`` についてケース判別をする必要はない。``Vector`` の ``casesOn`` エリミネータは2番目の引数でケース判別をするときに、引数 ``n`` の値を自動的に抽象化して ``0`` か ``n + 1`` に置き換える。アクセス不能パターンを使うことで、等式コンパイラに ``n`` でのケース判別を避けるように促すことができる。
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1265,13 +1049,9 @@ def add [Add α] : {n : Nat} → Vector α n → Vector α n → Vector α n
 # end Vector
 ```
 
-Marking the position as an inaccessible pattern tells the
-equation compiler first, that the form of the argument should be
-inferred from the constraints posed by the other arguments, and,
-second, that the first argument should *not* participate in pattern
-matching.
+この位置をアクセス不能パターンとしてマークすることは、等式コンパイラに次の2つのことを伝える。第一に、最初の引数の形式は他の引数によってもたらされる制約から推論されるべきである。第二に、最初の引数はパターンマッチングに参加すべきでは**ない**。
 
-The inaccessible pattern `.(_)` can be written as `_` for convenience.
+アクセス不能パターン ``.(_)`` は簡便のため ``_`` と書くことができる。
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1284,12 +1064,7 @@ def add [Add α] : {n : Nat} → Vector α n → Vector α n → Vector α n
 # end Vector
 ```
 
-As we mentioned above, the argument ``{n : Nat}`` is part of the
-pattern matching, because it cannot be held fixed throughout the
-definition. In previous Lean versions, users often found it cumbersome
-to have to include these extra discriminants. Thus, Lean 4
-implements a new feature, *discriminant refinement*, which includes
-these extra discriminants automatically for us.
+上述したように、引数 ``{n : Nat}`` は定義内で固定し続けることができないため、パターンマッチングの一部のならざるを得ない。Leanの以前のバージョンでは、ユーザーはこのような余分な判別子を含めなければならないことが面倒だとしばしば感じていた。そこで、Lean 4は新機能*discriminant refinement*(判別子の絞り込み)を実装した。この機能は余分な判別子を自動でパターンマッチングに含める。
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1302,8 +1077,7 @@ def add [Add α] {n : Nat} : Vector α n → Vector α n → Vector α n
 # end Vector
 ```
 
-When combined with the *auto bound implicits* feature, you can simplify
-the declare further and write:
+*auto bound implicits*(自動束縛暗黙引数)機能と組み合わせると、``add`` の定義をより簡潔に書くことができる:
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1316,8 +1090,7 @@ def add [Add α] : Vector α n → Vector α n → Vector α n
 # end Vector
 ```
 
-Using these new features, you can write the other vector functions defined
-in the previous sections more compactly as follows:
+これらの新機能を使うことで、前節で定義した他のベクトル関数を次のようによりコンパクトに書くことができる:
 
 ```lean
 # inductive Vector (α : Type u) : Nat → Type u
@@ -1343,11 +1116,9 @@ def zip : Vector α n → Vector β n → Vector (α × β) n
 # end Vector
 ```
 
-Match Expressions
------------------
+## Match Expressions (マッチ式)
 
-Lean also provides a compiler for *match-with* expressions found in
-many functional languages.
+Leanは、多くの関数型言語で見られる*match-with*式のコンパイラも提供している。
 
 ```lean
 def isNotZero (m : Nat) : Bool :=
@@ -1356,9 +1127,7 @@ def isNotZero (m : Nat) : Bool :=
   | n+1 => true
 ```
 
-This does not look very different from an ordinary pattern matching
-definition, but the point is that a ``match`` can be used anywhere in
-an expression, and with arbitrary arguments.
+``match`` は普通のパターンマッチングによる定義とあまり変わらないように見える。しかし、``match`` のポイントは、定義内のどこでも使えることと、任意の引数に対して使えることである。
 
 ```lean
 def isNotZero (m : Nat) : Bool :=
@@ -1376,7 +1145,7 @@ def filter (p : α → Bool) : List α → List α
 example : filter isNotZero [1, 0, 0, 3, 0] = [1, 3] := rfl
 ```
 
-Here is another example:
+別の例を挙げる:
 
 ```lean
 def foo (n : Nat) (b c : Bool) :=
@@ -1391,8 +1160,7 @@ def foo (n : Nat) (b c : Bool) :=
 example : foo 7 true false = 9 := rfl
 ```
 
-Lean uses the ``match`` construct internally to implement pattern-matching in all parts of the system.
-Thus, all four of these definitions have the same net effect.
+Leanは、システムの全ての部分で、パターンマッチングを実装するために内部で ``match`` 構文を使用する。したがって、以下の4つの定義は全て同じ効果を持つ。
 
 ```lean
 def bar₁ : Nat × Nat → Nat
@@ -1409,7 +1177,7 @@ def bar₄ (p : Nat × Nat) : Nat :=
   let (m, n) := p; m + n
 ```
 
-These variations are equally useful for destructing propositions:
+命題を分解する際には、上記の変形版が役に立つ:
 
 ```lean
 variable (p q : Nat → Prop)
@@ -1432,90 +1200,17 @@ example (h₀ : ∃ x, p x) (h₁ : ∃ y, q y)
   ⟨x, y, px, qy⟩
 ```
 
-Local Recursive Declarations
----------
+## Exercises (練習問題)
 
-You can define local recursive declarations using the `let rec` keyword.
+1. 名前の衝突を避けるために名前空間 ``Hidden`` を開き、等式コンパイラを使って自然数上の加法、乗法、べき乗を定義せよ。次に、等式コンパイラを使って、それらの基本的な性質を証明せよ。
 
-```lean
-def replicate (n : Nat) (a : α) : List α :=
-  let rec loop : Nat → List α → List α
-    | 0,   as => as
-    | n+1, as => loop n (a::as)
-  loop n []
+2. 同様に、等式コンパイラを使ってリストに対する基本的な操作(``reverse`` 関数など)を定義し、リストに関する定理を帰納法で証明せよ。例えば、任意のリストに対して、``reverse (reverse xs) = xs`` となることを示せ。
 
-#check @replicate.loop
--- {α : Type} → α → Nat → List α → List α
-```
+3. 累積再帰を実行する自然数上の関数を自分で定義せよ。同様に、``WellFounded.fix`` を自分で定義する方法を見つけられるか試してみよ。
 
-Lean creates an auxiliary declaration for each `let rec`. In the example above,
-it created the declaration `replicate.loop` for the `let rec loop` occurring at `replicate`.
-Note that, Lean "closes" the declaration by adding any local variable occurring in the
-`let rec` declaration as additional parameters. For example, the local variable `a` occurs
-at `let rec loop`.
+4. 節[Dependent Pattern Matching (依存パターンマッチング)](#dependent-pattern-matching-依存パターンマッチング)の例に従って、2つのベクトル ``va`` ``vb`` を受け取り、``va`` の末尾に ``vb`` を追加したベクトルを返す関数を定義せよ。これは厄介で、補助関数を定義しなければならないだろう。
 
-You can also use `let rec` in tactic mode and for creating proofs by induction.
-
-```lean
-# def replicate (n : Nat) (a : α) : List α :=
-#  let rec loop : Nat → List α → List α
-#    | 0,   as => as
-#    | n+1, as => loop n (a::as)
-#  loop n []
-theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
-  let rec aux (n : Nat) (as : List α)
-              : (replicate.loop a n as).length = n + as.length := by
-    match n with
-    | 0   => simp [replicate.loop]
-    | n+1 => simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
-  exact aux n []
-```
-
-You can also introduce auxiliary recursive declarations using a `where` clause after your definition.
-Lean converts them into a `let rec`.
-
-```lean
-def replicate (n : Nat) (a : α) : List α :=
-  loop n []
-where
-  loop : Nat → List α → List α
-    | 0,   as => as
-    | n+1, as => loop n (a::as)
-
-theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
-  exact aux n []
-where
-  aux (n : Nat) (as : List α)
-      : (replicate.loop a n as).length = n + as.length := by
-    match n with
-    | 0   => simp [replicate.loop]
-    | n+1 => simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
-```
-
-Exercises
----------
-
-1. Open a namespace ``Hidden`` to avoid naming conflicts, and use the
-   equation compiler to define addition, multiplication, and
-   exponentiation on the natural numbers. Then use the equation
-   compiler to derive some of their basic properties.
-
-2. Similarly, use the equation compiler to define some basic
-   operations on lists (like the ``reverse`` function) and prove
-   theorems about lists by induction (such as the fact that
-   ``reverse (reverse xs) = xs`` for any list ``xs``).
-
-3. Define your own function to carry out course-of-value recursion on
-   the natural numbers. Similarly, see if you can figure out how to
-   define ``WellFounded.fix`` on your own.
-
-4. Following the examples in [Section Dependent Pattern Matching](#_dependent_pattern_matching),
-   define a function that will append two vectors.
-   This is tricky; you will have to define an auxiliary function.
-
-5. Consider the following type of arithmetic expressions. The idea is
-   that ``var n`` is a variable, ``vₙ``, and ``const n`` is the
-   constant whose value is ``n``.
+5. 次のような算術式の型を考える。ここで、``var n`` は変数 ``vₙ``を、``const n`` は値が ``n`` である定数を表す。
 
 ```lean
 inductive Expr where
@@ -1531,9 +1226,9 @@ def sampleExpr : Expr :=
   plus (times (var 0) (const 7)) (times (const 2) (var 1))
 ```
 
-Here ``sampleExpr`` represents ``(v₀ * 7) + (2 * v₁)``.
+ここで、``sampleExpr`` は ``(v₀ * 7) + (2 * v₁)`` を表す。
 
-Write a function that evaluates such an expression, evaluating each ``var n`` to ``v n``.
+各 ``var n`` を ``v n`` に評価した上で、このような式(``Expr`` の項)を評価する関数を書け。
 
 ```lean
 # inductive Expr where
@@ -1556,15 +1251,11 @@ def sampleVal : Nat → Nat
   | 1 => 6
   | _ => 0
 
--- Try it out. You should get 47 here.
+-- 次のコマンドを実行せよ。`47` が出力されたら正解である。
 -- #eval eval sampleVal sampleExpr
 ```
 
-Implement "constant fusion," a procedure that simplifies subterms like
-``5 + 7`` to ``12``. Using the auxiliary function ``simpConst``,
-define a function "fuse": to simplify a plus or a times, first
-simplify the arguments recursively, and then apply ``simpConst`` to
-try to simplify the result.
+補助関数 ``simpConst`` を使って、``5 + 7`` のような部分項を ``12`` に単純化する「定数融合関数」``fuse`` を実装せよ。``plus`` や ``times`` を単純化するために、まず引数を再帰的に単純化せよ。次に ``simpConst`` を適用して結果の単純化を試みよ。
 
 ```lean
 # inductive Expr where
@@ -1595,4 +1286,4 @@ theorem fuse_eq (v : Nat → Nat)
   sorry
 ```
 
-The last two theorems show that the definitions preserve the value.
+最後の2つの定理は、``simpConst`` や ``fuse`` が式の値を保存することを表す。

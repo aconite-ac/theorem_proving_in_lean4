@@ -1,11 +1,6 @@
-# Type Classes
+# Type Classes (型クラス)
 
-Type classes were introduced as a principled way of enabling
-ad-hoc polymorphism in functional programming languages. We first observe that it
-would be easy to implement an ad-hoc polymorphic function (such as addition) if the
-function simply took the type-specific implementation of addition as an argument
-and then called that implementation on the remaining arguments. For example,
-suppose we declare a structure in Lean to hold implementations of addition.
+型クラスは、関数型プログラミング言語においてアドホックな多相性を実現する原理的な方法として導入された。まず、次のことを見る: もし関数が型固有の加法の実装を引数として取り、残りの引数に対してその加法の実装を呼び出すだけであれば、加法のようなアドホックな多相性関数を実装するのは簡単である。例えば、Leanで加法の実装を保持する構造体を宣言したとしよう。
 
 ```lean
 # namespace Ex
@@ -14,13 +9,11 @@ structure Add (a : Type) where
 
 #check @Add.add
 -- Add.add : {a : Type} → Add a → a → a → a
+-- `Add.add` はstructure宣言によって自動生成される射影関数
 # end Ex
 ```
 
-In the above Lean code, the field `add` has type
-`Add.add : {a : Type} → Add a → a → a → a`
-where the curly braces around the type `a` mean that it is an implicit argument.
-We could implement `double` by:
+このLeanコードでは、``add`` フィールドへの射影関数は ``Add.add : {a : Type} → Add a → a → a → a`` という型を持っている。ここで、型 ``a`` を囲んでいる波括弧は、``a`` が暗黙の引数であることを示している。次のようにして ``double`` 関数を実装することができる:
 
 ```lean
 # namespace Ex
@@ -40,16 +33,9 @@ def double (s : Add a) (x : a) : a :=
 # end Ex
 ```
 
-Note that you can double a natural number `n` by `double { add := Nat.add } n`.
-Of course, it would be highly cumbersome for users to manually pass the
-implementations around in this way.
-Indeed, it would defeat most of the potential benefits of ad-hoc
-polymorphism.
+``double { add := Nat.add } n`` と書くことで自然数 ``n`` を2倍することができる。もちろん、このように手動で実装(を保持するレコード)を渡すのはユーザーにとって非常に面倒である。実際、そのような面倒さがあれば、アドホック多相性の潜在的な利点のほとんどを失うことになる。
 
-The main idea behind type classes is to make arguments such as `Add a` implicit,
-and to use a database of user-defined instances to synthesize the desired instances
-automatically through a process known as typeclass resolution. In Lean, by changing
-`structure` to `class` in the example above, the type of `Add.add` becomes:
+型クラスの主な考え方は、まず ``Add a`` のような型の引数を暗黙にすることである。それから、ユーザーが定義したインスタンスを保管するデータベースを使用して、*typeclass resolution*(型クラス解決)として知られるプロセスを通じて、目的のインスタンス ``{s : Add a}`` を自動合成することである。Leanでは、上の例で ``structure`` を ``class`` に書き換えることで、``Add.add`` の型は次のように変化する:
 
 ```lean
 # namespace Ex
@@ -61,10 +47,7 @@ class Add (a : Type) where
 # end Ex
 ```
 
-where the square brackets indicate that the argument of type `Add a` is *instance implicit*,
-i.e. that it should be synthesized using typeclass resolution. This version of
-`add` is the Lean analogue of the Haskell term `add :: Add a => a -> a -> a`.
-Similarly, we can register instances by:
+ここで、角括弧 ``[]`` は ``Add a`` 型の引数が*instance implicit*(インスタンス暗黙引数)であること、つまり型クラス解決を使って合成されるべきであることを示している。``class`` 宣言によって自動生成された ``add`` 射影関数は、Haskellの ``add :: Add a => a -> a -> a`` のLean版である。そして、ユーザー定義インスタンスは次のように登録できる:
 
 ```lean
 # namespace Ex
@@ -81,9 +64,7 @@ instance : Add Float where
 # end Ex
 ```
 
-Then for `n : Nat` and `m : Nat`, the term `Add.add n m` triggers typeclass resolution with
-the goal of `Add Nat`, and typeclass resolution will synthesize the instance for `Nat` above.
-We can now reimplement `double` using an instance implicit by:
+インスタンスの登録後、``n : Nat`` と ``m : Nat`` に対して、``Add.add n m`` という項は、``Add Nat`` 型のインスタンス合成を目標とする型クラス解決を引き起こす。型クラス解決は上で ``instance`` 宣言を用いて登録した ``Add Nat`` のインスタンスを参照し、目標のインスタンスを合成する。インスタンス暗黙引数を使って、``double`` を再実装することができる:
 
 ```lean
 # namespace Ex
@@ -105,7 +86,7 @@ def double [Add a] (x : a) : a :=
 -- 20
 
 #eval double (10 : Int)
--- 100
+-- 20
 
 #eval double (7 : Float)
 -- 14.000000
@@ -116,9 +97,11 @@ def double [Add a] (x : a) : a :=
 # end Ex
 ```
 
-In general, instances may depend on other instances in complicated ways. For example,
-you can declare an (anonymous) instance stating that if `a` has addition, then `Array a`
-has addition:
+<!--
+(訳者注: この時点では、大雑把に言えば、型クラスは型クラス解決によりインスタンスが自動合成される構造体だといえる。)
+-->
+
+一般的に、インスタンスは複雑な方法で他のインスタンスに依存することがある。例えば、「もし ``a`` が加法を持つなら、``Array a`` も加法を持つ」と主張する(匿名)インスタンスを宣言することができる:
 
 ```lean
 instance [Add a] : Add (Array a) where
@@ -131,18 +114,9 @@ instance [Add a] : Add (Array a) where
 -- #[4, 6]
 ```
 
-Note that `(· + ·)` is notation for `fun x y => x + y` in Lean.
+Leanにおいて ``(· + ·)`` は ``fun x y => x + y`` の略記であることに注意してほしい。
 
-The example above demonstrates how type classes are used to overload notation.
-Now, we explore another application. We often need an arbitrary element of a given type.
-Recall that types may not have any elements in Lean.
-It often happens that we would like a definition to return an arbitrary element in a "corner case."
-For example, we may like the expression ``head xs`` to be of type ``a`` when ``xs`` is of type ``List a``.
-Similarly, many theorems hold under the additional assumption that a type is not empty.
-For example, if ``a`` is a type, ``exists x : a, x = x`` is true only if ``a`` is not empty.
-The standard library defines a type class ``Inhabited`` to enable type class inference to infer a
-"default" element of an inhabited type.
-Let us start with the first step of the program above, declaring an appropriate class:
+上記の例では、記法をオーバーロード(多重定義)するために型クラスを使う方法を実践した。別の応用例も見てみよう。まず、Leanにおいて、型は項を1つも持たないことがあることを思い出してほしい。しかし、型が有項なら、その型について様々なことができるようになる。Leanを使っていると、ある型の任意の項が必要になることがよくある。例えば、「コーナーケース」において任意の項を返す関数を定義したいと思うことがよくある。また、``xs`` が ``List a`` 型を持つとき、``head xs`` は ``a`` 型を持ってほしいと思うかもしれない。同様に、型が空でないという付加的な仮定の下では、多くの付加的な定理が成立する。例えば、``a`` が型であるとき、``exists x : a, x = x`` が成立するためには ``a`` が空でないことが必要である。標準ライブラリは、有項型の*default*要素を推論できるようにするために、``Inhabited`` という型クラスを定義している。今述べた応用例を実践するために、まず適切なクラスを宣言することから始めよう:
 
 ```lean
 # namespace Ex
@@ -154,11 +128,9 @@ class Inhabited (a : Type u) where
 # end Ex
 ```
 
-Note `Inhabited.default` doesn't have any explicit arguments.
+``Inhabited.default`` は明示的な引数を持たないことに注意してほしい。
 
-An element of the class ``Inhabited a`` is simply an expression of the form ``Inhabited.mk x``, for some element ``x : a``.
-The projection ``Inhabited.default`` will allow us to "extract" such an element of ``a`` from an element of ``Inhabited a``.
-Now we populate the class with some instances:
+``Inhabited a`` クラスの項とは、ある項 ``x : a`` に対する ``Inhabited.mk x`` という形の式である。射影 ``Inhabited.default`` を使えば、``Inhabited a`` の項から ``a`` の項 ``x`` を「抽出」することができる。次に、このクラスにいくつかのインスタンスを登録する:
 
 ```lean
 # namespace Ex
@@ -184,7 +156,7 @@ instance : Inhabited Prop where
 # end Ex
 ```
 
-You can use the command `export` to create the alias `default` for `Inhabited.default`
+``export`` コマンドを使うと、``Inhabited.default`` に対して別名 ``default`` を生成することができる(正確には、``export`` コマンドは名前空間 ``Foo`` 内で ``Bar.baz`` に対して別名 ``Foo.baz`` を生成する)。
 
 ```lean
 # namespace Ex
@@ -208,22 +180,18 @@ export Inhabited (default)
 # end Ex
 ```
 
-## Chaining Instances
+## Chaining Instances (インスタンスの連鎖)
 
-If that were the extent of type class inference, it would not be all that impressive;
-it would be simply a mechanism of storing a list of instances for the elaborator to find in a lookup table.
-What makes type class inference powerful is that one can *chain* instances. That is,
-an instance declaration can in turn depend on an implicit instance of a type class.
-This causes class inference to chain through instances recursively, backtracking when necessary, in a Prolog-like search.
+型クラス推論で出来ることがこれで終わりだとしたら、それほど印象的なものではないだろう。もしそうなら、型クラス推論はユーザー定義インスタンスを保存して、elaboratorがルックアップテーブル(配列や連想配列などのデータ構造)からそれらを見つけられるようにする仕組みに過ぎないからである。型クラス推論が強力なのは、インスタンスを「連鎖」させることができるからである。つまり、インスタンス宣言は、他の型クラスの暗黙のインスタンスに依存することができる。これにより、型クラス推論は、Prolog-likeな探索を用いて、必要に応じてバックトラッキングしながら、再帰的にインスタンスを連鎖させることができる。
 
-For example, the following definition shows that if two types ``a`` and ``b`` are inhabited, then so is their product:
+例えば、次の定義は、2つの型 ``a`` と ``b`` が有項なら、その直積型 ``a × b`` も有項であることを示している:
 
 ```lean
 instance [Inhabited a] [Inhabited b] : Inhabited (a × b) where
   default := (default, default)
 ```
 
-With this added to the earlier instance declarations, type class instance can infer, for example, a default element of ``Nat × Bool``:
+前節のインスタンス宣言に今の宣言を加えることで、例えば ``Nat × Bool`` のデフォルト項を推論できるようになる:
 
 ```lean
 # namespace Ex
@@ -243,17 +211,16 @@ instance [Inhabited a] [Inhabited b] : Inhabited (a × b) where
 # end Ex
 ```
 
-Similarly, we can inhabit type function with suitable constant functions:
+同様に、適切な定数関数の存在により、型 ``b`` が有項なら関数型 ``a → b`` も有項であることを示すことができる:
 
 ```lean
 instance [Inhabited b] : Inhabited (a → b) where
   default := fun _ => default
 ```
 
-As an exercise, try defining default instances for other types, such as `List` and `Sum` types.
+練習として、``List`` 型や ``Sum`` 型などの他の型のデフォルトインスタンスを定義してみよう。
 
-The Lean standard library contains the definition `inferInstance`. It has type `{α : Sort u} → [i : α] → α`,
-and is useful for triggering the type class resolution procedure when the expected type is an instance.
+Leanの標準ライブラリには ``inferInstance`` という定義がある。これは型 ``{α : Sort u} → [i : α] → α`` を持ち、期待される型がインスタンスを持つときに型クラス解決手続きを実行させるのに便利である。
 
 ```lean
 #check (inferInstance : Inhabited Nat) -- Inhabited Nat
@@ -261,21 +228,21 @@ and is useful for triggering the type class resolution procedure when the expect
 def foo : Inhabited (Nat × Nat) :=
   inferInstance
 
+#eval foo.default  -- (0, 0)
+
 theorem ex : foo.default = (default, default) :=
   rfl
 ```
 
-You can use the command `#print` to inspect how simple `inferInstance` is.
+``#print`` コマンドを使うと、``inferInstance`` がいかにシンプルかを見ることができる。
 
 ```lean
 #print inferInstance
 ```
 
-## ToString
+## ToString (``ToString`` 型クラス)
 
-The polymorphic method `toString` has type `{α : Type u} → [ToString α] → α → String`. You implement the instance
-for your own types and use chaining to convert complex values into strings. Lean comes with `ToString` instances
-for most builtin types.
+``ToString`` 型クラスの多相メソッド ``toString`` は型 ``{α : Type u} → [ToString α] → α → String`` を持つ。ユーザー定義の型 ``Foo`` に対して型 ``ToString Foo`` のインスタンスを宣言すると、連鎖を利用して複雑な値を文字列に変換することができる。Leanでは、ほとんどのビルトイン型 ``α`` について ``ToString α`` のインスタンスが付属している。
 
 ```lean
 structure Person where
@@ -286,13 +253,13 @@ instance : ToString Person where
   toString p := p.name ++ "@" ++ toString p.age
 
 #eval toString { name := "Leo", age := 542 : Person }
-#eval toString ({ name := "Daniel", age := 18 : Person }, "hello")
+#eval toString ({ name := "Daniel", age := 18 : Person }, "hello")  -- `instToStringProd` と `instToStringPerson` の連鎖
+
 ```
 
-## Numerals
+## Numerals (数字)
 
-Numerals are polymorphic in Lean. You can use a numeral (e.g., `2`) to denote an element of any type that implements
-the type class `OfNat`.
+Leanでは数字は多相である。型クラス ``OfNat`` に関するインスタンスを持つ任意の型の項を表すために、数字(例えば ``2``)を使うことができる。
 
 ```lean
 structure Rational where
@@ -300,7 +267,7 @@ structure Rational where
   den : Nat
   inv : den ≠ 0
 
-instance : OfNat Rational n where
+instance instOfNatRational (n : Nat) : OfNat Rational n where
   ofNat := { num := n, den := 1, inv := by decide }
 
 instance : ToString Rational where
@@ -310,22 +277,20 @@ instance : ToString Rational where
 
 #check (2 : Rational) -- Rational
 #check (2 : Nat)      -- Nat
+
+#check @OfNat.ofNat Nat 2 (instOfNatNat 2)  -- Nat
+#check @OfNat.ofNat Rational 2 (instOfNatRational 2)  -- Rational
 ```
 
-Lean elaborates the terms `(2 : Nat)` and `(2 : Rational)` as
-`OfNat.ofNat Nat 2 (instOfNatNat 2)` and
-`OfNat.ofNat Rational 2 (instOfNatRational 2)` respectively.
-We say the numerals `2` occurring in the elaborated terms are *raw* natural numbers.
-You can input the raw natural number `2` using the macro `nat_lit 2`.
+Leanのelaboratorは、項 ``(2 : Nat)`` と ``(2 : Rational)`` をそれぞれ ``@OfNat.ofNat Nat 2 (instOfNatNat 2)`` と ``@OfNat.ofNat Rational 2 (instOfNatRational 2)`` に変換する。変換後の項中に出現する数字 ``2`` は「生の」自然数と呼ばれる。マクロ ``nat_lit 2`` を使うと生の自然数 ``2`` を入力することができる。
 
 ```lean
 #check nat_lit 2  -- Nat
 ```
 
-Raw natural numbers are *not* polymorphic.
+生の自然数は多相では**ない**。
 
-The `OfNat` instance is parametric on the numeral. So, you can define instances for particular numerals.
-The second argument is often a variable as in the example above, or a *raw* natural number.
+``OfNat`` インスタンスは生の自然数を引数に取る。そのため、特定の数字に対して ``OfNat`` のインスタンスを定義することができる。``OfNat`` 型クラスの2番目の引数は、上の例のように変数であることが多いが、生の自然数の場合もある。
 
 ```lean
 class Monoid (α : Type u) where
@@ -339,21 +304,15 @@ def getUnit [Monoid α] : α :=
   1
 ```
 
-## Output Parameters
+## Output Parameters (出力パラメータ)
 
-By default, Lean only tries to synthesize an instance `Inhabited T` when the term `T` is known and does not
-contain missing parts. The following command produces the error
-"typeclass instance problem is stuck, it is often due to metavariables `?m.7`" because the type has a missing part (i.e., the `_`).
+デフォルトでは、Leanは型 ``T`` のデフォルト項が既知であり、``T`` が欠落部分を含まない場合にのみ、``Inhabited T`` のインスタンスを合成しようとする。次のコマンドは、型が欠落部分(つまり ``_``)を含むため、"failed to create type class instance for Inhabited (Nat × ?m.1499)" というエラーを生成する。
 
 ```lean
 #check_failure (inferInstance : Inhabited (Nat × _))
 ```
 
-You can view the parameter of the type class `Inhabited` as an *input* value for the type class synthesizer.
-When a type class has multiple parameters, you can mark some of them as output parameters.
-Lean will start type class synthesizer even when these parameters have missing parts.
-In the following example, we use output parameters to define a *heterogeneous* polymorphic
-multiplication.
+``Inhabited`` 型クラスのパラメータは、``Inhabited`` 型クラスのコンストラクタの「入力」の型とみなすことができる。型クラスが複数のパラメータを持つ場合、そのうちのいくつかを出力パラメータ(型クラスの要素である関数の出力の型)としてマークすることができる。出力パラメータに欠落部分があっても、Leanは型クラスのインスタンス合成を開始する。以下の例では、出力パラメータを使って*heterogeneous*(異種)多相乗法を定義している。
 
 ```lean
 # namespace Ex
@@ -373,12 +332,7 @@ instance : HMul Nat (Array Nat) (Array Nat) where
 # end Ex
 ```
 
-The parameters `α` and `β` are considered input parameters and `γ` an output one.
-Given an application `hMul a b`, after the types of `a` and `b` are known, the type class
-synthesizer is invoked, and the resulting type is obtained from the output parameter `γ`.
-In the example above, we defined two instances. The first one is the homogeneous
-multiplication for natural numbers. The second is the scalar multiplication for arrays.
-Note that you chain instances and generalize the second instance.
+パラメータ ``α`` と ``β`` は入力パラメータ、``γ`` は出力パラメータとみなされる。関数適用 ``hMul a b`` が与えられると、``a`` と ``b`` の型が分かっているなら型クラスインスタンス合成器が呼び出され、型クラスインスタンス合成器は ``hMul a b`` の出力の型情報を出力パラメータ ``γ`` から得る。上の例では、2つのインスタンスを定義した。最初のインスタンスは自然数上の同種乗法である。2つ目のインスタンスは配列のスカラー倍である。2つ目のインスタンスの定義では、インスタンスの連鎖が使われていることに注意してほしい。
 
 ```lean
 # namespace Ex
@@ -403,15 +357,11 @@ instance [HMul α β γ] : HMul α (Array β) (Array γ) where
 # end Ex
 ```
 
-You can use our new scalar array multiplication instance on arrays of type `Array β`
-with a scalar of type `α` whenever you have an instance `HMul α β γ`.
-In the last `#eval`, note that the instance was used twice on an array of arrays.
+この新しい配列スカラー倍インスタンスは、``HMul α β γ`` のインスタンスがあれば、いつでも ``Array β`` 型の配列と ``α`` 型のスカラーに対して使用することができる。最後の ``#eval`` では、``HMul Nat Nat Nat`` のインスタンスから ``HMul Nat (Array Nat) (Array Nat)`` のインスタンスが合成され、``HMul Nat (Array Nat) (Array Nat)`` のインスタンスから ``HMul Nat (Array (Array Nat)) (Array (Array Nat))`` のインスタンスが合成されていることに注意してほしい。
 
-## Default Instances
+## Default Instances (デフォルトインスタンス)
 
-In the class `HMul`, the parameters `α` and `β` are treated as input values.
-Thus, type class synthesis only starts after these two types are known. This may often
-be too restrictive.
+型クラス ``HMul`` では、パラメータ ``α`` と ``β`` は入力パラメータとして扱われる。したがって、型クラスインスタンス合成はこれら2つの型が特定されてから開始される。場合によっては、この制約は強すぎるかもしれない。
 
 ```lean
 # namespace Ex
@@ -426,16 +376,15 @@ instance : HMul Int Int Int where
 def xs : List Int := [1, 2, 3]
 
 -- Error "typeclass instance problem is stuck, it is often due to metavariables HMul ?m.89 ?m.90 ?m.91"
+-- `y` の型を明示的に与えればエラーは消える
 #check_failure fun y => xs.map (fun x => hMul x y)
 # end Ex
 ```
 
-The instance `HMul` is not synthesized by Lean because the type of `y` has not been provided.
-However, it is natural to assume that the type of `y` and `x` should be the same in
-this kind of situation. We can achieve exactly that using *default instances*.
+``y`` の型が与えられていないため、``HMul`` のインスタンスはLeanによって合成されない。しかし、このような状況では ``y`` と ``x`` の型は同じはずだと考えるのが自然である。*default instances*(デフォルトインスタンス)を使えば、まさにそれを実現できる。
 
 ```lean
-# namespace Ex
+namespace Ex
 class HMul (α : Type u) (β : Type v) (γ : outParam (Type w)) where
   hMul : α → β → γ
 
@@ -447,17 +396,12 @@ instance : HMul Int Int Int where
 
 def xs : List Int := [1, 2, 3]
 
-#check fun y => xs.map (fun x => hMul x y)  -- Int → List Int
-# end Ex
+#check fun y => xs.map (fun x => hMul x y)    -- Int → List Int
+#eval (fun y => xs.map (fun x => hMul x y)) 3 -- [3, 6, 9]
+end Ex
 ```
 
-By tagging the instance above with the attribute `default_instance`, we are instructing Lean
-to use this instance on pending type class synthesis problems.
-The actual Lean implementation defines homogeneous and heterogeneous classes for arithmetical operators.
-Moreover, `a+b`, `a*b`, `a-b`, `a/b`, and `a%b` are notations for the heterogeneous versions.
-The instance `OfNat Nat n` is the default instance (with priority 100) for the `OfNat` class. This is why the numeral
-`2` has type `Nat` when the expected type is not known. You can define default instances with higher
-priority to override the builtin ones.
+上記のインスタンスに ``default_instance`` 属性を付けることで、保留中の型クラスインスタンス合成問題においてこのインスタンスを使用するようLeanに指示することができる。実際のLeanの実装では、各算術演算子について同種型クラス(``Add`` など)と異種型クラス(``HAdd`` など)が定義されている。さらに言うと、``a+b``、``a*b``、``a-b``、``a/b``、``a%b`` は異種版演算子を表す。``OfNat Nat n`` のインスタンスは ``OfNat`` 型クラスのデフォルトインスタンス(優先度100)である。これが、期待される型が不明な場合に、数字 ``2`` が ``Nat`` 型を持つ理由である。より高い優先度を持つデフォルトインスタンスを定義することで、ビルトインのデフォルトインスタンスをオーバーライドすることができる。
 
 ```lean
 structure Rational where
@@ -475,11 +419,7 @@ instance : ToString Rational where
 #check 2 -- Rational
 ```
 
-Priorities are also useful to control the interaction between different default instances.
-For example, suppose `xs` has type `List α`. When elaborating `xs.map (fun x => 2 * x)`, we want the homogeneous instance for multiplication
-to have higher priority than the default instance for `OfNat`. This is particularly important when we have implemented only the instance
-`HMul α α α`, and did not implement `HMul Nat α α`.
-Now, we reveal how the notation `a*b` is defined in Lean.
+優先度は、異なるデフォルトインスタンス間の相互作用を制御するのにも便利である。例えば、``xs`` が ``List α`` 型を持つとする。elaboratorが式 ``xs.map (fun x => 2 * x)`` を解釈するとき、この式が多相性を持つために、同種乗法のデフォルトインスタンスが ``OfNat`` のデフォルトインスタンスより高い優先度を持つようにしたい。これは、``Hmul α α α`` のインスタンスを実装し、``HMul Nat α α`` のインスタンスは実装しなかった場合に特に重要である。ここで、Leanにおいて表記 ``a*b`` がどう定義されているかを種明かしする。
 
 ```lean
 # namespace Ex
@@ -504,14 +444,11 @@ infixl:70 " * " => HMul.hMul
 # end Ex
 ```
 
-The `Mul` class is convenient for types that only implement the homogeneous multiplication.
+``Mul`` 型クラスは、同種乗法は実装されているが異種乗法は実装されていない型を扱う際に便利である。
 
-## Local Instances
+## Local Instances (ローカルインスタンス)
 
-Type classes are implemented using attributes in Lean. Thus, you can
-use the `local` modifier to indicate that they only have effect until
-the current ``section`` or ``namespace`` is closed, or until the end
-of the current file.
+Leanにおいて、型クラスのインスタンスは属性を用いて実装される。そのため、``local`` 修飾子を使うことで、そのインスタンスが現在のセクションや名前空間が閉じられるまで、あるいは現在のファイルの終わりまでしか効果がないことを示すことができる。
 
 ```lean
 structure Point where
@@ -526,15 +463,13 @@ local instance : Add Point where
 def double (p : Point) :=
   p + p
 
-end -- instance `Add Point` is not active anymore
+end -- もうインスタンス `Add Point` は使えない
 
 -- def triple (p : Point) :=
 --  p + p + p  -- Error: failed to synthesize instance
 ```
 
-You can also temporarily disable an instance using the `attribute` command
-until the current ``section`` or ``namespace`` is closed, or until the end
-of the current file.
+コマンド ``attribute [-instance]`` を使えば、現在のセクションや名前空間が閉じられるまで、あるいは現在のファイルの終わりまで、指定したインスタンスを一時的に無効化することもできる。
 
 ```lean
 structure Point where
@@ -553,12 +488,11 @@ attribute [-instance] addPoint
 --  p + p + p  -- Error: failed to synthesize instance
 ```
 
-We recommend you only use this command to diagnose problems.
+コマンド ``attribute [-instance]`` は問題の分析時にのみ使うことを勧める。
 
-## Scoped Instances
+## Scoped Instances (スコープ付きインスタンス)
 
-You can also declare scoped instances in namespaces. This kind of instance is
-only active when you are inside of the namespace or open the namespace.
+``scoped instance`` を用いてスコープ付きのインスタンスを宣言することもできる。スコープ付きインスタンスは、名前空間の中にいるとき、または名前空間を開いているときのみ使用可能である。
 
 ```lean
 structure Point where
@@ -574,22 +508,21 @@ def double (p : Point) :=
   p + p
 
 end Point
--- instance `Add Point` is not active anymore
+-- インスタンス `Add Point` はもう使えない
 
 -- #check fun (p : Point) => p + p + p  -- Error
 
 namespace Point
--- instance `Add Point` is active again
+-- インスタンス `Add Point` は再び利用可能になった
 #check fun (p : Point) => p + p + p
 
 end Point
 
-open Point -- activates instance `Add Point`
+open Point -- 名前空間を開き、インスタンス `Add Point` を利用可能にする
 #check fun (p : Point) => p + p + p
 ```
 
-You can use the command `open scoped <namespace>` to activate scoped attributes but will
-not "open" the names from the namespace.
+コマンド ``open scoped <namespace>`` を使うと、名前空間 ``<namespace>`` 内の ``scoped`` 属性のついた定義が利用可能になるが、名前空間 ``<namespace>`` 内のそれ以外の定義に短い別名でアクセスすることはできない。
 
 ```lean
 structure Point where
@@ -606,29 +539,42 @@ def double (p : Point) :=
 
 end Point
 
-open scoped Point -- activates instance `Add Point`
+open scoped Point -- インスタンス `Add Point` を利用可能にする
 #check fun (p : Point) => p + p + p
 
 -- #check fun (p : Point) => double p -- Error: unknown identifier 'double'
 ```
 
-## Decidable Propositions
+## Decidable Propositions (決定可能命題)
 
-Let us consider another example of a type class defined in the
-standard library, namely the type class of ``Decidable``
-propositions. Roughly speaking, an element of ``Prop`` is said to be
-decidable if we can decide whether it is true or false. The
-distinction is only useful in constructive mathematics; classically,
-every proposition is decidable. But if we use the classical principle,
-say, to define a function by cases, that function will not be
-computable. Algorithmically speaking, the ``Decidable`` type class can
-be used to infer a procedure that effectively determines whether or
-not the proposition is true. As a result, the type class supports such
-computational definitions when they are possible while at the same
-time allowing a smooth transition to the use of classical definitions
-and classical reasoning.
+標準ライブラリで定義されている、命題に関する型クラス ``Decidable`` について考えてみよう。大雑把に言えば、``Prop`` 型の項(具体的な命題)は、それが真か偽かを決めることができる場合、決定可能であると言われる。古典論理において全ての命題は決定可能であるため、命題が決定可能かどうかという区別は構成的論理においてのみ有用である。古典論理を使っているかどうかの区別は重要である。古典論理を使って、例えば場合分けによって関数を定義すると、その関数は計算不能になる。
 
-In the standard library, ``Decidable`` is defined formally as follows:
+```lean
+variable (p : Nat → Prop)
+
+-- error : failed to synthesize instance
+--   Decidable (p n)
+/-
+def bad_foo : Nat → Bool :=
+  fun (n : Nat) =>
+  if p n then true
+  else false
+-/
+
+open Classical
+
+noncomputable def foo : Nat → Bool :=
+  fun (n : Nat) =>
+  if p n then true
+  else false
+
+#print axioms foo
+-- 'foo' depends on axioms: [Classical.choice, Quot.sound, propext]
+```
+
+アルゴリズム的に言えば、``Decidable`` 型クラスは、その命題が真か偽かを効果的に決定する手続きを推論するために使うことができる。結果として、この型クラスはある定義が計算可能なときその定義をサポートすると同時に、古典論理を使った定義や推論の使用へのスムーズな移行を可能にする。
+
+標準ライブラリでは、``Decidable`` は次のように形式的に定義されている:
 
 ```lean
 # namespace Hidden
@@ -638,12 +584,7 @@ class inductive Decidable (p : Prop) where
 # end Hidden
 ```
 
-Logically speaking, having an element ``t : Decidable p`` is stronger
-than having an element ``t : p ∨ ¬p``; it enables us to define values
-of an arbitrary type depending on the truth value of ``p``. For
-example, for the expression ``if p then a else b`` to make sense, we
-need to know that ``p`` is decidable. That expression is syntactic
-sugar for ``ite p a b``, where ``ite`` is defined as follows:
+論理的に言えば、項 ``t : Decidable p`` を持つことは、証明項 ``t : p ∨ ¬p`` を持つことよりも強い。項 ``t : Decidable p`` の存在は、``p`` の真理値に依存して任意の型の値や関数を定義することを可能にする。例えば、``if p then a else b`` という式が意味をなすには、``p`` が決定可能であることを知っている必要がある。ここで ``if p then a else b`` は ``ite p a b`` の糖衣構文である。``ite`` は次のように定義される:
 
 ```lean
 # namespace Hidden
@@ -652,9 +593,7 @@ def ite {α : Sort u} (c : Prop) [h : Decidable c] (t e : α) : α :=
 # end Hidden
 ```
 
-The standard library also contains a variant of ``ite`` called
-``dite``, the dependent if-then-else expression. It is defined as
-follows:
+標準ライブラリは ``dite`` と呼ばれる ``ite`` の変形版を持っている。``dite`` は依存版if-then-else式である。これは次のように定義される:
 
 ```lean
 # namespace Hidden
@@ -663,17 +602,9 @@ def dite {α : Sort u} (c : Prop) [h : Decidable c] (t : c → α) (e : Not c �
 # end Hidden
 ```
 
-That is, in ``dite c t e``, we can assume ``hc : c`` in the "then"
-branch, and ``hnc : ¬ c`` in the "else" branch. To make ``dite`` more
-convenient to use, Lean allows us to write ``if h : c then t else e``
-instead of ``dite c (λ h : c => t) (λ h : ¬ c => e)``.
+つまり、``dite c t e`` において、「then」分岐では ``hc : c`` を、「else」分岐では ``hnc : ¬ c`` を仮定できる。Leanでは、``dite`` をより使いやすくするために、``dite c (λ h : c => t) (λ h : ¬ c => e)`` の代わりに ``if h : c then t else e`` と書くことができる。
 
-Without classical logic, we cannot prove that every proposition is
-decidable. But we can prove that *certain* propositions are
-decidable. For example, we can prove the decidability of basic
-operations like equality and comparisons on the natural numbers and
-the integers. Moreover, decidability is preserved under propositional
-connectives:
+古典論理がなければ、全ての命題が決定可能であることを証明することはできない。しかし、**ある**命題が決定可能であることは証明できる。例えば、自然数や整数に関する等式や不等式のような基本関係の決定可能性は古典論理なしで証明できる。さらに、決定可能性は命題結合子の適用前後で保存される:
 
 ```lean
 #check @instDecidableAnd
@@ -683,37 +614,25 @@ connectives:
 #check @instDecidableNot
 ```
 
-Thus we can carry out definitions by cases on decidable predicates on
-the natural numbers:
+したがって、自然数上の決定可能述語を用いた場合分けによって関数を定義することができる:
 
 ```lean
 def step (a b x : Nat) : Nat :=
   if x < a ∨ x > b then 0 else 1
 
-set_option pp.explicit true
+set_option pp.explicit true  -- 暗黙の引数を表示する
 #print step
 ```
 
-Turning on implicit arguments shows that the elaborator has inferred
-the decidability of the proposition ``x < a ∨ x > b``, simply by
-applying appropriate instances.
+暗黙の引数の表示をオンにすると、elaboratorは適切なインスタンス ``instDecidableOr`` と ``Nat.decLt`` を適用しただけで、命題 ``x < a ∨ x > b`` の決定可能性を推論したことがわかる。
 
-With the classical axioms, we can prove that every proposition is
-decidable. You can import the classical axioms and make the generic
-instance of decidability available by opening the `Classical` namespace.
+古典論理の公理を使うと、全ての命題が決定可能であることが証明できる。``Classical`` 名前空間を開くと、古典論理の公理がインポートされ、全ての命題 ``p`` に対して ``Decidable p`` のインスタンスが利用できるようになる。
 
 ```lean
 open Classical
 ```
 
-Thereafter ``Decidable p`` has an instance for every ``p``.
-Thus all theorems in the library
-that rely on decidability assumptions are freely available when you
-want to reason classically. In [Chapter Axioms and Computation](./axioms_and_computation.md),
-we will see that using the law of the
-excluded middle to define functions can prevent them from being used
-computationally. Thus, the standard library assigns a low priority to
-the `propDecidable` instance.
+したがって、古典論理的に推論したい場合、決定可能性を前提とするライブラリ内の定理は、全て自由に利用できる。[12章 Axioms and Computation (公理と計算)](./axioms_and_computation.md)では、排中律を使って関数を定義すると、その関数が計算に使われなくなることがあることを説明する。したがって、標準ライブラリでは ``Classical.propDecidable`` インスタンスに低い優先度を割り当てている。
 
 ```lean
 # namespace Hidden
@@ -726,13 +645,9 @@ instance (priority := low) propDecidable (a : Prop) : Decidable a :=
 # end Hidden
 ```
 
-This guarantees that Lean will favor other instances and fall back on
-``propDecidable`` only after other attempts to infer decidability have
-failed.
+これは、``Decidable p`` の型クラス解決において、Leanが他のインスタンスを優先し、他の試みが全て失敗した後にのみインスタンス ``propDecidable p`` を使うことを保証する。
 
-The ``Decidable`` type class also provides a bit of small-scale
-automation for proving theorems. The standard library introduces the
-tactic `decide` that uses the `Decidable` instance to solve simple goals.
+``Decidable`` 型クラスは、定理証明の小規模な自動化もいくつか提供している。標準ライブラリには、``Decidable`` のインスタンスを使って単純なゴールを解くタクティク ``decide`` が含まれている。
 
 ```lean
 example : 10 < 5 ∨ 1 > 0 := by
@@ -758,21 +673,11 @@ theorem ex : True ∧ 2 = 1+1 := by
 -- (p : Prop) → [Decidable p] → Bool
 ```
 
-They work as follows. The expression ``decide p`` tries to infer a
-decision procedure for ``p``, and, if it is successful, evaluates to
-either ``true`` or ``false``. In particular, if ``p`` is a true closed
-expression, ``decide p`` will reduce definitionally to the Boolean ``true``.
-On the assumption that ``decide p = true`` holds, ``of_decide_eq_true``
-produces a proof of ``p``. The tactic ``decide`` puts it all together to
-prove a target ``p``. By the previous observations,
-``decide`` will succeed any time the inferred decision procedure
- for ``c`` has enough information to evaluate, definitionally, to the ``isTrue`` case.
+これらは次のように動作する。式 ``decide p`` は ``p`` の決定可能性を用いて ``p`` の真偽決定手続きの推論を試み、成功すれば ``decide p`` は ``true`` か ``false`` のどちらかに評価される。特に、``p`` が正しい閉論理式である場合、``decide p`` はdefinitionallyにブール値 ``true`` に簡約される。``decide p = true`` が成立するという前提を受け取ると、``of_decide_eq_true`` は ``p`` の証明を出力する。ターゲット ``p`` を証明するために以上の過程をまとめたものが ``decide`` タクティクである。前述した内容により、``decide`` は、推論された ``c`` の真偽決定手続きが、``c`` が ``isTrue`` の場合であることをdefinitionallyに評価するために十分な情報を持っていれば、いつでも成功する。
 
-## Managing Type Class Inference
+## Managing Type Class Inference (型クラス推論の管理)
 
-If you are ever in a situation where you need to supply an expression
-that Lean can infer by type class inference, you can ask Lean to carry
-out the inference using `inferInstance`:
+Leanの型クラス推論によって合成できる式 ``t`` を提供する必要があるとき、``inferInstance`` を使うと ``t`` を推論によって合成するようLeanに依頼することができる:
 
 ```lean
 def foo : Add Nat := inferInstance
@@ -782,14 +687,13 @@ def bar : Inhabited (Nat → Nat) := inferInstance
 -- {α : Sort u} → [α] → α
 ```
 
-In fact, you can use Lean's ``(t : T)`` notation to specify the class whose instance you are looking for,
-in a concise manner:
+Leanの ``(t : T)`` 記法を使えば、インスタンス ``t`` を探している型クラス ``T`` を簡潔に指定することができる:
 
 ```lean
 #check (inferInstance : Add Nat)
 ```
 
-You can also use the auxiliary definition `inferInstanceAs`:
+型 ``T`` を引数に取る補助定義 ``inferInstanceAs`` を使うこともできる:
 
 ```lean
 #check inferInstanceAs (Add Nat)
@@ -798,10 +702,7 @@ You can also use the auxiliary definition `inferInstanceAs`:
 -- (α : Sort u) → [α] → α
 ```
 
-Sometimes Lean can't find an instance because the class is buried
-under a definition. For example, Lean cannot
-find an instance of ``Inhabited (Set α)``. We can declare one
-explicitly:
+型クラスが定義の下に埋もれているために、Leanがインスタンスを見つけられないことがある。例えば、単に ``inferInstance`` を使うだけで ``Inhabited (Set α)`` のインスタンスを見つけることはできない。この場合、定義を使って ``Set α`` を ``α → Prop`` に書き下し、それを明示的に与えればよい:
 
 ```lean
 def Set (α : Type u) := α → Prop
@@ -812,54 +713,34 @@ def Set (α : Type u) := α → Prop
 
 instance : Inhabited (Set α) :=
   inferInstanceAs (Inhabited (α → Prop))
+
+-- 別解
+example : Inhabited (Set α) :=
+  @inferInstance (Inhabited (α → Prop)) _
 ```
 
-At times, you may find that the type class inference fails to find an
-expected instance, or, worse, falls into an infinite loop and times
-out. To help debug in these situations, Lean enables you to request a
-trace of the search:
+時には、型クラス推論が期待されるインスタンスを見つけることに失敗したり、最悪の場合、無限ループに陥ってタイムアウトすることがある。このような状況でのデバッグを手伝ってもらうために、Leanにインスタンス検索の追跡を依頼することができる:
 
 ```lean
 set_option trace.Meta.synthInstance true
 ```
 
-If you are using VS Code, you can read the results by hovering over
-the relevant theorem or definition, or opening the messages window
-with ``Ctrl-Shift-Enter``. In Emacs, you can use ``C-c C-x`` to run an
-independent Lean process on your file, and the output buffer will show
-a trace every time the type class resolution procedure is subsequently
-triggered.
+VSCodeを使用している場合は、関連する定理や定義にカーソルを合わせるか、``Ctrl-Shift-Enter`` によりメッセージウィンドウを開くことで、追跡結果を読むことができる。Emacsでは、``C-c C-x`` によりファイルと独立したLeanプロセスを実行することができる。その後、出力バッファには型クラス解決手順が起きるたびに追跡内容が表示される。
 
-You can also limit the search using the following options:
+次のオプションを使ってインスタンス検索を制限することもできる:
 
 ```lean
 set_option synthInstance.maxHeartbeats 10000
 set_option synthInstance.maxSize 400
 ```
 
-Option `synthInstance.maxHeartbeats` specifies the maximum amount of
-heartbeats per typeclass resolution problem. A heartbeat is the number of
-(small) memory allocations (in thousands), 0 means there is no limit.
-Option `synthInstance.maxSize` is the maximum number of instances used
-to construct a solution in the type class instance synthesis procedure.
+``synthInstance.maxHeartbeats`` オプションは、型クラス解決問題ごとのheartbeatsの最大量を指定する。heartbeatsとは(小さな)メモリ割り当ての数(1000単位)であり、``synthInstance.maxHeartbeats 0`` は制限がないことを意味する。``synthInstance.maxSize`` オプションは、型クラスインスタンス合成過程で解を構築するために使われるインスタンスの最大数を指定する。
 
-Remember also that in both the VS Code and Emacs editor modes, tab
-completion works in ``set_option``, to help you find suitable options.
+VSCodeでもEmacsでも、``set_option`` の中でタブ補完が機能することを覚えてほしい。タブ補完は適切なオプションを探すのに役立つ。
 
-As noted above, the type class instances in a given context represent
-a Prolog-like program, which gives rise to a backtracking search. Both
-the efficiency of the program and the solutions that are found can
-depend on the order in which the system tries the instance. Instances
-which are declared last are tried first. Moreover, if instances are
-declared in other modules, the order in which they are tried depends
-on the order in which namespaces are opened. Instances declared in
-namespaces which are opened later are tried earlier.
+上述したように、与えられたコンテキストでの型クラスインスタンス合成はProlog-likeなプログラムであり、これはバックトラック探索を生じさせる。プログラムの効率も発見される解も、システムがインスタンスを探索する順番に依存して変化する。探索においては、最後に宣言されたインスタンスから順番に探索される。さらに、インスタンスが他のモジュール(ファイル)で宣言されている場合、インスタンスが探索される順番は名前空間を開いた順番に依存する。後に開いた名前空間で宣言されたインスタンスほど先に探索される。
 
-You can change the order that type class instances are tried by
-assigning them a *priority*. When an instance is declared, it is
-assigned a default priority value. You can assign other priorities
-when defining an instance. The following example illustrates how this
-is done:
+型クラスのインスタンスに「優先度」を割り当てることで、探索される順番を変更することができる。普通にインスタンスが宣言されると、そのインスタンスにはデフォルトの優先度が割り当てられる。インスタンスを定義するとき、デフォルト以外の優先度を割り当てることができる。次の例はその方法を示している:
 
 ```lean
 class Foo where
@@ -885,33 +766,31 @@ example : Foo.a = 3 :=
   rfl
 ```
 
-## Coercions using Type Classes
+## Coercions using Type Classes (型クラスを用いた強制)
 
-The most basic type of coercion maps elements of one type to another. For example, a coercion from ``Nat`` to ``Int`` allows us to view any element ``n : Nat`` as an element of ``Int``. But some coercions depend on parameters; for example, for any type ``α``, we can view any element ``as : List α`` as an element of ``Set α``, namely, the set of elements occurring in the list. The corresponding coercion is defined on the "family" of types ``List α``, parameterized by ``α``.
+最も基本的なタイプの(型)強制は、ある型の項を別の型の項にマッピングする。例えば、``Nat`` 型から ``Int`` 型への強制は、任意の項 ``n : Nat`` を ``Int`` の項とみなすことを可能にする。しかし、いくつかの強制はより複雑で、パラメータに依存する。例えば、任意の型 ``α`` に対して、任意の項 ``as : List α`` を ``Set α`` の項、つまりリストに出現する ``α`` の項全体からなる集合とみなすことが可能である。これに対応する強制は、``α`` によってパラメータ化された型の「族」``List α`` 上で定義される。
 
-Lean allows us to declare three kinds of coercions:
+Leanでは3種類の強制を宣言することができる:
 
-- from a family of types to another family of types
-- from a family of types to the class of sorts
-- from a family of types to the class of function types
+- ある型の族から他の型の族への強制
+- ある型の族からSortのクラスへの強制
+- ある型の族から関数型のクラスへの強制
 
-The first kind of coercion allows us to view any element of a member of the source family as an element of a corresponding member of the target family. The second kind of coercion allows us to view any element of a member of the source family as a type. The third kind of coercion allows us to view any element of the source family as a function. Let us consider each of these in turn.
-
-In Lean, coercions are implemented on top of the type class resolution framework. We define a coercion from ``α`` to ``β`` by declaring an instance of ``Coe α β``. For example, we can define a coercion from ``Bool`` to ``Prop`` as follows:
+1種類目の強制は、強制元の族に属する型の任意の「項」を、強制先の族に属する対応する型の「項」として見ることを可能にする。2種類目の強制は、強制元の族に属する型の任意の「項」を「型」として見ることを可能にする。3種類目の強制は、強制元の族に属する型の任意の「項」を「関数」として見ることを可能にする。それぞれを順番に考えてみよう:
 
 ```lean
 instance : Coe Bool Prop where
   coe b := b = true
 ```
 
-This enables us to use boolean terms in if-then-else expressions:
+この強制により、if-then-else式の条件の中でブール型の項を使うことができる:
 
 ```lean
 #eval if true then 5 else 3
 #eval if false then 5 else 3
 ```
 
-We can define a coercion from ``List α`` to ``Set α`` as follows:
+``List α`` から ``Set α`` への強制は次のように定義される:
 
 ```lean
 # def Set (α : Type u) := α → Prop
@@ -933,7 +812,7 @@ def s : Set Nat := {1}
 -- s ∪ List.toSet [2, 3] : Set Nat
 ```
 
-We can use the notation ``↑`` to force a coercion to be introduced in a particular place. It is also helpful to make our intent clear, and work around limitations of the coercion resolution system.
+特定の場所に明示的に強制を導入するために、``↑`` という記法を使うことができる。この記法は書き手の意図を明確にすることや、強制解決システムの制限を回避することにも役立つ。
 
 ```lean
 # def Set (α : Type u) := α → Prop
@@ -956,22 +835,22 @@ def s : Set Nat := {1}
 -- let x := [2, 3]; s ∪ List.toSet x : Set Nat
 ```
 
-Lean also supports dependent coercions using the type class `CoeDep`. For example, we cannot coerce arbitrary propositions to `Bool`, only the ones that implement the `Decidable` typeclass.
+Leanは ``CoeDep`` 型クラスを使った依存強制もサポートしている。例えば、``Prop`` 型の任意の項 ``p`` をBool型の項に強制することはできないが、``Decidable p`` 型クラスがインスタンスを持つような ``p`` だけはBool型の項に強制できる。
 
 ```lean
 instance (p : Prop) [Decidable p] : CoeDep Prop p Bool where
   coe := decide p
 ```
 
-Lean will also chain (non-dependent) coercions as necessary. Actually, the type class ``CoeT`` is the transitive closure of ``Coe``.
+Leanは必要に応じて(非依存)強制を連鎖させる。実際、型クラス ``CoeT`` は ``Coe`` の推移的閉包である。
 
-Let us now consider the second kind of coercion. By the *class of sorts*, we mean the collection of universes ``Type u``. A coercion of the second kind is of the form:
+次に、2種類目の強制について考えよう。「Sortのクラス」とは、宇宙 ``Type u`` の集まりを意味する。2種類目の強制は次のような形をとる:
 
 ```
     c : (x1 : A1) → ... → (xn : An) → F x1 ... xn → Type u
 ```
 
-where ``F`` is a family of types as above. This allows us to write ``s : t`` whenever ``t`` is of type ``F a1 ... an``. In other words, the coercion allows us to view the elements of ``F a1 ... an`` as types. This is very useful when defining algebraic structures in which one component, the carrier of the structure, is a ``Type``. For example, we can define a semigroup as follows:
+ここで、``F`` は型の族であり、``F x1 ... xn`` は型の族に属する特定の型である。この種類の強制により、``t`` が型 ``F a1 ... an`` の項であるときは、いつでも ``s : t`` と書くことができる。言い換えれば、この強制は ``F a1 ... an`` の項を型として見ることを可能にする。これは、構造体の1つの要素、つまり構造の台(集合) ``carrier`` が型であるような代数的構造を定義するときに非常に便利である。例えば、*semigroup*(半群)は次のように定義できる:
 
 ```lean
 structure Semigroup where
@@ -983,7 +862,7 @@ instance (S : Semigroup) : Mul S.carrier where
   mul a b := S.mul a b
 ```
 
-In other words, a semigroup consists of a type, ``carrier``, and a multiplication, ``mul``, with the property that the multiplication is associative. The ``instance`` command allows us to write ``a * b`` instead of ``Semigroup.mul S a b`` whenever we have ``a b : S.carrier``; notice that Lean can infer the argument ``S`` from the types of ``a`` and ``b``. The function ``Semigroup.carrier`` maps the class ``Semigroup`` to the sort ``Type u``:
+つまり、半群は型 ``carrier``、乗法 ``mul``、「乗法は結合的である」という性質の3要素からなる。上記の ``instance`` コマンドは、``a b : S.carrier`` があるとき、``Semigroup.mul S a b`` を ``a * b`` と略記することを可能にする。Leanは ``a`` と ``b`` の型からインスタンスの引数 ``S`` を推測できることに注意してほしい。関数 ``Semigroup.carrier`` はクラス ``Semigroup`` の項(半群)を ``Type u`` の項(型)にマッピングする:
 
 ```lean
 # structure Semigroup where
@@ -995,7 +874,7 @@ In other words, a semigroup consists of a type, ``carrier``, and a multiplicatio
 #check Semigroup.carrier
 ```
 
-If we declare this function to be a coercion, then whenever we have a semigroup ``S : Semigroup``, we can write ``a : S`` instead of ``a : S.carrier``:
+この関数は強制であると宣言すれば、半群 ``S : Semigroup`` があるときはいつでも、``a : S.carrier`` を ``a : S`` と略記することができる:
 
 ```lean
 # structure Semigroup where
@@ -1011,15 +890,15 @@ example (S : Semigroup) (a b c : S) : (a * b) * c = a * (b * c) :=
   Semigroup.mul_assoc _ a b c
 ```
 
-It is the coercion that makes it possible to write ``(a b c : S)``. Note that, we define an instance of ``CoeSort Semigroup (Type u)`` instead of ``Coe Semigroup (Type u)``.
+上記の ``CoeSort Semigroup (Type u)`` のインスタンスは、``(a b c : S)`` と書くことを可能にする強制である。ここで、2種類目の強制では ``Coe Semigroup (Type u)`` ではなく ``CoeSort Semigroup (Type u)`` のインスタンスを定義したことに注意してほしい。
 
-By the *class of function types*, we mean the collection of Pi types ``(z : B) → C``. The third kind of coercion has the form:
+最後に、3種類目の強制について考えよう。「関数型のクラス」とは、依存関数型(Π型) ``(z : B) → C`` の集まりを意味する。3種類目の強制は次のような形をとる:
 
 ```
     c : (x1 : A1) → ... → (xn : An) → (y : F x1 ... xn) → (z : B) → C
 ```
 
-where ``F`` is again a family of types and ``B`` and ``C`` can depend on ``x1, ..., xn, y``. This makes it possible to write ``t s`` whenever ``t`` is an element of ``F a1 ... an``. In other words, the coercion enables us to view elements of ``F a1 ... an`` as functions. Continuing the example above, we can define the notion of a morphism between semigroups ``S1`` and ``S2``. That is, a function from the carrier of ``S1`` to the carrier of ``S2`` (note the implicit coercion) that respects the multiplication. The projection ``morphism.mor`` takes a morphism to the underlying function:
+ここで、``F`` は再び型の族であり、``F x1 ... xn`` は型の族に属する特定の型である。``B`` と ``C`` は ``x1, ..., xn, y`` に依存することができる。この種類の強制により、``t`` が ``F a1 ... an`` の項であるときは、いつでも ``t s`` と書くことができる。言い換えれば、この強制は ``F a1 ... an`` の項を関数として見ることを可能にする。上記の例の続きとして、半群 ``S1`` と ``S2`` の間の*morphism*(射)あるいは*homomorphism*(準同型)という概念を定義できる。射とは、``S1`` の台から ``S2`` の台への、乗法を保存する(``mor (a * b) = (mor a) * (mor b)``)関数である。次のコードでは、``S1``、``S2``、``*`` に関する暗黙の強制に注意してほしい。射影 ``Morphism.mor`` は、構造体 ``Morphism S1 S2`` の項を受け取り、射の台関数を返す:
 
 ```lean
 # structure Semigroup where
@@ -1037,7 +916,7 @@ structure Morphism (S1 S2 : Semigroup) where
 #check @Morphism.mor
 ```
 
-As a result, it is a prime candidate for the third type of coercion.
+以下のコードにより、半群間の射は3種類目の強制 ``CoeFun`` の代表例となった。
 
 ```lean
 # structure Semigroup where
@@ -1065,4 +944,6 @@ example (S1 S2 : Semigroup) (f : Morphism S1 S2) (a : S1) :
     _ = f a * f a * f a := by rw [resp_mul f]
 ```
 
-With the coercion in place, we can write ``f (a * a * a)`` instead of ``f.mor (a * a * a)``. When the ``Morphism``, ``f``, is used where a function is expected, Lean inserts the coercion. Similar to ``CoeSort``, we have yet another class ``CoeFun`` for this class of coercions. The field ``F`` is used to specify the function type we are coercing to. This type may depend on the type we are coercing from.
+この強制を使えば、``f.mor (a * a * a)`` を ``f (a * a * a)`` と略記することができる。関数型が期待される場所で ``Morphism`` や ``f`` が使われると、Leanは強制を挿入する。フィールド ``F`` は強制先の関数型を指定するために使われる。``F`` の型は強制元の型に依存しうる。
+
+まとめると、1種類目の強制のために型クラス ``Coe`` があり、2種類目の強制のために型クラス ``CoeSort`` があり、3種類目の強制のために型クラス ``CoeFun`` がある。
