@@ -13,6 +13,6 @@ git init
 cp -r ../out/./ .
 git add -A
 git commit -m "Update `date`"
-git push https://github.com/aconite-ac/theorem_proving_in_lean4.git +HEAD:gh-pages
+git push git@github.com:aconite-ac/theorem_proving_in_lean4.git +HEAD:gh-pages
 cd ..
 rm -rf deploy
