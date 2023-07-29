@@ -1,15 +1,15 @@
 [book]
 authors = ["Jeremy Avigad", "Leonardo de Moura", "Soonho Kong", "Sebastian Ullrich"]
-language = "en"
+language = "ja"
 multilingual = false
 src = "."
-title = "Theorem Proving in Lean 4"
+title = "Theorem Proving in Lean 4 日本語訳"
 
 [build]
 build-dir = "out"
 
 [output.html]
-git-repository-url = "https://github.com/leanprover/theorem_proving_in_lean4"
+git-repository-url = "https://github.com/aconite-ac/theorem_proving_in_lean4"
 
 [output.html.playground.boring-prefixes]
 lean = "# "
