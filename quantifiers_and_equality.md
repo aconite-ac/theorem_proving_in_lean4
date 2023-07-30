@@ -196,7 +196,7 @@ example : f a = g a := congrFun h₂ a
 example : f a = g b := congr h₂ h₁
 ```
 
-Leanのライブラリは次のような一般的な恒等式が多数収載されている:
+Leanのライブラリには次のような一般的な恒等式が多数収載されている:
 
 ```lean
 variable (a b c : Nat)
