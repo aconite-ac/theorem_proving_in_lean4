@@ -19,7 +19,7 @@ def foo : Nat → Nat → Nat
   | succ x, succ y => 3
 ```
 
-があるとき、``zero`` や ``succ y`` などを「パターン(pattern)」、``| zero  , zero   => 0`` などを「ケース(case)」、定義として与えられたケース全てをまとめたものを「ケースリスト(list of cases)」、不足なくケースが与えられたケースリストを用いてパターンマッチングすることを「場合分け(by cases)」あるいは「場合分けする(split on cases)」と呼ぶ。
+があるとき、``zero`` や ``succ y`` などを「パターン(pattern)」、``| zero  , zero`` などを「ケース(case)」、定義として与えられたケース全てをまとめたものを「ケースリスト(list of cases)」、不足なくケースが与えられたケースリストを用いてパターンマッチングすることを「場合分け(by cases)」あるいは「場合分けする(split on cases)」と呼ぶ。
 
 ## Pattern Matching (パターンマッチング)
 
