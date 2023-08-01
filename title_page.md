@@ -2,8 +2,8 @@
 
 *by Jeremy Avigad, Leonardo de Moura, Soonho Kong and Sebastian Ullrich, with contributions from the Lean Community*
 
-このテキストは読者がLean 4を使うことを前提にしています。Lean 4をインストールするには、[Lean 4 Manual](https://leanprover.github.io/lean4/doc/)の[Setting
-Up Lean section](https://leanprover.github.io/lean4/doc/setup.html)をご覧ください。このテキストの最初のバージョンはLean 2用に書かれました。Lean 3用のバージョンは[こちら](https://leanprover.github.io/theorem_proving_in_lean/)で入手可能です。
+このテキストは読者がLean 4を使うことを前提にしています。Lean 4をインストールするには、[Lean 4 Manual](https://leanprover.github.io/lean4/doc/)の節[Setting
+Up Lean](https://leanprover.github.io/lean4/doc/setup.html)をご覧ください。このテキストの最初のバージョンはLean 2用に書かれました。Lean 3用のバージョンは[こちら](https://leanprover.github.io/theorem_proving_in_lean/)で入手可能です。
 
 ## この翻訳について
 
@@ -15,4 +15,4 @@ mdBook付属の検索機能に関して、今のところ日本語検索は非�
 
 誤字脱字、内容の誤りの指摘、フォークからのPull Request、フォークによる翻訳の改変等は歓迎いたします。
 
-翻訳に際して、翻訳サービス[DeepL翻訳](https://www.deepl.com/ja/translator)と[Google翻訳](https://translate.google.co.jp/?hl=ja)を使用しました。
+翻訳に際して、翻訳サービス[DeepL翻訳](https://www.deepl.com/ja/translator)を参考にしました。
