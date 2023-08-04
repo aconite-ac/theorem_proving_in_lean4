@@ -1,86 +1,41 @@
-Introduction
-============
+# Introduction (イントロダクション)
 
-Computers and Theorem Proving
------------------------------
+## Computers and Theorem Proving (コンピュータと定理証明)
 
-*Formal verification* involves the use of logical and computational methods to establish claims that are expressed in
-precise mathematical terms. These can include ordinary mathematical theorems, as well as claims that pieces of hardware
-or software, network protocols, and mechanical and hybrid systems meet their specifications. In practice, there is not a
-sharp distinction between verifying a piece of mathematics and verifying the correctness of a system: formal
-verification requires describing hardware and software systems in mathematical terms, at which point establishing claims
-as to their correctness becomes a form of theorem proving. Conversely, the proof of a mathematical theorem may require a
-lengthy computation, in which case verifying the truth of the theorem requires verifying that the computation does what
-it is supposed to do.
+*Formal verification*(形式検証)では、論理的・計算的手法を使って、厳密な数学用語で表現された主張を立証する。この主張には、通常の数学の定理の他にも、ハードウェアやソフトウェアの一部、 ネットワークプロトコル、機械的・ハイブリッドシステムがその仕様を満たしているという主張も含まれる。
+実際には、数学的主張の検証をすることと、システムの正しさを検証することの間には、明確な区別はない。というのも、形式検証では、ハードウェアやソフトウェアのシステムを数学的な言葉で記述する必要があり、その時点で、その正しさに関する主張を立証することは、定理証明の一形態となる。
+逆に、数学の定理の証明には長い計算が必要な場合があり、その場合、定理の真偽を検証するには、その計算が想定通りに実行されることを検証する必要がある。
 
-The gold standard for supporting a mathematical claim is to provide a proof, and twentieth-century developments in logic
-show most if not all conventional proof methods can be reduced to a small set of axioms and rules in any of a number of
-foundational systems. With this reduction, there are two ways that a computer can help establish a claim: it can help
-find a proof in the first place, and it can help verify that a purported proof is correct.
+数学的な主張を裏付けるための最も信頼性のある方法は証明を与えることであり、20世紀の論理学の発展により、従来の証明方法のすべてではないにせよ、そのほとんどが、いくつかの基礎的な体系における小さな公理と規則の集合に還元できることが明らかになった。
+この還元のもとで、コンピューターが主張の立証に役立つ方法は2つある : 
+1つは、そもそも証明を「発見」する手助けをすること、もう1つは証明とされるものが正しいかどうかを「検証」する手助けをすることである。
 
-*Automated theorem proving* focuses on the "finding" aspect. Resolution theorem provers, tableau theorem provers, fast
-satisfiability solvers, and so on provide means of establishing the validity of formulas in propositional and
-first-order logic. Other systems provide search procedures and decision procedures for specific languages and domains,
-such as linear or nonlinear expressions over the integers or the real numbers. Architectures like SMT ("satisfiability
-modulo theories") combine domain-general search methods with domain-specific procedures. Computer algebra systems and
-specialized mathematical software packages provide means of carrying out mathematical computations, establishing
-mathematical bounds, or finding mathematical objects. A calculation can be viewed as a proof as well, and these systems,
-too, help establish mathematical claims.
+*Automated theorem proving*(自動定理証明)は、この「発見」の側面に焦点を当てている。導出定理証明器(resolution theorem provers)、タブロー定理証明器(tableau theorem provers)、高速充足可能性ソルバー(fast satisfiability solvers)などは、命題論理や一階論理における公式の正しさを証明する手段を提供する。また、整数や実数に対する線形式や非線形式など、特定の言語や領域に対する探索手続きや決定手続きを提供するシステムもある。SMT(充足可能性モジュロ理論, satisfiability modulo theories)のようなアーキテクチャは、領域一般的な探索手法と領域固有の手続きを組み合わせたものである。数式処理システムや高度な数学ソフトウェア・パッケージは、数学的計算を実行したり、数学的境界を確立したり、数学的対象を見つけたりする手段を提供する。計算は証明と見なすこともでき、これらのシステムも数学的主張の立証に役立つ。
 
-Automated reasoning systems strive for power and efficiency, often at the expense of guaranteed soundness. Such systems
-can have bugs, and it can be difficult to ensure that the results they deliver are correct. In contrast, *interactive
-theorem proving* focuses on the "verification" aspect of theorem proving, requiring that every claim is supported by a
-proof in a suitable axiomatic foundation. This sets a very high standard: every rule of inference and every step of a
-calculation has to be justified by appealing to prior definitions and theorems, all the way down to basic axioms and
-rules. In fact, most such systems provide fully elaborated "proof objects" that can be communicated to other systems and
-checked independently. Constructing such proofs typically requires much more input and interaction from users, but it
-allows you to obtain deeper and more complex proofs.
+自動推論システムは、そのパワーと効率性を追求する結果、しばしば健全性の保証を犠牲にしている。このようなシステムにはバグがあることもあり、システムが導いた結果が正しいことを保証するのは難しい。対照的に、*interactive theorem proving*(対話型定理証明)は、定理証明の「検証」の側面に焦点を当て、全ての主張が適切な公理的基礎づけにおける証明によって保証されることを要求する。その基準は非常に高く、推論の全てのルールと計算の全てのステップは、それ以前の定義や定理に訴えることで正当化されなければならず、それら全ては最終的には基本的な公理や規則にまで遡る。実際、このようなシステムのほとんどは、他のシステムに伝達したり、独立にチェックしたりできる、完全に精緻化された「証明オブジェクト」を提供する。このような証明を構築するためには、通常ユーザーからの入力やインタラクションがより多く必要となるが、それによってより深く複雑な証明を得ることができる。
 
-The *Lean Theorem Prover* aims to bridge the gap between interactive and automated theorem proving, by situating
-automated tools and methods in a framework that supports user interaction and the construction of fully specified
-axiomatic proofs. The goal is to support both mathematical reasoning and reasoning about complex systems, and to verify
-claims in both domains.
+*Lean Theorem Prover*(Lean定理証明器)は、これら対話型定理証明と自動定理証明との間のギャップを埋めることを目的としている。このために、ユーザーとのインタラクションと完全に明記された公理的証明の構築が可能であるフレームワークの内部で、自動化されたツールと方法が使えるようにする。そのゴールは、数学的推論と複雑なシステムについての推論の両方をサポートし、両方の領域における主張を検証することである。
 
-Lean's underlying logic has a computational interpretation, and Lean can be viewed equally well as a programming
-language. More to the point, it can be viewed as a system for writing programs with a precise semantics, as well as
-reasoning about the functions that the programs compute. Lean also has mechanisms to serve as its own *metaprogramming
-language*, which means that you can implement automation and extend the functionality of Lean using Lean itself. These
-aspects of Lean are explored in a companion tutorial to this one, [Programming in Lean 4](TBD), though computational
-aspects of the system will make an appearance here.
+Leanの基礎となる論理には計算機的解釈があり、Leanはプログラミング言語とみなすこともできる。もっと言えば、Leanは厳密な意味論を持つプログラムを書くためのシステムであり、プログラムが計算する関数について推論を行うためのシステムである。Leanはまた、独自の*metaprogramming language*(メタプログラミング言語)として機能するメカニズムを持つ。つまり、Leanそのものを使って自動化を実装したり、Leanの機能を拡張したりすることができる。Leanのこのような側面は、このチュートリアルの関連チュートリアルである[Programming in Lean 4](TBD)(訳者注: 原文ではリンク切れだが[Functional Programming in Lean](https://leanprover.github.io/functional_programming_in_lean/)のこと？)で深く解説されるが、システムの計算的側面はここでも登場するだろう。
 
-About Lean
-----------
+## About Lean (Leanについて)
 
-The *Lean* project was launched by Leonardo de Moura at Microsoft Research Redmond in 2013. It is an ongoing, long-term
-effort, and much of the potential for automation will be realized only gradually over time. Lean is released under the
-[Apache 2.0 license](LICENSE), a permissive open source license that permits others to use and extend the code and
-mathematical libraries freely.
 
-To install Lean in your computer consider using the [Quickstart](https://github.com/leanprover/lean4/blob/master/doc/quickstart.md) instructions. The Lean source code, and instructions for building Lean, are available at
-[https://github.com/leanprover/lean4/](https://github.com/leanprover/lean4/).
+*Lean*プロジェクトは、2013年にMicrosoft Research RedmondのLeonardo de Mouraによって立ち上げられた、現在進行中の長期的な取り組みであり、自動化へのポテンシャルの多くは時間をかけて徐々に実現されるだろう。Leanは[Apache 2.0 ライセンス](LICENSE)の下でリリースされている。これは寛容なオープンソースライセンスであり、他の人がコードと数学ライブラリを自由に利用し、拡張することを許可している。
 
-This tutorial describes the current version of Lean, known as Lean 4.
+Leanをあなたのコンピュータにインストールするには、[Quickstart](https://github.com/leanprover/lean4/blob/master/doc/quickstart.md)にある指示を参照するのがよいだろう。LeanのソースコードとLeanのビルド方法は、[https://github.com/leanprover/lean4/](https://github.com/leanprover/lean4/)から入手できる。
 
-About this Book
----------------
+このチュートリアルは、Lean 4として知られるLeanの現在のバージョンについて記述する。
 
-This book is designed to teach you to develop and verify proofs in Lean. Much of the background information you will
-need in order to do this is not specific to Lean at all. To start with, you will learn the logical system that Lean is
-based on, a version of *dependent type theory* that is powerful enough to prove almost any conventional mathematical
-theorem, and expressive enough to do it in a natural way. More specifically, Lean is based on a version of a system
-known as the Calculus of Constructions with inductive types. Lean can not only define mathematical objects and express
-mathematical assertions in dependent type theory, but it also can be used as a language for writing proofs.
+## About this Book (この本について)
 
-Because fully detailed axiomatic proofs are so complicated, the challenge of theorem proving is to have the computer
-fill in as many of the details as possible. You will learn various methods to support this in [dependent type
-theory](dependent_type_theory.md). For example, term rewriting, and Lean's automated methods for simplifying terms and
-expressions automatically. Similarly, methods of *elaboration* and *type inference*, which can be used to support
-flexible forms of algebraic reasoning.
+この本は、Leanで証明を記述し検証する方法を学ぶために意図されている。そのために必要な背景情報の多くは、Lean特有のものではない。まず最初に、Leanがベースにしている論理システムを学ぶ。これは*dependent type theory*(依存型理論)の一種で、通常の数学の定理のほとんどを証明するのに十分強力であり、またそれを自然な方法で行うのに十分な表現力を持っている。より具体的には、Leanは帰納的型を持つCalculus of Constructionsとして知られるシステムの一種に基づいている。Leanは依存型理論で数学的対象を定義し数学的主張を表現できるだけでなく、証明を書くための言語としても使用できる。
 
-Finally, you will learn about features that are specific to Lean, including the language you use to communicate
-with the system, and the mechanisms Lean offers for managing complex theories and data.
+完全に詳述された公理的証明は非常に複雑であるため、定理証明の課題は、できるだけ多くの細部をコンピュータに埋めさせることである。[2章 Dependent Type Theory (依存型理論)](./dependent_type_theory.md)では、これを行う様々な方法を学ぶことができる。例えば、項の書き換えや、項や式を自動的に簡略化するLeanの自動化手法などである。同様に、*elaboration*や*type inference*(型推論)の方法も、柔軟な代数的推論をサポートするために使うことができる。
 
-Throughout the text you will find examples of Lean code like the one below:
+最後に、システムとのコミュニケーションに使用する言語や、複雑な理論やデータを管理するためにLeanが提供するメカニズムなど、Lean特有の機能について学ぶ。
+
+本文中には、以下のようなLeanのコード例が見られる:
 
 ```lean
 theorem and_commutative (p q : Prop) : p ∧ q → q ∧ p :=
@@ -90,13 +45,10 @@ theorem and_commutative (p q : Prop) : p ∧ q → q ∧ p :=
   show q ∧ p from And.intro hq hp
 ```
 
-If you are reading the book inside of [VS Code](https://code.visualstudio.com/), you will see a button that reads "try it!" Pressing the button copies the example to your editor with enough surrounding context to make the code compile correctly. You can type
-things into the editor and modify the examples, and Lean will check the results and provide feedback continuously as you
-type. We recommend running the examples and experimenting with the code on your own as you work through the chapters
-that follow. You can open this book on VS Code by using the command "Lean 4: Open Documentation View".
+(訳者注: 以下の文章は、文章中にあるようにVS Codeのコマンドを用いて翻訳元英語版を開いた際の話だと思われます。)
+この本を[VS Code](https://code.visualstudio.com/)の中で読んでいると、"try it!"というボタンが表示される。このボタンを押すと、コードを正しくコンパイルするのに十分な周囲のコンテキストとともに、エディタにサンプルがコピーされる。あなたはそこへ入力して例を自由に修正することができ、それに応じてLeanはあなたが入力した結果をチェックし、継続的にフィードバックを提供する。この後の章を読み進めながら、自分でサンプルを実行し、コードを試してみることをお勧めする。本書はVS Code上で「Lean 4: Open Documentation View」コマンドで開くことができる。
 
-Acknowledgments
----------------
+## Acknowledgments (謝辞)
 
 This tutorial is an open access project maintained on Github. Many people have contributed to the effort, providing
 corrections, suggestions, examples, and text. We are grateful to Ulrik Buchholz, Kevin Buzzard, Mario Carneiro, Nathan
