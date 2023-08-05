@@ -7,7 +7,7 @@ Up Lean](https://leanprover.github.io/lean4/doc/setup.html)をご覧ください
 
 ## この翻訳について
 
-*translated by aconite, Haruhisa Enomoto*
+*translated by aconite*(2章～12章)*, Haruhisa Enomoto*(1章)
 
 この翻訳は有志による**非公式**翻訳です。翻訳に際して、表現を大きく変えた箇所や、分かりやすさを期すため記述やコード例を追加した箇所があります。また、用語の訳が一般的でない可能性があります。誤りを含む可能性もあります。必要に応じて原文[Theorem Proving in Lean 4](https://leanprover.github.io/theorem_proving_in_lean4/) ([GitHub](https://github.com/leanprover/theorem_proving_in_lean4))もご覧ください。
 
