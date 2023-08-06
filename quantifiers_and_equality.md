@@ -75,8 +75,8 @@ variable (trans_r : ∀ {x y z}, r x y → r y z → r x z)
 variable (a b c : α)
 variable (hab : r a b) (hbc : r b c)
 
-#check trans_r          -- r ?m.131 ?m.132 → r ?m.132 ?m.133 → r ?m.131 ?m.133
-#check trans_r hab      -- r b ?m.172 → r a ?m.172
+#check trans_r          -- r ?m.1 ?m.2 → r ?m.2 ?m.3 → r ?m.1 ?m.3
+#check trans_r hab      -- r b ?m.42 → r a ?m.42
 #check trans_r hab hbc  -- r a c
 ```
 
