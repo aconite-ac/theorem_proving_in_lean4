@@ -17,6 +17,4 @@ Up Lean](https://leanprover.github.io/lean4/doc/setup.html)をご覧ください
 
 誤字脱字、内容の誤りの指摘、フォークからのPull Request、フォークによる翻訳の改変等は歓迎いたします。基本的に、ご指摘は[GitHubリポジトリのIssues](https://github.com/aconite-ac/theorem_proving_in_lean4/issues)で受け付けます。
 
-mdBook付属の検索機能に関して、今のところ日本語検索は非対応です。お手数ですがページ内検索をご活用ください。章や節の名前、一部の専門用語は英語検索でヒットします。
-
 翻訳に際して、機械翻訳サービス[DeepL翻訳](https://www.deepl.com/ja/translator)を参考にしました。
