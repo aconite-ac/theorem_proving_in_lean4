@@ -140,7 +140,7 @@ open Nat renaming mul → times, add → plus
 #eval Nat.mul 1 2         -- 2
 ```
 
-ある名前空間から別の名前空間へ、あるいはルートレベルへ別名を ``export`` することは時に便利である。現在の名前空間 ``Foo`` の中で、コマンド ``export Nat (succ add sub)`` は、``Nat.succ``、``Nat.add``、``Nat.sub`` に対して別名 ``Foo.succ``、``Foo.succ``、``Foo.sub`` を生成する。したがって、名前空間が開かれているときは、いつでもこれらの別名を使うことができる。名前空間の外で ``export`` コマンドが使われたときは、短い別名がルートレベルにエクスポートされる。
+ある名前空間から別の名前空間へ、あるいはルートレベルへ別名を ``export`` することは時に便利である。現在の名前空間 ``Foo`` の中で、コマンド ``export Nat (succ add sub)`` は、``Nat.succ``、``Nat.add``、``Nat.sub`` に対して別名 ``Foo.succ``、``Foo.add``、``Foo.sub`` を生成する。したがって、名前空間が開かれているときは、いつでもこれらの別名を使うことができる。名前空間の外で ``export`` コマンドが使われたときは、短い別名がルートレベルにエクスポートされる。
 
 ```lean
 namespace Foo
