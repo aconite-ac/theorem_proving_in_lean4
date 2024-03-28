@@ -3,7 +3,7 @@
 *by Jeremy Avigad, Leonardo de Moura, Soonho Kong and Sebastian Ullrich, with contributions from the Lean Community*
 
 このテキストは読者がLean 4を使うことを前提にしています。Lean 4をインストールするには、[Lean 4 Manual](https://lean-lang.org/lean4/doc/)の節[Setting
-Up Lean](https://lean-lang.org/lean4/doc/setup.html)をご覧ください。このテキストの最初のバージョンはLean 2用に書かれました。Lean 3用のバージョンは[こちら](https://lean-lang.org/theorem_proving_in_lean/)で入手可能です。
+Up Lean](https://lean-lang.org/lean4/doc/setup.html)をご覧ください。このテキストの最初のバージョンはLean 2用に書かれました。Lean 3用のバージョンは[こちら](https://leanprover.github.io/theorem_proving_in_lean/)で入手可能です。
 
 ## この翻訳について
 
