@@ -186,13 +186,13 @@ Leanの全ての式(項)が型を持っていることを考えれば、「``Typ
 いくつかの演算子は型の宇宙に対して*polymorphic*(多相)である必要がある。例えば、``List α`` は、``α`` がどの型宇宙にいようと意味をなすべきである。多相な関数 ``List`` の型は次のように表記される:
 
 ```lean
-#check List    -- Type u_1 → Type u_1
+#check List    -- List.{u} (α : Type u) : Type u
 ```
 
-ここで、``u_1`` は宇宙レベルを表す変数である。コマンド ``#check List`` の出力は、``α`` が型 ``Type n`` を持つなら、``List α`` も ``Type n`` を持つことを表している。関数 ``Prod`` も多相である:
+ここで、``u`` は宇宙レベルを表す変数である。コマンド ``#check List`` の出力は、``α`` が型 ``Type n`` を持つなら、``List α`` も ``Type n`` を持つことを表している。関数 ``Prod`` も多相である:
 
 ```lean
-#check Prod    -- Type u_1 → Type u_2 → Type (max u_1 u_2)
+#check Prod    -- Prod.{u, v} (α : Type u) (β : Type v) : Type (max u v)
 ```
 
 ``universe`` コマンドを使うと、明示的に宇宙変数を宣言することができる。宇宙変数を使うと多相な項を定義することができる:
@@ -756,10 +756,10 @@ def test : i := 5 + 5
 # def Lst.cons (α : Type u) (a : α) (as : Lst α) : Lst α := List.cons a as
 # def Lst.nil (α : Type u) : Lst α := List.nil
 # def Lst.append (α : Type u) (as bs : Lst α) : Lst α := List.append as bs
-#check Lst          -- Type u_1 → Type u_1
-#check Lst.cons     -- (α : Type u_1) → α → Lst α → Lst α
-#check Lst.nil      -- (α : Type u_1) → Lst α
-#check Lst.append   -- (α : Type u_1) → Lst α → Lst α → Lst α
+#check Lst          -- Lst.{u} (α : Type u) : Type u
+#check Lst.cons     -- Lst.cons.{u} (α : Type u) (a : α) (as : Lst α) : Lst α
+#check Lst.nil      -- Lst.nil.{u} (α : Type u) : Lst α
+#check Lst.append   -- Lst.append.{u} (α : Type u) (as bs : Lst α) : Lst α
 ```
 
 このとき、次のように ``Nat`` の項からなるリストを作ることができる:
@@ -883,7 +883,7 @@ Leanでは数字はオーバーロードされる。しかし数字の型が推�
 しかし、ある関数の引数を暗黙の引数として宣言しておきながら、その引数を明示的に与えたいという状況に陥ることがある。``foo`` がそのような関数である場合、``@foo`` という表記は、すべての引数を明示的にした同じ関数を表す。
 
 ```lean
-#check @id        -- {α : Type u_1} → α → α
+#check @id        -- {α : Sort u_1} → α → α
 #check @id Nat    -- Nat → Nat
 #check @id Bool   -- Bool → Bool
 
