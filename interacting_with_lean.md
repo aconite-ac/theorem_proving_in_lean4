@@ -728,7 +728,7 @@ example (x y : α) : g x y = fun (c : α) => x + y + c := rfl
 inductive Term where
   | var    (name : String)
   | num    (val : Nat)
-  | add    (fn : Term) (arg : Term)
+  | app    (fn : Term) (arg : Term)
   | lambda (name : String) (type : Term) (body : Term)
 
 def getBinderName : Term → Option String
