@@ -427,7 +427,7 @@ example (hnp : ¬p) (hq : q) (hqp : q → p) : r :=
 
 ちなみに、``False`` が除去則しか持たないように、``True`` は導入則である ``True.intro : True`` しか持たない。つまり、``True`` は単に真であり、``True.intro`` という正規の証明を持っている。
 
-### Logical Equivalence (論理同値)
+### Logical Equivalence (論理的同値)
 
 式 ``Iff.intro h1 h2`` は ``h1 : p → q`` と ``h2 : q → p`` から ``p ↔ q`` の証明を作る。 式 ``Iff.mp h`` は ``h : p ↔ q`` から ``p → q`` の証明を作る。同様に、``Iff.mpr h`` は ``h : p ↔ q`` から ``q → p`` の証明を作る。以下は ``p ∧ q ↔ q ∧ p`` の証明である。
 
