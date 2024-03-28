@@ -110,9 +110,9 @@ example (a b c d : α) (hab : r a b) (hcb : r c b) (hcd : r c d) : r a d :=
 もちろん、等号の基本的な性質の一つは、「等号は同値関係である」という性質である:
 
 ```lean
-#check Eq.refl    -- {α : Sort u_1} (a : α) : a = a
-#check Eq.symm    -- {α : Sort u} {a b : α} (h : a = b) : b = a
-#check Eq.trans   -- {α : Sort u} {a b c : α} (h₁ : a = b) (h₂ : b = c) : a = c
+#check Eq.refl    -- Eq.refl.{u_1} (a : α) : a = a
+#check Eq.symm    -- Eq.symm.{u} {α : Sort u} {a b : α} (h : a = b) : b = a
+#check Eq.trans   -- Eq.trans.{u} {α : Sort u} {a b c : α} (h₁ : a = b) (h₂ : b = c) : a = c
 ```
 
 Leanに暗黙の引数(ここではメタ変数として表示されている)を挿入しないように指示することで、出力を読みやすくすることができる。
@@ -120,9 +120,9 @@ Leanに暗黙の引数(ここではメタ変数として表示されている)�
 ```lean
 universe u
 
-#check @Eq.refl.{u}   -- ∀ {α : Sort u} (a : α), a = a
-#check @Eq.symm.{u}   -- ∀ {α : Sort u} {a b : α}, a = b → b = a
-#check @Eq.trans.{u}  -- ∀ {α : Sort u} {a b c : α}, a = b → b = c → a = c
+#check @Eq.refl.{u}   -- @Eq.refl : ∀ {α : Sort u} (a : α), a = a
+#check @Eq.symm.{u}   -- @Eq.symm : ∀ {α : Sort u} {a b : α}, a = b → b = a
+#check @Eq.trans.{u}  -- @Eq.trans : ∀ {α : Sort u} {a b c : α}, a = b → b = c → a = c
 ```
 
 ``.{u}`` という記法は、宇宙 ``u`` で定数をインスタンス化することをLeanに指示する。
