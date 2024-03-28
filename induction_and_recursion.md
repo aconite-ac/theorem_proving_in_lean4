@@ -652,10 +652,10 @@ def ack : Nat → Nat → Nat
   | 0,   y   => y+1
   | x+1, 0   => ack x 1
   | x+1, y+1 => ack x (ack (x+1) y)
-termination_by ack x y => (x, y)
+termination_by x y => (x, y)
 
 #eval ack 3 5
--- アッカーマン関数は急速に増加する関数であり、
+-- アッカーマン関数は入力値の増加に伴い出力値が急速に増加する関数であり、
 -- 例えば `#eval ack 4 1` などはバッファオーバーフロー等のエラーを引き起こす可能性が高いため、
 -- 実行しないことをお勧めする。
 ```
@@ -684,7 +684,7 @@ where
         r
     else
       r
-termination_by go i r => as.size - i
+termination_by as.size - i
 
 #eval takeWhile (fun n : Nat => if n % 2 = 1 then true else false) #[1, 3, 5, 6, 7]
 ```
@@ -712,11 +712,12 @@ def ack : Nat → Nat → Nat
   | 0,   y   => y+1
   | x+1, 0   => ack x 1
   | x+1, y+1 => ack x (ack (x+1) y)
-termination_by ack x y => (x, y)
+termination_by x y => (x, y)
 decreasing_by
-  simp_wf -- unfolds well-founded recursion auxiliary definitions
-  first | apply Prod.Lex.right; simp_arith
-        | apply Prod.Lex.left; simp_arith
+  all_goals simp_wf -- unfolds well-founded recursion auxiliary definitions
+  · apply Prod.Lex.left; simp_arith
+  · apply Prod.Lex.right; simp_arith
+  · apply Prod.Lex.left; simp_arith
 ```
 
 ``decreasing_by sorry`` を使えば、Leanに関数が停止することを「信じ」させることができる。
