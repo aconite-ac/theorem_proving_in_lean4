@@ -2,14 +2,14 @@
 
 *by Jeremy Avigad, Leonardo de Moura, Soonho Kong and Sebastian Ullrich, with contributions from the Lean Community*
 
-このテキストは読者がLean 4を使うことを前提にしています。Lean 4をインストールするには、[Lean 4 Manual](https://leanprover.github.io/lean4/doc/)の節[Setting
-Up Lean](https://leanprover.github.io/lean4/doc/setup.html)をご覧ください。このテキストの最初のバージョンはLean 2用に書かれました。Lean 3用のバージョンは[こちら](https://leanprover.github.io/theorem_proving_in_lean/)で入手可能です。
+このテキストは読者がLean 4を使うことを前提にしています。Lean 4をインストールするには、[Lean 4 Manual](https://lean-lang.org/lean4/doc/)の節[Setting
+Up Lean](https://lean-lang.org/lean4/doc/setup.html)をご覧ください。このテキストの最初のバージョンはLean 2用に書かれました。Lean 3用のバージョンは[こちら](https://lean-lang.org/theorem_proving_in_lean/)で入手可能です。
 
 ## この翻訳について
 
 *translated by aconite*(2章～12章)*, Haruhisa Enomoto*(1章)
 
-この翻訳は有志による**非公式**翻訳です。翻訳に際して、表現を大きく変えた箇所や、分かりやすさを期すため記述やコード例を追加した箇所があります。また、用語の訳が一般的でない可能性があります。誤りを含む可能性もあります。必要に応じて原文[Theorem Proving in Lean 4](https://leanprover.github.io/theorem_proving_in_lean4/) ([GitHub](https://github.com/leanprover/theorem_proving_in_lean4))もご覧ください。
+この翻訳は有志による**非公式**翻訳です。翻訳に際して、表現を大きく変えた箇所や、分かりやすさを期すため記述やコード例を追加した箇所があります。また、用語の訳が一般的でない可能性があります。誤りを含む可能性もあります。必要に応じて原文[Theorem Proving in Lean 4](https://lean-lang.org/theorem_proving_in_lean4/) ([GitHub](https://github.com/leanprover/theorem_proving_in_lean4))もご覧ください。
 
 原文のライセンスは[Apache License 2.0](https://github.com/leanprover/theorem_proving_in_lean4/blob/master/LICENSE)であり、それに基づいて原文を翻訳・公開しています。
 
