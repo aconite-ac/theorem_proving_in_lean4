@@ -17,3 +17,7 @@
 誤字脱字、内容の誤りの指摘、フォークからのPull Request、フォークによる翻訳の改変等は歓迎いたします。基本的に、ご指摘は[GitHubリポジトリのIssues](https://github.com/aconite-ac/theorem_proving_in_lean4/issues)で受け付けます。
 
 翻訳に際して、機械翻訳サービス[DeepL翻訳](https://www.deepl.com/ja/translator)を参考にしました。
+
+## バージョン情報
+
+この翻訳は原文のcommit[81b028359684646f2db48e3909ee81b4fad51dfb](https://github.com/leanprover/theorem_proving_in_lean4/tree/81b028359684646f2db48e3909ee81b4fad51dfb)(Date: Fri Mar 1 14:54:59 2024 -0600)に基づいています。
