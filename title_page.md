@@ -20,4 +20,4 @@
 
 ## バージョン情報
 
-この翻訳は原文のcommit[81b028359684646f2db48e3909ee81b4fad51dfb](https://github.com/leanprover/theorem_proving_in_lean4/tree/81b028359684646f2db48e3909ee81b4fad51dfb)(Date: Fri Mar 1 14:54:59 2024 -0600)に基づいています。
+この翻訳は原文のcommit [81b028359684646f2db48e3909ee81b4fad51dfb](https://github.com/leanprover/theorem_proving_in_lean4/tree/81b028359684646f2db48e3909ee81b4fad51dfb) (Date: Fri Mar 1 14:54:59 2024 -0600)に基づいています。
