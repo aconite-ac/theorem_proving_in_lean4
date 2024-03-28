@@ -18,7 +18,7 @@ Leanの基礎となる論理は計算的解釈を持ち、Leanはプログラミ
 
 *Lean*プロジェクトは、2013年にMicrosoft Research RedmondのLeonardo de Mouraによって立ち上げられた、現在進行中の長期的な取り組みであり、自動化への潜在的可能性の多くは時間をかけて徐々に実現されるだろう。Leanは[Apache License 2.0](LICENSE)の下でリリースされている。これは寛容なオープンソースライセンスであり、他の人がコードと数学ライブラリを自由に利用し、拡張することを許可している。
 
-Leanをあなたのコンピュータにインストールするには、[Quickstart](https://leanprover.github.io/lean4/doc/quickstart.html)にある指示を参照するのがよいだろう。LeanのソースコードとLeanのビルド方法は、[https://github.com/leanprover/lean4/](https://github.com/leanprover/lean4/)から入手できる。
+Leanをあなたのコンピュータにインストールするには、[Quickstart](https://lean-lang.org/lean4/doc/quickstart.html)にある指示を参照するのがよいだろう。LeanのソースコードとLeanのビルド方法は、[https://github.com/leanprover/lean4/](https://github.com/leanprover/lean4/)から入手できる。
 
 このチュートリアルは、Lean 4として知られるLeanの現在のバージョンについて記述する。
 

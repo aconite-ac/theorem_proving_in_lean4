@@ -2,7 +2,7 @@
 
 Lean 4の入門ドキュメント『Theorem Proving in Lean 4』の非公式日本語訳です。
 
-原文: [Theorem Proving in Lean 4](https://leanprover.github.io/theorem_proving_in_lean4/)
+原文: [Theorem Proving in Lean 4](https://lean-lang.org/theorem_proving_in_lean4/)
 
 ドキュメントのビルド方法はフォーク元のリポジトリの ``README.md`` をご参照ください。
 
