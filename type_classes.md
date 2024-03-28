@@ -687,7 +687,7 @@ def bar : Inhabited (Nat → Nat) := inferInstance
 -- {α : Sort u} → [α] → α
 ```
 
-Leanの ``(t : T)`` 記法を使えば、インスタンス ``t`` を探している型クラス ``T`` を簡潔に指定することができる:
+Leanの ``(t : T)`` 記法を使えば、今探している ``t`` がどの型クラス ``T`` のインスタンスなのかを簡潔に指定することができる:
 
 ```lean
 #check (inferInstance : Add Nat)
