@@ -72,7 +72,7 @@ inductive Weekday where
 
 ``sunday``、``monday``、...、``saturday`` は ``Weekday`` の互いに異なる項であり、それ以外に互いに異なる項はないと考えてほしい。除去則 ``Weekday.rec`` は 型 ``Weekday`` とそのコンストラクタを用いて定義されている。除去則は*recursor*(再帰子)とも呼ばれ、この型を*inductive*(帰納的)にしている: 除去則は、各コンストラクタに対応する値を割り当てることで、``Weekday`` 上の関数を定義することを可能にしている。直感的には、帰納型の項は各コンストラクタによって網羅的に生成され、帰納型はコンストラクタが構築する項以外の項を持たないということである。
 
-``Weekday`` から自然数への関数を定義するには、``match`` 文を使うことができる:
+``Weekday`` から自然数への関数を定義するには、``match`` 式を使うことができる:
 
 ```lean
 # inductive Weekday where
@@ -1074,7 +1074,7 @@ example (x : Nat) {y : Nat} (h : y > 0) : x % y < y := by
       assumption
 ```
 
-タクティク証明の中で ``match`` 記法を使うこともできる:
+タクティク証明の中で ``match`` を使うこともできる:
 
 ```lean
 example : p ∨ q → q ∨ p := by
