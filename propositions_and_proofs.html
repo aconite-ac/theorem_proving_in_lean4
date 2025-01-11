@@ -1,0 +1,708 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>命題と証明 - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html" class="active"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="propositions-and-proofs-命題と証明"><a class="header" href="#propositions-and-proofs-命題と証明">Propositions and Proofs (命題と証明)</a></h1>
+<p>第2章で、Leanにおいて項と関数を定義する方法を見てきた。この章では、依存型理論の言語を用いて数学的な主張と証明を書く方法を学ぶ。</p>
+<h2 id="propositions-as-types-型としての命題"><a class="header" href="#propositions-as-types-型としての命題">Propositions as Types (型としての命題)</a></h2>
+<p>依存型理論の言語で定義された項に関する命題を証明するための戦略の一つは、定義に用いる言語の上に命題に用いる言語と証明に用いる言語を重ねることである。しかし、複数の言語を使う必要はない。
+依存型理論は、命題と証明を同じ一般的な枠組みで表現するのに十分な柔軟さと表現力を兼ね備えている。</p>
+<p>例えば、命題を表す新しい型 <code>Prop</code> を導入することができる。さらに、他の命題から新しい命題を構築するコンストラクタを導入することができる。</p>
+<pre><code class="language-lean"><span class="boring">def Implies (p q : Prop) : Prop := p → q
+</span>#check And     -- Prop → Prop → Prop
+#check Or      -- Prop → Prop → Prop
+#check Not     -- Prop → Prop
+#check Implies -- Prop → Prop → Prop
+
+variable (p q r : Prop)
+#check And p q                      -- Prop
+#check Or (And p q) r               -- Prop
+#check Implies (And p q) (And q p)  -- Prop
+</code></pre>
+<p>それから、各要素 <code>p : Prop</code> に対して、<code>p</code> の証明の型 <code>Proof p</code> を導入できる。
+「公理」とは、<code>Proof p</code> のような命題の証明の型を持った定数である。</p>
+<pre><code class="language-lean"><span class="boring">def Implies (p q : Prop) : Prop := p → q
+</span><span class="boring">structure Proof (p : Prop) : Type where
+</span><span class="boring">  proof : p
+</span>#check Proof   -- Proof (p : Prop) : Type
+
+axiom and_comm (p q : Prop) : Proof (Implies (And p q) (And q p))
+
+variable (p q : Prop)
+#check and_comm p q     -- and_comm p q : Proof (Implies (p ∧ q) (q ∧ p))
+#check and_comm q p     -- and_comm q p : Proof (Implies (q ∧ p) (p ∧ q))
+</code></pre>
+<p>公理だけでなく、既存の証明から新しい証明を作るためのルールも必要である。例えば、命題論理の証明系の多くには、&quot;modus ponens(モーダス・ポネンス)&quot;という推論規則がある。</p>
+<blockquote>
+<p>modus ponens : <code>Implies p q</code> の証明と <code>p</code> の証明があれば、そこから <code>q</code> の証明が得られる。</p>
+</blockquote>
+<p>Leanではモーダス・ポネンスを次のように表現できる。</p>
+<pre><code class="language-lean"><span class="boring">def Implies (p q : Prop) : Prop := p → q
+</span><span class="boring">structure Proof (p : Prop) : Type where
+</span><span class="boring">  proof : p
+</span>axiom modus_ponens : (p q : Prop) → Proof (Implies p q) → Proof p → Proof q
+</code></pre>
+<p>一般的に、命題論理のための自然演繹のシステムは次の推論規則も採用している:</p>
+<blockquote>
+<p>含意導入 : <code>p</code> を仮定すると <code>q</code> の証明が得られるとする。このとき、<code>Implies p q</code> の証明が得られる。</p>
+</blockquote>
+<p>含意導入はLean上で次のように表現できる。</p>
+<pre><code class="language-lean"><span class="boring">def Implies (p q : Prop) : Prop := p → q
+</span><span class="boring">structure Proof (p : Prop) : Type where
+</span><span class="boring">  proof : p
+</span>axiom implies_intro : (p q : Prop) → (Proof p → Proof q) → Proof (Implies p q)
+</code></pre>
+<p>以上の手法は、命題と証明の合理的な構築方法を提供する。この手法において、ある式 <code>t</code> が命題 <code>p : Prop</code> の正しい証明であることを確定させるには、<code>t</code> が <code>Proof p</code> という型を持つことをチェックすればよい。</p>
+<p>いくつかの簡略化が可能である。まず、命題 <code>p : Prop</code> があるとき、<code>p</code> 自体を型として解釈することができる。さらに、型 <code>p</code> を <code>p</code> の証明の型と解釈する。つまり、型 <code>p</code> と型 <code>Proof p</code> を同一視する。すると、「<code>t</code> は <code>p</code> の証明である」という主張をシンプルに <code>t : p</code> と書くことができる。
+この簡略化により、毎回 <code>Proof</code> と書く手間が省ける。</p>
+<p>さらにこの手法を発展させる。命題 <code>p</code> と <code>q</code> の間の含意 <code>Implies p q</code> は、<code>p</code> の任意の要素に<code>q</code> の要素を一つ割り当てる関数 <code>p → q</code> と同一視できる。結果として、<code>Implies</code> という結合子の導入は不要である。含意の型 <code>Implies p q</code> の代わりに、依存型理論の関数の型 <code>p → q</code> を使えばよいのである。</p>
+<p>これが<em>Calculus of Constructions</em>のアプローチであり、Leanはこのアプローチを採用している。自然演繹の証明系における含意に関する規則が、関数のラムダ抽象と適用に関する規則と正確に対応しているという事実は、<em>Curry-Howard isomorphism</em>(カリー=ハワード同型)の一例であり、<em>proposition-as-types</em>(型としての命題)パラダイムとして知られている。実は、型 <code>Prop</code> は前章で説明した型階層の最下層である型 <code>Sort 0</code> の糖衣構文である(<code>Prop</code> と <code>Sort 0</code> は全く同じ意味である)。さらに言えば、型 <code>Type u</code> は型 <code>Sort (u+1)</code> の糖衣構文に過ぎない。<code>Prop</code> はいくつか特別な特徴を持っているが、他の型宇宙と同様に、アローコンストラクタの下で閉じている。つまり、<code>p q : Prop</code> ならば <code>p → q : Prop</code> である(<code>α β : Type</code> ならば <code>α → β : Type</code> であるのと同様である)。</p>
+<p>「型としての命題」について考えるには、少なくとも2通りの方法がある。論理学や数学について構成主義的な立場をとる人にとっては、「型としての命題」は「命題とはどういうものか」を忠実に表現している。命題 <code>p</code> は <code>p</code> の証明を構成するデータの型を表している。<code>p</code> の証明とは、単に正しく型付けされた項 <code>t : p</code> である。</p>
+<p>このような主義に傾倒していない人にとって、「型としての命題」はむしろ単純なコーディング・トリックだと考えることができる。各命題 <code>p</code> に対して、 <code>p</code> が偽なら <code>p</code> に空の型を関連付ける。<code>p</code> が真なら <code>p</code> にただ一つの項 <code>*</code> を持つ型を関連付ける。後者のとき、<code>p</code> (に関連付けられた型)を <em>inhabited</em>(有項) と呼び、型 <code>p</code> が持つ項 <code>*</code> を<em>inhabitant</em>(住人) と呼ぶ。このとき、たまたま、関数の適用と抽象化の規則が、<code>Prop</code> のどの要素が有項かを追跡するのに便利だったのである。つまり、項 <code>t : p</code> を構築することが、<code>p</code> が真であることを保証してくれるのである。
+このとき、<code>p</code> の住人 <code>t</code> とは「<code>p</code> が真であるという事実」のことだと考えることができる。そうすると、<code>p → q</code> の証明とは「<code>p</code> が真であるという事実」を受け取って「<code>q</code> が真であるという事実」を返す関数のことだと考えることができる。</p>
+<p>実際、Leanのカーネルは <code>(fun x =&gt; t) s</code> と <code>t[s/x]</code>(項 <code>t</code> の中の全ての <code>x</code> を <code>s</code> で置き換えた項) をdefinitionally equalとみなすのと同様に、任意の <code>p : Prop</code> に対して任意の2つの項 <code>t1 t2 : p</code> をdefinitionally equalとみなす。<code>t1 t2 : p</code> をdefinitionally equalとみなすことは<em>proof irrelevance</em>(証明無関係)と呼ばれ、前段落の解釈と矛盾しない。つまり、証明 <code>t : p</code> は依存型理論の言語の中で普通の項として扱うことができるが、<code>t</code> は <code>p</code> が真であるという事実以上の情報は持っていないということである。</p>
+<p>以上で提案した「型としての命題」パラダイムについて考えるための2つの方法は、根本的なところで異なっている。構成主義的な観点からすると、証明は抽象的な数学的対象であり、依存型理論において適切な項で「表現」される。対照的に、前述のコーディング・トリックの観点からすると、項 <code>t : p</code> そのものは何も面白いものを示さない。むしろ、項を書き下し、その項がきちんと型付けされていることを確認することで、問題の命題が真であることを保証するのである。つまり、項「そのもの」が証明なのである。</p>
+<p>以下の説明では、ある項がある命題の証明を「構築する」「生成する」「返す」と表現したり、単にある項がある命題の証明「である」と表現したり、この両方の表現を使うことにする。これは、計算機科学者が、あるプログラムがある関数を「計算する」と言いながら、時にはそのプログラムがその関数「である」と言うことで、構文論と意味論の区別を曖昧にすることがあるのと似たようなものである。</p>
+<p>いずれにせよ、本当に重要なのは次のことである: 依存型理論の言語で数学的な命題 <code>p</code> を形式的に表現するには、項 <code>p : Prop</code> を構築する必要がある。命題 <code>p</code> を「証明」するには、項 <code>t : p</code> を構築する必要がある。証明支援系Leanの仕事は、このような項 <code>t</code> を構築する手助けをし、そして <code>t</code> が適切な形をとっていて正しい型を持つことを検証することである。</p>
+<h2 id="working-with-propositions-as-types-型としての命題を実践する"><a class="header" href="#working-with-propositions-as-types-型としての命題を実践する">Working with Propositions as Types (「型としての命題」を実践する)</a></h2>
+<p>「型としての命題」パラダイムにおいては、<code>→</code> と命題だけを含む定理はラムダ抽象と関数適用を使って証明することができる。Leanでは、<code>theorem</code> コマンドを使うと新しい定理を導入できる。</p>
+<pre><code class="language-lean">variable {p : Prop}
+variable {q : Prop}
+
+theorem t1 : p → q → p := fun hp : p =&gt; fun hq : q =&gt; hp
+</code></pre>
+<p>この証明を、型 <code>α → β → α</code> (<code>α</code> と <code>β</code> は型 <code>Type</code> の項) の項 <code>fun x : α =&gt; fun y : β =&gt; x</code> と比較してほしい。<code>fun x : α =&gt; fun y : β =&gt; x</code> は引数 <code>x : α</code> と引数 <code>y : β</code> をとり、<code>x</code> を返す。
+<code>p → q → p</code> の証明は同じ形をとる。唯一の違いは <code>p</code> と <code>q</code> が <code>Type</code> ではなく <code>Prop</code> の項であることだけである。
+直観的には、我々の <code>p → q → p</code> の証明は命題 <code>p : Prop</code> と命題 <code>q : Prop</code> が正しいことを前提とし、最初の前提から <code>p</code> が正しいことを(自明に)結論づける。</p>
+<p><code>theorem</code> コマンドは <code>def</code> コマンドと全く同じである。つまり、命題と型の対応の下で、定理 <code>p → q → p</code> を証明することは、型 <code>p → q → p</code> の要素を定義することと全く同じである。実際、Leanのカーネルの型チェッカーにとって、<code>theorem</code> コマンドと <code>def</code> コマンドの間に違いはない。</p>
+<p>しかしながら、定義と定理の間にはいくつかの実用的な違いがある。通常、定理の「定義」を展開する必要はない。証明無関係の原則により、ある定理の任意の2つの証明はdefinitionally equalである。一度定理の証明が完成したら、通常はその定理の証明が存在することだけが分かればよく、その証明が何であるかは重要ではない。この事実をふまえ、Leanは証明に<em>irreducible</em>とタグ付けする。ファイルを処理するとき、このタグはパーサー(より正確には<em>elaborator</em>)に対して、「このタグが付いたものを展開する必要はない」というヒントとして機能する。実際、Leanは一般的に証明の処理とチェックを平行して行うことができる。これは、ある証明の正しさを検証する際に、他の証明の詳細を知る必要がないからできることである。</p>
+<p>定義と同様に、<code>#print</code> コマンドは定理の証明を表示する。</p>
+<pre><code class="language-lean">variable {p : Prop}
+variable {q : Prop}
+theorem t1 : p → q → p := fun hp : p =&gt; fun hq : q =&gt; hp
+
+#print t1    -- ∀ {p q : Prop}, p → q → p := fun {p q} hp hq =&gt; hp
+</code></pre>
+<p>ラムダ抽象 <code>hp : p</code> と <code>hq : q</code> は <code>p → q → p</code> の証明における一時的な前提と見なせることに注意してほしい。また、Leanでは、最後の項 <code>hp</code> の型を、<code>show</code> 文で明示的に指定することができる。</p>
+<pre><code class="language-lean"><span class="boring">variable {p : Prop}
+</span><span class="boring">variable {q : Prop}
+</span>theorem t1 : p → q → p :=
+  fun hp : p =&gt;
+  fun hq : q =&gt;
+  show p from hp      -- show &lt;型&gt; from &lt;項&gt;
+</code></pre>
+<p>このような情報を追加することで、証明の分かりやすさを向上させ、証明を書く際の誤りを発見しやすくすることができる。<code>show</code> コマンドは型に注釈をつける以上のことはしない。内部的には、これまで見てきた <code>t1</code> の表現は全て同じ項を生成している。</p>
+<p>通常の定義と同様に、<code>theorem</code> コマンドにおいても、ラムダ抽象された変数をコロンの左側に持ってくることができる。</p>
+<pre><code class="language-lean"><span class="boring">variable {p : Prop}
+</span><span class="boring">variable {q : Prop}
+</span>theorem t1 (hp : p) (hq : q) : p := hp
+
+#print t1    -- p → q → p
+</code></pre>
+<p>定理 <code>t1</code> は関数適用と同様に他の項に適用することができる。</p>
+<pre><code class="language-lean"><span class="boring">variable {p : Prop}
+</span><span class="boring">variable {q : Prop}
+</span>theorem t1 (hp : p) (hq : q) : p := hp
+
+axiom hp : p
+
+theorem t2 : q → p := t1 hp
+</code></pre>
+<p>ここで、<code>axiom</code> 宣言は与えられた型の項の存在を無条件に認めるため、<code>axiom</code> コマンドの使い方によっては論理的整合性を損なう可能性がある。例えば、<code>axiom</code> コマンドにより空の型 <code>False</code> が項を持つことを認めることさえ可能である。</p>
+<pre><code class="language-lean">axiom unsound : False
+-- `False`(偽)からは任意の命題を示すことができる
+theorem ex : 1 = 0 :=    -- 本来は偽の命題
+  False.elim unsound
+</code></pre>
+<p>「公理」<code>hp : p</code> を宣言することは、<code>hp</code> の存在を無条件に認め、<code>hp</code> により <code>p</code> が真であると宣言することと等価である。<code>p</code> が真だと主張する公理 <code>hp : p</code> に定理 <code>t1 : p → q → p</code> を適用すると、定理 <code>t1 hp : q → p</code> が得られる。</p>
+<p>定理 <code>t1</code> は次のように書けることを思い出そう。</p>
+<pre><code class="language-lean">theorem t1 {p q : Prop} (hp : p) (hq : q) : p := hp
+
+#print t1    -- ∀ {p q : Prop}, p → q → p := fun {p q} hp hq =&gt; hp
+</code></pre>
+<p><code>t1</code> の型は <code>∀ {p q : Prop}, p → q → p</code> だと表示される。これは、「任意の命題のペア <code>p q</code> について、<code>p → q → p</code> が成立する」と読める。
+この結果を用いると、<code>t1</code> の全ての引数をコロンの右側に持っていくことができる。</p>
+<pre><code class="language-lean">theorem t1 : ∀ {p q : Prop}, p → q → p :=
+  fun {p q : Prop} (hp : p) (hq : q) =&gt; hp
+</code></pre>
+<p><code>p</code> と <code>q</code> が <code>variable</code> コマンドを使って宣言されているなら、Leanは自動的に <code>p</code> と <code>q</code> を全称化する。</p>
+<pre><code class="language-lean">variable {p q : Prop}
+
+theorem t1 : p → q → p := fun (hp : p) (hq : q) =&gt; hp
+
+#print t1    -- ∀ {p q : Prop}, p → q → p := fun {p q} hp hq =&gt; hp
+</code></pre>
+<p>「型としての命題」対応に従って、<code>p</code> は正しいという前提 <code>hp</code> を別の変数として宣言することができる。</p>
+<pre><code class="language-lean">variable {p q : Prop}
+variable (hp : p)
+
+theorem t1 : q → p := fun (hq : q) =&gt; hp
+
+#print t1    -- ∀ {p q : Prop}, p → q → p := fun {p q} hp hq =&gt; hp
+</code></pre>
+<p>Leanはこの証明が <code>hp</code> を使っていることを検出し、自動的に <code>hp : p</code> を前提に追加する。どの例でも <code>#print t1</code> は <code>∀ p q : Prop, p → q → p</code> を表示する。この型は <code>∀ (p q : Prop) (hp : p) (hq : q), p</code> とも書けることに注意してほしい。</p>
+<p><code>t1</code> を全称化すれば、<code>t1</code> を様々な命題のペアに適用させることで、一般的な定理 <code>t1</code> の様々な例を得ることができる。</p>
+<pre><code class="language-lean">theorem t1 (p q : Prop) (hp : p) (hq : q) : p := hp
+
+variable (p q r s : Prop)
+
+#check t1 p q                -- p → q → p
+#check t1 r s                -- r → s → r
+#check t1 (r → s) (s → r)    -- (r → s) → (s → r) → r → s
+
+variable (h : r → s)
+#check t1 (r → s) (s → r) h  -- (s → r) → r → s
+</code></pre>
+<p>再び、「型としての命題」対応を利用すると、<code>r → s</code> 型の変数 <code>h</code> を「<code>r → s</code> は真である」という前提とみなすことができる。</p>
+<p>別の例として、前章で説明した合成関数を、今度は型の代わりに命題を使って考えてみよう。</p>
+<pre><code class="language-lean">variable (p q r s : Prop)
+
+theorem t2 (h₁ : q → r) (h₂ : p → q) : p → r :=
+  fun h₃ : p =&gt;
+  show r from h₁ (h₂ h₃)
+</code></pre>
+<p>命題論理の定理として見ると、<code>t2</code> は何を表現しているだろうか？</p>
+<p>この例で使ったように、前提として使える証明項の名前にはUnicode数字添字を使うのが便利である。これらは<code>\0</code>、<code>\1</code>、<code>\2</code>、...と打つと入力できる。</p>
+<h2 id="propositional-logic-命題論理"><a class="header" href="#propositional-logic-命題論理">Propositional Logic (命題論理)</a></h2>
+<p>Leanでは標準的な論理的結合子と記法の全てが定義されている。命題論理の結合子は次のように表す:</p>
+<table><thead><tr><th>Ascii</th><th>Unicode</th><th>エディターでの入力方法</th><th>定義</th></tr></thead><tbody>
+<tr><td>True</td><td></td><td></td><td>True</td></tr>
+<tr><td>False</td><td></td><td></td><td>False</td></tr>
+<tr><td>Not</td><td>¬</td><td><code>\not</code>, <code>\neg</code></td><td>Not</td></tr>
+<tr><td>/\</td><td>∧</td><td><code>\and</code></td><td>And</td></tr>
+<tr><td>\/</td><td>∨</td><td><code>\or</code></td><td>Or</td></tr>
+<tr><td>-&gt;</td><td>→</td><td><code>\to</code>, <code>\r</code>, <code>\imp</code></td><td></td></tr>
+<tr><td>&lt;-&gt;</td><td>↔</td><td><code>\iff</code>, <code>\lr</code></td><td>Iff</td></tr>
+</tbody></table>
+<p>これらは <code>Prop</code> 型の項(命題)を取り、<code>Prop</code> 型の新しい項(命題)を返す。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+#check p → q → p ∧ q
+#check ¬p → p ↔ False
+#check p ∨ q → q ∨ p
+</code></pre>
+<p>演算の順序は次の通り: 単項否定 <code>¬</code> が一番最初に結合し、次に <code>∧</code>、<code>∨</code>、<code>→</code>、最後に <code>↔</code> が結合する。例えば、<code>a ∧ b → c ∨ d ∧ e</code> と書かれていたら、それは <code>(a ∧ b) → (c ∨ (d ∧ e))</code> のことである。
+引数の型が <code>Prop</code> であっても他の型であっても、<code>→</code> は右から順に結合していくことを忘れないでほしい。つまり、<code>p q r : Prop</code> とすると、<code>p → q → r</code> という式は <code>p → (q → r)</code> と同じである。これは、「カリー化」された <code>p ∧ q → r</code> である。</p>
+<p>前節ではラムダ抽象を <code>→</code> の「導入則」とみなすことができることを説明した。ラムダ抽象が含意命題を「導入」あるいは構築する方法だとすると、関数適用は「含意の除去則」だとみなせる。つまり、関数適用は証明の中で含意を「除去する」あるいは使う方法である。他の命題論理の結合子はLeanのライブラリのファイル <code>Init/Prelude.lean</code> (ライブラリの階層構造については<a href="./interacting_with_lean.html#importing-files-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%88">Importing Files (ファイルのインポート)</a>を参照のこと)で定義されている。それぞれの結合子には正規化された導入則と除去則が存在する。</p>
+<h3 id="conjunction-連言"><a class="header" href="#conjunction-連言">Conjunction (連言)</a></h3>
+<p>式 <code>And.intro h1 h2</code> は証明 <code>h1 : p</code> と証明 <code>h2 : q</code> を使って <code>p ∧ q</code> の証明を構築する。<code>And.intro</code> は一般的に「連言の導入則」と表現される。次の例では、<code>And.intro</code> を使って <code>p → q → p ∧ q</code> の証明を作る。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (hp : p) (hq : q) : p ∧ q := And.intro hp hq
+
+#check fun (hp : p) (hq : q) =&gt; And.intro hp hq
+</code></pre>
+<p><code>example</code> コマンドは、定理に名前を付けたり、永続する文脈に定理を保存したりすることなく、定理を記述するのに使う。基本的には、<code>example</code> コマンドは与えられた項が与えられた型を持っているかどうかをチェックするだけである。実例を示すのに便利で、よく使うコマンドである。</p>
+<p>式 <code>And.left h</code> は証明 <code>h : p ∧ q</code> から <code>p</code> の証明を作る。同様に、<code>And.right h</code> は証明 <code>h : p ∧ q</code> から <code>q</code> の証明を作る。これらは一般的に「左連言除去則」と「右連言除去則」として知られている。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (h : p ∧ q) : p := And.left h
+example (h : p ∧ q) : q := And.right h
+</code></pre>
+<p>ここまでの知識を使って、次のように <code>p ∧ q → q ∧ p</code> を証明することができる。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (h : p ∧ q) : q ∧ p :=
+  And.intro (And.right h) (And.left h)
+</code></pre>
+<p>連言導入と連言除去は直積ペアの構築と射影の操作に似ていることに注意してほしい。<code>p : Prop</code>、<code>q : Prop</code>、<code>hp : p</code>、<code>hq : q</code> のとき、<code>And.intro hp hq</code> は型 <code>p ∧ q : Prop</code> を持つ。一方、<code>p : Type</code>、<code>q : Type</code>、<code>hp : p</code>、<code>hq : q</code> のとき、<code>Prod hp hq</code> は型 <code>p × q : Type</code> を持つ。
+この類似性は「カリー=ハワード同型対応」の別の例である。この類似性によると、今作った証明は直積ペアの要素を入れ替える関数に似ていることになる。しかし、含意と関数型コンストラクタとは対照的に、Leanでは <code>∧</code> と <code>×</code> は別々に扱われている。</p>
+<p><a href="./structures_and_records.html">9章 Structures and Records (構造体とレコード)</a>で、Leanには<em>structures</em>(構造体)と呼ばれる型があることを学ぶ。構造体 <code>S</code> は適切な引数の列から <code>S</code> の要素を構築する単一で正規の<em>constructor</em>(コンストラクタ)によって定義される。任意の <code>p q : Prop</code> に対して、<code>p ∧ q</code> は構造体の一例である。構造体 <code>p ∧ q</code> の要素を構築する正規の方法は、適切な引数 <code>hp : p</code> と <code>hq : q</code> に <code>And.intro</code> を適用することである。
+Leanでは、関連する型が帰納型であり、文脈から型推論できる場合、<em>anonymous constructor</em>(無名コンストラクタ)表記 <code>⟨arg1, arg2, ...⟩</code> を使うことができる。特に、<code>And.intro hp hq</code> の代わりに <code>⟨hp, hq⟩</code> と書くことがよくある。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+variable (hp : p) (hq : q)
+
+#check (⟨hp, hq⟩ : p ∧ q)
+</code></pre>
+<p>角括弧 <code>⟨ ⟩</code> は <code>\&lt;</code> <code>\&gt;</code> と打つことで入力できる。</p>
+<p>他にもLeanには便利な構文機能がある。項 <code>e</code> が(パラメータをとる可能性のある)帰納型 <code>Foo</code> を持つとき、<code>e.bar</code> は <code>Foo.bar e</code> の略記である。この記法は名前空間を開くことなく関数にアクセスする便利な方法を提供する。例えば、次の2つの項は全く同じである:</p>
+<pre><code class="language-lean">variable (xs : List Nat)
+
+#check List.length xs
+#check xs.length
+</code></pre>
+<p>結果として、<code>h : p ∧ q</code> があるとき、<code>And.left h</code> の代わりに <code>h.left</code> と書け、<code>And.right h</code> の代わりに <code>h.right</code> と書ける。従って、上記の例は次のように簡潔に書ける:</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (h : p ∧ q) : q ∧ p :=
+  ⟨h.right, h.left⟩
+</code></pre>
+<p>簡潔さと難解さは紙一重であり、このように情報を省略することは時として証明を読みにくくする。しかし、上のような簡単な例で、<code>h</code> の型と構築したい型がはっきりしている場合、この記法は簡潔で効果的である。</p>
+<p><code>And.</code> のような構築を繰り返すことは普通である。Leanはネストされた角括弧を外すことができる。このとき、各引数は右から結合する。したがって、次の2つの証明は等価である:</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (h : p ∧ q) : q ∧ p ∧ q :=
+  ⟨h.right, ⟨h.left, h.right⟩⟩
+
+example (h : p ∧ q) : q ∧ p ∧ q :=
+  ⟨h.right, h.left, h.right⟩
+</code></pre>
+<p>これも便利である。</p>
+<h3 id="disjunction-選言"><a class="header" href="#disjunction-選言">Disjunction (選言)</a></h3>
+<p>式 <code>Or.intro_left q hp</code> は 証明 <code>hp : p</code> から <code>p ∨ q</code> の証明を作る。同様に、<code>Or.intro_right p hq</code> は証明 <code>hq : q</code> から <code>p ∨ q</code> の証明を作る。これらは「左選言導入則」と「右選言導入則」に相当する。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+example (hp : p) : p ∨ q := Or.intro_left q hp
+example (hq : q) : p ∨ q := Or.intro_right p hq
+</code></pre>
+<p>「選言除去則」は少し複雑である。<code>p</code> から <code>r</code> が導かれることと、 <code>q</code> から <code>r</code> が導かれることの両方を示せば、<code>p ∨ q</code> から <code>r</code> を証明できるという考えを使う。つまり、これは場合分けによる証明である。式 <code>Or.elim hpq hpr hqr</code> の中で、<code>Or.elim</code> は3つの引数 <code>hpq : p ∨ q</code>、<code>hpr : p → r</code>、
+<code>hqr : q → r</code> を取り、<code>r</code> の証明を作る。次の例の中で、<code>p ∨ q → q ∨ p</code> を証明するのに <code>Or.elim</code> を使う。</p>
+<pre><code class="language-lean">variable (p q r : Prop)
+
+example (h : p ∨ q) : q ∨ p :=
+  Or.elim h
+    (fun hp : p =&gt;
+      show q ∨ p from Or.intro_right q hp)
+    (fun hq : q =&gt;
+      show q ∨ p from Or.intro_left p hq)
+</code></pre>
+<p>ほとんどの場合、<code>Or.intro_right</code> の第1引数と <code>Or.intro_left</code> の第1引数はLeanによって自動的に推論される。Leanは <code>Or.intro_right _</code> の略記として <code>Or.inr</code> を、<code>Or.intro_left _</code> の略記として <code>Or.inl</code> を提供する。したがって、上記の証明はより簡潔に書ける:</p>
+<pre><code class="language-lean">variable (p q r : Prop)
+
+example (h : p ∨ q) : q ∨ p :=
+  Or.elim h (fun hp =&gt; Or.inr hp) (fun hq =&gt; Or.inl hq)
+</code></pre>
+<p>この簡潔な式の中に、Leanが <code>hp</code> と <code>hq</code> の型を推論するのに十分な情報が含まれていることに注意してほしい。しかし、型注釈を用いた長い記述を用いることは、証明を読みやすくし、エラーを発見してデバッグするのに役立つ。</p>
+<p><code>Or</code> は2つのコンストラクタを持つ、つまり単一で正規のコンストラクタを持たないため、<code>Or</code> の構築のために無名コンストラクタを使うことはできない。しかし、<code>Or.elim h</code> の代わりに <code>h.elim</code> と書くことはできる:</p>
+<pre><code class="language-lean">variable (p q r : Prop)
+
+example (h : p ∨ q) : q ∨ p :=
+  h.elim (fun hp =&gt; Or.inr hp) (fun hq =&gt; Or.inl hq)
+</code></pre>
+<p>繰り返しになるが、このような略記が読みやすさを向上させるか低下させるか、書き手が判断する必要がある。</p>
+<h3 id="negation-and-falsity-否定と恒偽"><a class="header" href="#negation-and-falsity-否定と恒偽">Negation and Falsity (否定と恒偽)</a></h3>
+<p>否定 <code>¬p</code> は <code>p → False</code> と定義される。したがって、<code>¬p</code> の証明は <code>p</code> から矛盾を導くことで得られる。同様に、式 <code>hnp hp</code> は <code>hp : p</code> と <code>hnp : ¬p</code> から <code>False</code> の証明を作る。
+次の例ではこれらの規則の両方を使って <code>(p → q) → ¬q → ¬p</code> の証明を作る(記号 <code>¬</code> は <code>\not</code> あるいは <code>\neg</code> と打つことで入力できる)。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (hpq : p → q) (hnq : ¬q) : ¬p :=
+  fun hp : p =&gt;
+  show False from hnq (hpq hp)
+</code></pre>
+<p>結合子 <code>False</code> は単一の除去則 <code>False.elim</code> を持つ。<code>False.elim</code> は矛盾からは任意の命題が導かれるという事実を表現している。この規則は<em>ex falso</em> (<em>ex falso sequitur quodlibet</em>の略記)あるいは<em>principle of explosion</em>(爆発律)と呼ばれる。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (hp : p) (hnp : ¬p) : q := False.elim (hnp hp)
+</code></pre>
+<p>恒偽から導かれる任意の命題 <code>q</code> は暗黙の引数であり、自動的に型推論される。矛盾する前提から任意の命題を導くパターンは非常によく見られ、<code>absurd</code> で表現される。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (hp : p) (hnp : ¬p) : q := absurd hp hnp
+</code></pre>
+<p>次は <code>¬p → q → (q → p) → r</code> の証明である:</p>
+<pre><code class="language-lean">variable (p q r : Prop)
+
+example (hnp : ¬p) (hq : q) (hqp : q → p) : r :=
+  absurd (hqp hq) hnp
+</code></pre>
+<p>ちなみに、<code>False</code> が除去則しか持たないように、<code>True</code> は導入則である <code>True.intro : True</code> しか持たない。つまり、<code>True</code> は単に真であり、<code>True.intro</code> という正規の証明を持っている。</p>
+<h3 id="logical-equivalence-論理的同値"><a class="header" href="#logical-equivalence-論理的同値">Logical Equivalence (論理的同値)</a></h3>
+<p>式 <code>Iff.intro h1 h2</code> は <code>h1 : p → q</code> と <code>h2 : q → p</code> から <code>p ↔ q</code> の証明を作る。 式 <code>Iff.mp h</code> は <code>h : p ↔ q</code> から <code>p → q</code> の証明を作る。同様に、<code>Iff.mpr h</code> は <code>h : p ↔ q</code> から <code>q → p</code> の証明を作る。以下は <code>p ∧ q ↔ q ∧ p</code> の証明である。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+theorem and_swap : p ∧ q ↔ q ∧ p :=
+  Iff.intro
+    (fun h : p ∧ q =&gt;
+     show q ∧ p from And.intro (And.right h) (And.left h))
+    (fun h : q ∧ p =&gt;
+     show p ∧ q from And.intro (And.right h) (And.left h))
+
+#check and_swap p q    -- p ∧ q ↔ q ∧ p
+
+variable (h : p ∧ q)
+example : q ∧ p := Iff.mp (and_swap p q) h
+</code></pre>
+<p>無名コンストラクタ記法を使って、<code>p → q</code> の証明と　<code>q → p</code> の証明から <code>p ↔ q</code> の証明を構築することができる。また、<code>mp</code> と <code>mpr</code> について <code>.</code> に関する記法が使える。これらを使うと、上記の例は次のように簡潔に書くことができる:</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+theorem and_swap : p ∧ q ↔ q ∧ p :=
+  ⟨ fun h =&gt; ⟨h.right, h.left⟩, fun h =&gt; ⟨h.right, h.left⟩ ⟩
+
+example (h : p ∧ q) : q ∧ p := (and_swap p q).mp h
+</code></pre>
+<h2 id="introducing-auxiliary-subgoals-補助的なサブゴールの導入"><a class="header" href="#introducing-auxiliary-subgoals-補助的なサブゴールの導入">Introducing Auxiliary Subgoals (補助的なサブゴールの導入)</a></h2>
+<p>そろそろ長い証明を書く際に役に立つ機能 <code>have</code> の紹介をする頃合いだろう。<code>have</code> は証明の中で補助的なサブゴールを導入する。次は前節から抜粋した短い例である。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (h : p ∧ q) : q ∧ p :=
+  have hp : p := h.left
+  have hq : q := h.right
+  show q ∧ p from And.intro hq hp
+</code></pre>
+<p>内部的には、式 <code>have h : p := s; t</code> は項 <code>(fun (h : p) =&gt; t) s</code> を作る。つまり、<code>s</code> は <code>p</code> の証明であり、<code>t</code> は 前提 <code>h : p</code> の下で欲しい結論の証明であり、<code>s</code> と <code>t</code> はラムダ抽象と関数適用によって組み合わせられる。<code>have</code> は、長い証明を構築する際に、最終的なゴールに至るための踏み台として使えるため、非常に便利である。</p>
+<p>Leanは、ゴールから<em>backward reasoning</em>(後ろ向き推論)する構造化された方法もサポートしている。これは通常の数学における「Aを示すにはBを示せば十分である」という証明を模した手法である。次の例は、前の証明の最後の2行を単に並べ替えたものである。</p>
+<pre><code class="language-lean">variable (p q : Prop)
+
+example (h : p ∧ q) : q ∧ p :=
+  have hp : p := h.left
+  suffices hq : q from And.intro hq hp
+  show q from And.right h
+</code></pre>
+<p><code>suffices hq : q</code> を使った後は2つのゴールを示す必要がある。まず、<code>q ∧ p</code> を示すには <code>q</code> を示せば十分であることを実際に示す必要がある。そのためには追加された前提 <code>hq : q</code> を使って元のゴール <code>q ∧ p</code> を証明すればよい。 最後に、<code>q</code> を示す必要がある。</p>
+<h2 id="classical-logic-古典論理"><a class="header" href="#classical-logic-古典論理">Classical Logic (古典論理)</a></h2>
+<p>これまで見てきた導入則と除去則は全て構成的論理(直観主義論理)のものである。これは「型としての命題」対応に基づいた論理的結合子の計算論的理解を反映したものである。通常の古典論理では、以上の導入則と除去則に加え、排中律 <code>p ∨ ¬p</code> を認める。この原則を使うには、名前空間 <code>Classical</code> を開く必要がある。</p>
+<pre><code class="language-lean">open Classical
+
+variable (p : Prop)
+#check em p      -- p ∨ ¬p
+</code></pre>
+<p>直感的には、構成的論理の「Or」は非常に強い主張であり、<code>p ∨ q</code> を主張することは、どちらが正しいかを知っていることに等しい。リーマン予想を <code>RH</code> と表すと、古典論理を採用している数学者は、<code>RH</code> と <code>¬RH</code> のどちらが正しいのか分からないうちに <code>RH ∨ ¬RH</code> を主張することを厭わない。構成的論理を採用すると、このような主張の仕方はできない。</p>
+<p>排中律の帰結として、二重否定除去則が得られる。</p>
+<pre><code class="language-lean">open Classical
+
+theorem dne {p : Prop} (h : ¬¬p) : p :=
+  Or.elim (em p)
+    (fun hp : p =&gt; hp)
+    (fun hnp : ¬p =&gt; absurd hnp h)
+</code></pre>
+<p><code>¬p</code> を仮定すると <code>False</code> が導かれるとき、二重否定除去を使うと命題 <code>p</code> を証明することができる。なぜなら、仮定 <code>¬p</code> から <code>False</code> を導いたことは、<code>¬¬p</code> を証明したことと同義だからである。つまり、二重否定消去を使えば、構成的論理では一般には不可能な、矛盾による証明を行うことができる。練習として、逆を、つまり <code>dne</code> から <code>em</code> が証明できることを示してみよう。</p>
+<p>古典論理の公理はまた、<code>em</code> により正当化される追加の証明パターンを使えるようにする。例えば、場合分けによる証明を行うことができる:</p>
+<pre><code class="language-lean">open Classical
+variable (p : Prop)
+
+example (h : ¬¬p) : p :=
+  byCases
+    (fun h1 : p =&gt; h1)
+    (fun h1 : ¬p =&gt; absurd h1 h)
+</code></pre>
+<p><code>hpq : p → q</code>、<code>hnpq : ¬p → q</code> のとき、<code>byCases hpq hnpq</code> は <code>q</code> の証明を作る。</p>
+<p>あるいは、矛盾により証明を行うこともできる:</p>
+<pre><code class="language-lean">open Classical
+variable (p : Prop)
+
+example (h : ¬¬p) : p :=
+  byContradiction
+    (fun h1 : ¬p =&gt;
+     show False from h h1)
+</code></pre>
+<p><code>hnpf : ¬p → False</code> のとき、<code>byContradiction hnpf</code> は <code>p</code> の証明を作る。</p>
+<p>もし構成的論理の考え方に慣れていないなら、古典論理的な推論がどこで使われているのか感覚を掴むのに時間がかかるかもしれない。次の例は、構成的論理では、 <code>p</code> と <code>q</code> が両立しないと分かってもどちらが偽であるかは必ずしも分からないので、古典論理が必要である:</p>
+<pre><code class="language-lean"><span class="boring">open Classical
+</span><span class="boring">variable (p q : Prop)
+</span>example (h : ¬(p ∧ q)) : ¬p ∨ ¬q :=
+  Or.elim (em p)
+    (fun hp : p =&gt;
+      Or.inr
+        (show ¬q from
+          fun hq : q =&gt;
+          h ⟨hp, hq⟩))
+    (fun hp : ¬p =&gt;
+      Or.inl hp)
+</code></pre>
+<p>構成的論理には、排中律や二重否定除去のような原則が許される状況が「ある」ことを後に学ぶ。そのような状況では、Leanは排中律に頼ることなく古典論理的な推論の使用をサポートする。</p>
+<p>古典論理的な推論を行うためにLeanで採用されている全ての公理の一覧は<a href="./axioms_and_computation.html">12章 Axioms and Computation (公理と計算)</a>で論じられている。</p>
+<h2 id="examples-of-propositional-validities-命題論理における恒真式の例"><a class="header" href="#examples-of-propositional-validities-命題論理における恒真式の例">Examples of Propositional Validities (命題論理における恒真式の例)</a></h2>
+<p>Leanの標準ライブラリは命題論理における恒真式の証明をいくつも含んでいる。その全ては読者自身の証明を書く際に自由に用いてよい。命題論理における恒真式のいくつかを以下に示す。</p>
+<p>可換性:</p>
+<ol>
+<li><code>p ∧ q ↔ q ∧ p</code></li>
+<li><code>p ∨ q ↔ q ∨ p</code></li>
+</ol>
+<p>結合性:</p>
+<ol start="3">
+<li><code>(p ∧ q) ∧ r ↔ p ∧ (q ∧ r)</code></li>
+<li><code>(p ∨ q) ∨ r ↔ p ∨ (q ∨ r)</code></li>
+</ol>
+<p>分配性:</p>
+<ol start="5">
+<li><code>p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r)</code></li>
+<li><code>p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r)</code></li>
+</ol>
+<p>他の性質:</p>
+<ol start="7">
+<li><code>(p → (q → r)) ↔ (p ∧ q → r)</code></li>
+<li><code>((p ∨ q) → r) ↔ (p → r) ∧ (q → r)</code></li>
+<li><code>¬(p ∨ q) ↔ ¬p ∧ ¬q</code></li>
+<li><code>¬p ∨ ¬q → ¬(p ∧ q)</code></li>
+<li><code>¬(p ∧ ¬p)</code></li>
+<li><code>p ∧ ¬q → ¬(p → q)</code></li>
+<li><code>¬p → (p → q)</code></li>
+<li><code>(¬p ∨ q) → (p → q)</code></li>
+<li><code>p ∨ False ↔ p</code></li>
+<li><code>p ∧ False ↔ False</code></li>
+<li><code>¬(p ↔ ¬p)</code></li>
+<li><code>(p → q) → (¬q → ¬p)</code></li>
+</ol>
+<p>これらは古典論理的な推論を必要とする:</p>
+<ol start="19">
+<li><code>(p → r ∨ s) → ((p → r) ∨ (p → s))</code></li>
+<li><code>¬(p ∧ q) → ¬p ∨ ¬q</code></li>
+<li><code>¬(p → q) → p ∧ ¬q</code></li>
+<li><code>(p → q) → (¬p ∨ q)</code></li>
+<li><code>(¬q → ¬p) → (p → q)</code></li>
+<li><code>p ∨ ¬p</code></li>
+<li><code>(((p → q) → p) → p)</code></li>
+</ol>
+<p><code>sorry</code> は魔法のようにあらゆる証明を生成したり任意の型の項を提供したりする。もちろん、<code>sorry</code> は証明方法としては不健全である。例えば、<code>sorry</code> を使って <code>False</code> を証明することができる。Leanは、<code>sorry</code> に依存する定理を使ったり、インポートしたりすると、深刻な警告を発する。しかし、長い証明を段階的に構築する際は便利である。サブ証明を <code>sorry</code> で埋めながら、証明をトップダウンで書いてみよう。<code>sorry</code> だけで構築された項をLeanが受容することを確認してほしい。そうでない場合は、修正する必要があるエラーが存在する。確認と修正が済んだら、実際の証明で <code>sorry</code> を一つ残らず書き換えよう。</p>
+<p>もう一つ、便利な技がある。<code>sorry</code> を使う代わりに、アンダースコア <code>_</code> をプレースホルダーとして使うことができる。アンダースコアは引数が暗黙であることをLeanに伝えることを思い出してほしい。そしてアンダースコアはLeanによって自動的に埋められる。もしLeanがアンダースコアを埋めることに失敗したら、エラーメッセージ &quot;don't know how to synthesize placeholder&quot; が返され、続いて項の予想される型とその文脈で使用可能な全ての項と前提が返される。言い換えると、解決できなかったプレースホルダー1つ1つに対して、Leanはその時点で埋める必要のあるサブゴールを報告する。最終的に、プレースホルダーを段階的に埋めていくことで、証明を構築することができる。</p>
+<p>参考として、上記のリストから抜粋した恒真式の証明の例を2つ紹介する。</p>
+<pre><code class="language-lean">open Classical
+
+-- 分配性
+example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) :=
+  Iff.intro
+    (fun h : p ∧ (q ∨ r) =&gt;
+      have hp : p := h.left
+      Or.elim (h.right)
+        (fun hq : q =&gt;
+          show (p ∧ q) ∨ (p ∧ r) from Or.inl ⟨hp, hq⟩)
+        (fun hr : r =&gt;
+          show (p ∧ q) ∨ (p ∧ r) from Or.inr ⟨hp, hr⟩))
+    (fun h : (p ∧ q) ∨ (p ∧ r) =&gt;
+      Or.elim h
+        (fun hpq : p ∧ q =&gt;
+          have hp : p := hpq.left
+          have hq : q := hpq.right
+          show p ∧ (q ∨ r) from ⟨hp, Or.inl hq⟩)
+        (fun hpr : p ∧ r =&gt;
+          have hp : p := hpr.left
+          have hr : r := hpr.right
+          show p ∧ (q ∨ r) from ⟨hp, Or.inr hr⟩))
+
+-- 古典論理を必要とする例
+example (p q : Prop) : ¬(p ∧ ¬q) → (p → q) :=
+  fun h : ¬(p ∧ ¬q) =&gt;
+  fun hp : p =&gt;
+  show q from
+    Or.elim (em q)
+      (fun hq : q =&gt; hq)
+      (fun hnq : ¬q =&gt; absurd (And.intro hp hnq) h)
+</code></pre>
+<h2 id="exercises-練習問題"><a class="header" href="#exercises-練習問題">Exercises (練習問題)</a></h2>
+<p>&quot;sorry&quot; プレースホルダーを実際の証明で置き換えて、以下の恒真式を証明せよ。</p>
+<pre><code class="language-lean">variable (p q r : Prop)
+
+-- ∧ と ∨ の可換性
+example : p ∧ q ↔ q ∧ p := sorry
+example : p ∨ q ↔ q ∨ p := sorry
+
+-- ∧ と ∨ の結合性
+example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := sorry
+example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := sorry
+
+-- 分配性
+example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := sorry
+example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := sorry
+
+-- 他の性質
+example : (p → (q → r)) ↔ (p ∧ q → r) := sorry
+example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := sorry
+example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := sorry
+example : ¬p ∨ ¬q → ¬(p ∧ q) := sorry
+example : ¬(p ∧ ¬p) := sorry
+example : p ∧ ¬q → ¬(p → q) := sorry
+example : ¬p → (p → q) := sorry
+example : (¬p ∨ q) → (p → q) := sorry
+example : p ∨ False ↔ p := sorry
+example : p ∧ False ↔ False := sorry
+example : (p → q) → (¬q → ¬p) := sorry
+</code></pre>
+<p>&quot;sorry&quot; プレースホルダーを実際の証明で置き換えて、以下の恒真式を証明せよ。これらは古典論理を必要とする。</p>
+<pre><code class="language-lean">open Classical
+
+variable (p q r : Prop)
+
+example : (p → q ∨ r) → ((p → q) ∨ (p → r)) := sorry
+example : ¬(p ∧ q) → ¬p ∨ ¬q := sorry
+example : ¬(p → q) → p ∧ ¬q := sorry
+example : (p → q) → (¬p ∨ q) := sorry
+example : (¬q → ¬p) → (p → q) := sorry
+example : p ∨ ¬p := sorry
+example : (((p → q) → p) → p) := sorry
+</code></pre>
+<p>最後に、古典論理を使わずに <code>¬(p ↔ ¬p)</code> を証明せよ。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="dependent_type_theory.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="quantifiers_and_equality.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="dependent_type_theory.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="quantifiers_and_equality.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>

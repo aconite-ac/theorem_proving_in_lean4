@@ -1,0 +1,798 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>量化子と等号 - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html" class="active"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="quantifiers-and-equality-量化子と等号"><a class="header" href="#quantifiers-and-equality-量化子と等号">Quantifiers and Equality (量化子と等号)</a></h1>
+<p>第3章では、命題論理の結合子を含む定理の証明を構築する方法を紹介した。この章では、命題論理の結合子に加え、全称量化子、存在量化子、等号関係を用いた定理とその証明を構築する方法を紹介する。</p>
+<h2 id="the-universal-quantifier-全称量化子"><a class="header" href="#the-universal-quantifier-全称量化子">The Universal Quantifier (全称量化子)</a></h2>
+<p>任意の型 <code>α</code> に対して、<code>α</code> 上の一変数述語 <code>p</code> は、型 <code>α → Prop</code> の項として表現できることに注目してほしい。この場合、<code>x : α</code> が与えられると、<code>p x</code> は <code>x</code> について <code>p</code> が成り立つという主張を表す。同様に、項 <code>r : α → α → Prop</code> は <code>α</code> 上の二項関係を表す。<code>x y : α</code> が与えられると、<code>r x y</code> は <code>x</code> と <code>y</code> の間に二項関係 <code>r</code> が成立するという主張を表す。</p>
+<p>全称量化子 <code>∀</code> を用いた主張 <code>∀ x : α, p x</code> は、「全ての <code>x : α</code> に対して、<code>p x</code> が成立する」という主張を表す。命題結合子と同様に、自然演繹の体系においては、全称量化子は導入則と除去則によって統制される。非形式的には、全称量化子の導入則は次のように表される:</p>
+<blockquote>
+<p><code>x : α</code> が任意に選べる文脈で <code>p x</code> の証明が与えられたとき、<code>∀ x : α, p x</code> の証明を得ることができる。</p>
+</blockquote>
+<p>全称量化子の除去則は次のように表される:</p>
+<blockquote>
+<p><code>∀ x : α, p x</code> の証明があるとき、任意の項 <code>t : α</code> に対して、<code>p t</code> の証明を得ることができる。</p>
+</blockquote>
+<p>含意の場合と同様に、「型としての命題」の考え方が有効である。依存関数型の導入則と除去則を思い出してほしい:</p>
+<blockquote>
+<p><code>x : α</code> が任意に選べる文脈で型 <code>β x</code> の項 <code>t</code> が作れるとき、項 <code>(fun x : α =&gt; t) : (x : α) → β x</code> が作れる。</p>
+</blockquote>
+<p>依存関数型の除去則は次のように表される:</p>
+<blockquote>
+<p>項 <code>s : (x : α) → β x</code> が与えられたとき、型 <code>α</code> の任意の項 <code>t : α</code> に対して、項 <code>s t : β t</code> を得ることができる。</p>
+</blockquote>
+<p><code>p x</code> が <code>Prop</code> 型を持つとき、型 <code>(x : α) → β x</code> を型 <code>∀ x : α, p x</code> とみなすことで、依存関数型の導入則と除去則を全称量化子の導入則と除去則とみなすことができる。これらの規則に従って、全称量化子を含む証明を構築することができる。</p>
+<p>「型としての命題」の考え方に従って、Calculus of Constructionsでは、従属関数型と全称量化子を同一視する。つまり、任意の項 <code>p</code> に対して、<code>∀ x : α, p</code> は <code>(x : α) → p</code> の代替表現に過ぎず、<code>p</code> が命題のときは、前者の表現の方が後者より自然である、と考えるのである。</p>
+<p>通常の関数の場合、<code>α → β</code> は <code>β</code> が <code>x : α</code> に依存しない場合の <code>(x : α) → β</code> だと解釈できることを思い出してほしい。同様に、命題間の含意 <code>p → q</code> は命題 <code>q</code> が <code>x : p</code> に依存しない場合の <code>∀ x : p, q</code> だと解釈することができる。</p>
+<p>以下は、全称量化子に関する「型としての命題」対応がどのように実践されるかの例である。</p>
+<pre><code class="language-lean">example (α : Type) (p q : α → Prop) : (∀ x : α, p x ∧ q x) → ∀ y : α, p y :=
+  fun h : ∀ x : α, p x ∧ q x =&gt;
+  fun y : α =&gt;
+  show p y from (h y).left
+</code></pre>
+<p>表記上の慣習として、Leanは全称量化子に可能な限り広いスコープを与えるので、上の例では <code>x</code> に対する量化子のスコープを限定するために括弧が必要である。そして、<code>∀ y : α, p y</code> を証明する正規の方法は、<code>y</code> を任意に取り、<code>p y</code> を証明することである。これが全称量化子の導入則の使用例である。次に、型 <code>∀ x : α, p x ∧ q x</code> を持つ項 <code>h</code> が与えられると、項 <code>h y</code> は型 <code>p y ∧ q y</code> を持つ。これが全称量化子の除去則の使用例である。連言命題 <code>h y</code> の左の命題を取ると、所望の結論 <code>p y</code> が得られる。</p>
+<p>束縛変数の名前を変えることで同じにできる2つの式は、等価であるとみなされる(α-同値)ことを思い出してほしい。例えば、上記の例について、結論の前件と後件の両方で同じ束縛変数名 <code>x</code> を用いて、証明の中では別の束縛変数名 <code>z</code> を使うこともできる。</p>
+<pre><code class="language-lean">example (α : Type) (p q : α → Prop) : (∀ x : α, p x ∧ q x) → ∀ x : α, p x :=
+  fun h : ∀ x : α, p x ∧ q x =&gt;
+  fun z : α =&gt;
+  show p z from And.left (h z)
+</code></pre>
+<p>もう一つの例として、関係 <code>r</code> が推移的であることはどのように表現されるかを提示しよう:</p>
+<pre><code class="language-lean">variable (α : Type) (r : α → α → Prop)
+variable (trans_r : ∀ x y z, r x y → r y z → r x z)
+
+variable (a b c : α)
+variable (hab : r a b) (hbc : r b c)
+
+#check trans_r                -- ∀ (x y z : α), r x y → r y z → r x z
+/- (r : α → α → Prop) と 「r x y → r y z → r x z」により x,y,z の型が推論されている -/
+#check trans_r a b c          -- r a b → r b c → r a c
+#check trans_r a b c hab      -- r b c → r a c
+#check trans_r a b c hab hbc  -- r a c
+</code></pre>
+<p>この例で何が起こっているのかを考えてみよう。<code>trans_r</code> を値 <code>a b c</code> に適用すると、これは <code>r a b → r b c → r a c</code> の証明になる。これを「前提」<code>hab : r a b</code> に適用すると、含意命題 <code>r b c → r a c</code> の証明が得られる。最後に、これを前提 <code>hbc</code> に適用すると、結論 <code>r a c</code> の証明が得られる。</p>
+<p><code>hab</code> と <code>hbc</code> があれば最初の3つの引数が <code>a b c</code> であることは容易に推論できる。このような状況において、引数 <code>a b c</code> を毎回与えるのは面倒かもしれない。そのため、これらを暗黙の引数にするのが一般的である:</p>
+<pre><code class="language-lean">variable (α : Type) (r : α → α → Prop)
+variable (trans_r : ∀ {x y z}, r x y → r y z → r x z)
+
+variable (a b c : α)
+variable (hab : r a b) (hbc : r b c)
+
+#check trans_r          -- r ?m.1 ?m.2 → r ?m.2 ?m.3 → r ?m.1 ?m.3
+#check trans_r hab      -- r b ?m.42 → r a ?m.42
+#check trans_r hab hbc  -- r a c
+</code></pre>
+<p><code>x y z</code> を暗黙の引数にする利点は、<code>r a c</code> の証明を <code>trans_r hab hbc</code> と簡単に書けることである。欠点は、項 <code>trans_r</code> と項 <code>trans_r hab</code> の型を推論するのに必要な情報をLeanに与えることができないことである。最初の <code>#check</code> コマンドの出力は <code>r ?m.1 ?m.2 → r ?m.2 ?m.3 → r ?m.1 ?m.3</code> であり、暗黙の引数が特定できなかったことを示している。</p>
+<p>次は <code>r</code> が同値関係であるという前提を使って初歩的な推論を行う例である:</p>
+<pre><code class="language-lean">variable (α : Type) (r : α → α → Prop)
+
+variable (refl_r : ∀ x, r x x)
+variable (symm_r : ∀ {x y}, r x y → r y x)
+variable (trans_r : ∀ {x y z}, r x y → r y z → r x z)
+
+example (a b c d : α) (hab : r a b) (hcb : r c b) (hcd : r c d) : r a d :=
+  trans_r (trans_r hab (symm_r hcb)) hcd
+</code></pre>
+<p>全称量化子の使い方に慣れるために、この章の最後にある練習問題をいくつかやってみるとよい。</p>
+<p>依存関数型には型付け規則があるが、全称量化子には特殊な型付け規則がある。これが <code>Prop</code> と他の型の違いである。<code>α : Sort i</code> と <code>β : Sort j</code> があり、項 <code>β</code> は <code>x : α</code> に依存するかもしれないとする。このとき、<code>(x : α) → β</code> は型 <code>Sort (imax i j)</code> の項である。ここで、<code>imax i j</code> は <code>j</code> が0でないなら <code>i</code> と <code>j</code> の最大値で、<code>j</code> が0なら0である。</p>
+<p><code>imax i j</code> の定義は次のように解釈すればよい。もし <code>j</code> が <code>0</code> でないなら、<code>(x : α) → β</code> は型 <code>Sort (max i j)</code> の項である。言い換えれば、<code>α</code> から <code>β</code> への依存関数型は、インデックスが <code>i</code> と <code>j</code> の最大値である宇宙に「住んで」いる。他方で、<code>β</code> が <code>Sort 0</code>、つまり <code>Prop</code> の項であるとしよう。この場合、<code>α</code> がどの階層的型宇宙に住んでいるかに関わらず、<code>(x : α) → β</code> も <code>Sort 0</code> (<code>Prop</code>) の項となる。言い換えれば、<code>β</code> が <code>α</code> に依存する命題であれば、 <code>∀ x : α, β</code> も命題であるということである。これは、<code>Prop</code> は単なるデータの型ではなく命題の型であるという解釈を反映している。そして以上のことは <code>Prop</code> を<em>impredicative</em>(非可述的)にしている。</p>
+<p><em>predicative</em>(可述的)という用語は、20世紀初頭の数学基礎論の発展に由来する。当時、ポアンカレやラッセルといった論理学者が、集合論におけるパラドックスを、性質Aを持つ集合を量化することで性質Aを定義するときに生じる「悪循環」のせいにしたのである。任意の型 <code>α</code> に対して、<code>α</code> 上の全ての(一変数)述語からなる型 <code>α → Prop</code> (<code>α</code> の「べき型」)を作れることに注目してほしい。<code>Prop</code> のimpredicativity(非可述性)とは、<code>α → Prop</code> を量化した命題を作れることを意味する。特に、<code>α</code> 上の述語を全称量化することで、<code>α</code> 上の述語を定義することができ(<code>∀ X : α → Prop, β</code> と書くことで「全ての <code>α</code> 上の述語に対して <code>β</code> が成立する」という <code>α</code> 上の述語を定義することができ)、これはまさにかつて問題視された類の循環である。</p>
+<h2 id="equality-等号"><a class="header" href="#equality-等号">Equality (等号)</a></h2>
+<p>ここで、Leanのライブラリで定義されている最も基本的な関係の一つである「等号関係」に注目しよう。<a href="./inductive_types.html">7章 Inductive Types (帰納型)</a>では、Leanの<em>logical framework</em>(論理フレームワーク)の根本から「どのように」等号が定義されるかを説明する。その前に、ここでは等号の使い方を説明する。</p>
+<p>もちろん、等号の基本的な性質の一つは、「等号は同値関係である」という性質である:</p>
+<pre><code class="language-lean">#check Eq.refl    -- Eq.refl.{u_1} (a : α) : a = a
+#check Eq.symm    -- Eq.symm.{u} {α : Sort u} {a b : α} (h : a = b) : b = a
+#check Eq.trans   -- Eq.trans.{u} {α : Sort u} {a b c : α} (h₁ : a = b) (h₂ : b = c) : a = c
+</code></pre>
+<p>Leanに暗黙の引数(ここではメタ変数として表示されている)を挿入しないように指示することで、出力を読みやすくすることができる。</p>
+<pre><code class="language-lean">universe u
+
+#check @Eq.refl.{u}   -- @Eq.refl : ∀ {α : Sort u} (a : α), a = a
+#check @Eq.symm.{u}   -- @Eq.symm : ∀ {α : Sort u} {a b : α}, a = b → b = a
+#check @Eq.trans.{u}  -- @Eq.trans : ∀ {α : Sort u} {a b c : α}, a = b → b = c → a = c
+</code></pre>
+<p><code>.{u}</code> という記法は、宇宙パラメータとして <code>u</code> を使うことをLeanに指示する。</p>
+<p>したがって、例えば、前節の例を等号関係に特化させることができる:</p>
+<pre><code class="language-lean">variable (α : Type) (a b c d : α)
+variable (hab : a = b) (hcb : c = b) (hcd : c = d)
+
+example : a = d :=
+  Eq.trans (Eq.trans hab (Eq.symm hcb)) hcd
+</code></pre>
+<p>射影表記(<code>Foo.bar e</code> の <code>e.bar</code> という略記)も使うことができる:</p>
+<pre><code class="language-lean"><span class="boring">variable (α : Type) (a b c d : α)
+</span><span class="boring">variable (hab : a = b) (hcb : c = b) (hcd : c = d)
+</span>example : a = d := (hab.trans hcb.symm).trans hcd
+</code></pre>
+<p>反射律 <code>Eq.refl</code> は見た目よりも強力である。Calculus of Constructionsにおいて、任意の型は計算可能な解釈を持ち、論理フレームワークは同一の簡約結果を持つ項たちを同じものとして扱うことを思い出してほしい。その結果、いくつかの非自明な恒等式を反射律によって証明することができる:</p>
+<pre><code class="language-lean">variable (α β : Type)
+
+example (f : α → β) (a : α) : (fun x =&gt; f x) a = f a := Eq.refl _
+example (a : α) (b : β) : (a, b).1 = a := Eq.refl _
+example : 2 + 3 = 5 := Eq.refl _
+</code></pre>
+<p>論理フレームワークのこの機能は非常に重要であるため、Leanのライブラリでは <code>Eq.refl _</code> により <code>rfl</code> という記法を定義している:</p>
+<pre><code class="language-lean"><span class="boring">variable (α β : Type)
+</span>example (f : α → β) (a : α) : (fun x =&gt; f x) a = f a := rfl
+example (a : α) (b : β) : (a, b).1 = a := rfl
+example : 2 + 3 = 5 := rfl
+</code></pre>
+<p>しかし、等号は同値関係以上のものである。等号は、左辺の式を右辺の式に置き換えても、あるいは右辺の式を左辺の式に置き換えても真理値が変わらないという意味で、全ての命題が等号によって主張される同値性を尊重するという重要な性質を持っている。つまり、<code>h1 : a = b</code> と <code>h2 : p a</code> があれば、代入 <code>Eq.subst h1 h2</code> を使って <code>p b</code> の証明を作ることができる。</p>
+<pre><code class="language-lean">example (α : Type) (a b : α) (p : α → Prop)
+        (h1 : a = b) (h2 : p a) : p b :=
+  Eq.subst h1 h2
+
+example (α : Type) (a b : α) (p : α → Prop)  -- h2の型の中に登場するh1の左辺をh1の右辺で書き換える
+    (h1 : a = b) (h2 : p a) : p b :=
+  h1 ▸ h2
+
+example (α : Type) (a b : α) (p : α → Prop)  -- h2の型の中に登場するh1の右辺をh1の左辺で書き換える
+    (h1 : a = b) (h2 : p b) : p a :=
+  h1 ▸ h2
+</code></pre>
+<p>2番目、3番目の例の中の三角形は、<code>Eq.subst</code> と <code>Eq.symm</code> の上に構築されたマクロで、<code>\t</code> と打つことで入力できる。<code>h1 ▸ h2</code> は「<code>h1</code> を使って <code>h2</code> を書き換える」と解釈できる。</p>
+<p><code>Eq.subst</code> 規則は、より明示的な置換を行う以下の補助規則を定義するために使われる。これらは関数適用項、つまり <code>s t</code> の形の項を扱うためのものである。具体的には、<code>congrArg</code> は <code>s</code> を固定して <code>t</code> を置換するのに使われ、<code>congrFun</code> は <code>t</code> を固定して <code>s</code> を置換するのに使われ、<code>congr</code> は <code>s</code> と <code>t</code> の両方を一度に置換するのに使われる。</p>
+<pre><code class="language-lean">variable (α : Type)
+variable (a b : α)
+variable (f g : α → Nat)
+variable (h₁ : a = b)
+variable (h₂ : f = g)
+
+example : f a = f b := congrArg f h₁
+example : f a = g a := congrFun h₂ a
+example : f a = g b := congr h₂ h₁
+</code></pre>
+<p>Leanのライブラリには次のような一般的な恒等式が多数収載されている:</p>
+<pre><code class="language-lean">variable (a b c : Nat)
+
+example : a + 0 = a := Nat.add_zero a
+example : 0 + a = a := Nat.zero_add a
+example : a * 1 = a := Nat.mul_one a
+example : 1 * a = a := Nat.one_mul a
+example : a + b = b + a := Nat.add_comm a b
+example : a + b + c = a + (b + c) := Nat.add_assoc a b c
+example : a * b = b * a := Nat.mul_comm a b
+example : a * b * c = a * (b * c) := Nat.mul_assoc a b c
+example : a * (b + c) = a * b + a * c := Nat.mul_add a b c
+example : a * (b + c) = a * b + a * c := Nat.left_distrib a b c
+example : (a + b) * c = a * c + b * c := Nat.add_mul a b c
+example : (a + b) * c = a * c + b * c := Nat.right_distrib a b c
+</code></pre>
+<p><code>Nat.mul_add</code> と <code>Nat.add_mul</code> はそれぞれ <code>Nat.left_distrib</code> と <code>Nat.right_distrib</code> の別名である。上記の性質は、自然数（<code>Nat</code> 型）に関するものである。</p>
+<pre><code class="language-lean">example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
+  have h1 : (x + y) * (x + y) = (x + y) * x + (x + y) * y :=
+    Nat.mul_add (x + y) x y
+  have h2 : (x + y) * (x + y) = x * x + y * x + (x * y + y * y) :=
+    (Nat.add_mul x y x) ▸ (Nat.add_mul x y y) ▸ h1
+  h2.trans (Nat.add_assoc (x * x + y * x) (x * y) (y * y)).symm
+</code></pre>
+<p><code>Eq.subst</code> の2番目の暗黙の引数は、置換が行われる文脈を提供するもので、<code>α → Prop</code> 型を持っていることに注意してほしい。</p>
+<pre><code class="language-lean">#check Eq.subst  -- {α : Sort u} {motive : α → Prop} {a b : α} (h₁ : a = b) (h₂ : motive a) : motive b
+</code></pre>
+<p>したがって、この述語を推論するには、<em>higher-order unification</em>(高階ユニフィケーション)の解(高階単一子)が必要である。一般論として、高階単一子が存在するかを決定する問題は決定不能であり、Leanはせいぜいこの問題に対して不完全で近似的な解を提供することしかできない。そのため、<code>Eq.subst</code> は必ずしも思い通りに動くとは限らない。マクロ <code>h ▸ e</code> はこの暗黙の引数を計算する際により効果的なヒューリスティクスを使う。そのため、<code>Eq.subst</code> の適用が失敗するような状況でも、<code>h ▸ e</code> が成功することがしばしばある。</p>
+<p>等式の推論は非常に一般的で重要であるため、Leanはそれをより効率的に実行するためのメカニズムを数多く提供している。次の節では、より自然で簡潔な方法で計算的証明を書くための構文を提供する。しかし、より重要なのは、等式推論が<em>rewriter</em>(項書き換え器)、<em>simplifier</em>(単純化器)、その他の自動化によって成り立っていることである。項書き換え器と単純化器については次の節で簡単に説明し、次の章でさらに詳しく説明する。</p>
+<h2 id="calculational-proofs-計算的証明"><a class="header" href="#calculational-proofs-計算的証明">Calculational Proofs (計算的証明)</a></h2>
+<p>計算的証明は、等号の推移律などの基本原則によって構成される中間結果の連鎖にすぎない。Leanにおいて、計算的証明はキーワード <code>calc</code> から始まる以下の構文を持つ:</p>
+<pre><code>calc
+  &lt;expr&gt;_0  'op_1'  &lt;expr&gt;_1  ':='  &lt;proof&gt;_1
+  '_'       'op_2'  &lt;expr&gt;_2  ':='  &lt;proof&gt;_2
+  ...
+  '_'       'op_n'  &lt;expr&gt;_n  ':='  &lt;proof&gt;_n
+</code></pre>
+<p><code>calc</code> 以降の一連の行は全て同じインデントを持つ必要があることに注意。そうでなければコンパイルエラーになる。各 <code>&lt;proof&gt;_i</code> は <code>&lt;expr&gt;_{i-1} op_i &lt;expr&gt;_i</code> の証明である必要がある。</p>
+<p>最初の行に <code>calc &lt;expr&gt;_0</code> と書いた後、その次の行から <code>_</code> を使う事もできる。これは関係命題と証明の組からなる行を揃えるのに便利である。</p>
+<pre><code>calc &lt;expr&gt;_0 
+    '_' 'op_1' &lt;expr&gt;_1 ':=' &lt;proof&gt;_1
+    '_' 'op_2' &lt;expr&gt;_2 ':=' &lt;proof&gt;_2
+    ...
+    '_' 'op_n' &lt;expr&gt;_n ':=' &lt;proof&gt;_n
+</code></pre>
+<p>次は計算的証明の一例である:</p>
+<pre><code class="language-lean">variable (a b c d e : Nat)
+variable (h1 : a = b)
+variable (h2 : b = c + 1)
+variable (h3 : c = d)
+variable (h4 : e = 1 + d)
+
+theorem T : a = e :=
+  calc
+    a = b      := h1
+    _ = c + 1  := h2
+    _ = d + 1  := congrArg Nat.succ h3
+    _ = 1 + d  := Nat.add_comm d 1
+    _ = e      := Eq.symm h4
+</code></pre>
+<p>この証明の書き方は、次章で詳しく説明する <code>simp</code> タクティクや <code>rewrite</code> タクティクと併用すると最も効果的である。例えば、<code>rewrite</code> の略語 <code>rw</code> を使うと、上記の証明は次のように書ける:</p>
+<pre><code class="language-lean"><span class="boring">variable (a b c d e : Nat)
+</span><span class="boring">variable (h1 : a = b)
+</span><span class="boring">variable (h2 : b = c + 1)
+</span><span class="boring">variable (h3 : c = d)
+</span><span class="boring">variable (h4 : e = 1 + d)
+</span>theorem T : a = e :=
+  calc
+    a = b      := by rw [h1]
+    _ = c + 1  := by rw [h2]
+    _ = d + 1  := by rw [h3]
+    _ = 1 + d  := by rw [Nat.add_comm]
+    _ = e      := by rw [h4]
+</code></pre>
+<p>基本的に、<code>rw</code> タクティクは <code>[]</code> でくくられた等式(前提、定理名、複合的な項のいずれでもよい)を用いてゴールを「書き換える」。その結果、ゴールが恒等式 <code>t = t</code> になったら、<code>rw</code> タクティクは自動で反射律を使ってゴールを証明する。</p>
+<p>段階的な書き換えを一度に実行することもできる。上の証明は次のように短縮できる:</p>
+<pre><code class="language-lean"><span class="boring">variable (a b c d e : Nat)
+</span><span class="boring">variable (h1 : a = b)
+</span><span class="boring">variable (h2 : b = c + 1)
+</span><span class="boring">variable (h3 : c = d)
+</span><span class="boring">variable (h4 : e = 1 + d)
+</span>theorem T : a = e :=
+  calc
+    a = d + 1  := by rw [h1, h2, h3]
+    _ = 1 + d  := by rw [Nat.add_comm]
+    _ = e      := by rw [h4]
+</code></pre>
+<p>ここまで短くしてもよい:</p>
+<pre><code class="language-lean"><span class="boring">variable (a b c d e : Nat)
+</span><span class="boring">variable (h1 : a = b)
+</span><span class="boring">variable (h2 : b = c + 1)
+</span><span class="boring">variable (h3 : c = d)
+</span><span class="boring">variable (h4 : e = 1 + d)
+</span>theorem T : a = e :=
+  by rw [h1, h2, h3, Nat.add_comm, h4]
+</code></pre>
+<p><code>simp</code> タクティクは、ゴールの項の中に与えられた恒等式が適用できる場所がある限り、与えられた恒等式を任意の順番で繰り返し適用し、ゴールを書き換える。また、システム内で宣言された既存のルールも活用し、書き換えのループを避けるため可換性を賢く適用する。上記の証明は <code>simp</code> を使って次のように証明することもできる:</p>
+<pre><code class="language-lean"><span class="boring">variable (a b c d e : Nat)
+</span><span class="boring">variable (h1 : a = b)
+</span><span class="boring">variable (h2 : b = c + 1)
+</span><span class="boring">variable (h3 : c = d)
+</span><span class="boring">variable (h4 : e = 1 + d)
+</span>theorem T : a = e :=
+  by simp [h1, h2, h3, Nat.add_comm, h4]
+</code></pre>
+<p>次の章では <code>rw</code> と <code>simp</code> の派生について説明する。</p>
+<p><code>calc</code> コマンドは、何らかの形で推移律を持つあらゆる関係に対して使うことができる。計算的証明の中で異なる関係を組み合わせることもできる。</p>
+<pre><code class="language-lean">example (a b c d : Nat) (h1 : a = b) (h2 : b ≤ c) (h3 : c + 1 &lt; d) : a &lt; d :=
+  calc
+    a = b     := h1
+    _ &lt; b + 1 := Nat.lt_succ_self b
+    _ ≤ c + 1 := Nat.succ_le_succ h2
+    _ &lt; d     := h3
+</code></pre>
+<p><code>Trans</code> 型クラスの新しいインスタンスを追加することで、<code>calc</code> に新しい推移律の定理を「教える」ことができる。型クラスについては後で紹介するが、ここではとりあえず新しい <code>Trans</code> インスタンスを使って <code>calc</code> 記法を拡張する方法を示す小さな例を以下に挙げる。</p>
+<pre><code class="language-lean">def divides (x y : Nat) : Prop :=
+  ∃ k, k*x = y
+
+def divides_trans (h₁ : divides x y) (h₂ : divides y z) : divides x z :=
+  let ⟨k₁, d₁⟩ := h₁
+  let ⟨k₂, d₂⟩ := h₂
+  ⟨k₁ * k₂, by rw [Nat.mul_comm k₁ k₂, Nat.mul_assoc, d₁, d₂]⟩
+
+def divides_mul (x : Nat) (k : Nat) : divides x (k*x) :=
+  ⟨k, rfl⟩
+
+instance : Trans divides divides divides where
+  trans := divides_trans
+
+example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
+  calc
+    divides x y     := h₁
+    _ = z           := h₂
+    divides _ (2*z) := divides_mul ..
+
+infix:50 &quot; ∣ &quot; =&gt; divides
+
+example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
+  calc
+    x ∣ y   := h₁
+    _ = z   := h₂
+    _ ∣ 2*z := divides_mul ..
+</code></pre>
+<p>上記の例から、ユーザーが定義した関係がinfix表記を持たなくても、その関係について <code>calc</code> が使えることがわかる。最後に、上記の例の縦棒 <code>∣</code> はunicodeのものである。<code>match ... with</code> 式で使われるASCIIの <code>|</code> のオーバーロードを避けるためにunicodeの記号を用いた。</p>
+<p><code>calc</code> を用いると、前節の証明をより自然にわかりやすく書くことができる。</p>
+<pre><code class="language-lean">example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
+  calc
+    (x + y) * (x + y) = (x + y) * x + (x + y) * y  := by rw [Nat.mul_add]
+    _ = x * x + y * x + (x + y) * y                := by rw [Nat.add_mul]
+    _ = x * x + y * x + (x * y + y * y)            := by rw [Nat.add_mul]
+    _ = x * x + y * x + x * y + y * y              := by rw [←Nat.add_assoc]
+</code></pre>
+<p>ここでは、<code>calc</code> の他の記法を検討する価値がある。最初の式がこれだけ広いスペースをとる場合、最初の関係式に <code>_</code> を使うと、全ての関係式が自然に整列される:</p>
+<pre><code class="language-lean">example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
+  calc (x + y) * (x + y)
+    _ = (x + y) * x + (x + y) * y       := by rw [Nat.mul_add]
+    _ = x * x + y * x + (x + y) * y     := by rw [Nat.add_mul]
+    _ = x * x + y * x + (x * y + y * y) := by rw [Nat.add_mul]
+    _ = x * x + y * x + x * y + y * y   := by rw [←Nat.add_assoc]
+</code></pre>
+<p>ここで、<code>Nat.add_assoc</code> の前の左矢印は、書き換えの際に与えられた恒等式を逆向きに使うように <code>rw</code> に指示する(左矢印は <code>\l</code> と打つと入力できる。これと等価なascii文字列 <code>&lt;-</code> を使ってもいい)。簡潔さを求めるなら、次のように単独の <code>rw</code> や <code>simp</code> を使うだけで証明を完結させることもできる。 </p>
+<pre><code class="language-lean">example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
+  by rw [Nat.mul_add, Nat.add_mul, Nat.add_mul, ←Nat.add_assoc]
+
+example (x y : Nat) : (x + y) * (x + y) = x * x + y * x + x * y + y * y :=
+  by simp [Nat.mul_add, Nat.add_mul, Nat.add_assoc]
+</code></pre>
+<h2 id="the-existential-quantifier-存在量化子"><a class="header" href="#the-existential-quantifier-存在量化子">The Existential Quantifier (存在量化子)</a></h2>
+<p>最後に、存在量化子について考えよう。存在量化子は <code>exists x : α, p x</code> または <code>∃ x : α, p x</code> と書くことができる。どちらの記法も、Leanのライブラリで定義されている <code>Exists (fun x : α =&gt; p x)</code> という長ったらしい表現の便利な省略形である。</p>
+<p>もうお分かりのように、Leanのライブラリは存在量化子の導入則と除去則を含んでいる。導入則は簡単である: <code>∃ x : α, p x</code> を証明するには、適切な項 <code>t : α</code> と <code>p t</code> の証明を与えればよい。次はその例である:</p>
+<pre><code class="language-lean">example : ∃ x : Nat, x &gt; 0 :=
+  have h : 1 &gt; 0 := Nat.zero_lt_succ 0
+  Exists.intro 1 h
+
+example (x : Nat) (h : x &gt; 0) : ∃ y, y &lt; x :=
+  Exists.intro 0 h
+
+example (x y z : Nat) (hxy : x &lt; y) (hyz : y &lt; z) : ∃ w, x &lt; w ∧ w &lt; z :=
+  Exists.intro y (And.intro hxy hyz)
+
+#check @Exists.intro  -- @Exists.intro : ∀ {α : Sort u_1} {p : α → Prop} (w : α), p w → Exists p
+</code></pre>
+<p>型が文脈から明らかな場合、<code>Exists.intro t h</code> の代わりに、無名コンストラクタ表記 <code>⟨t, h⟩</code> を使うことができる。</p>
+<pre><code class="language-lean">example : ∃ x : Nat, x &gt; 0 :=
+  have h : 1 &gt; 0 := Nat.zero_lt_succ 0
+  ⟨1, h⟩
+
+example (x : Nat) (h : x &gt; 0) : ∃ y, y &lt; x :=
+  ⟨0, h⟩
+
+example (x y z : Nat) (hxy : x &lt; y) (hyz : y &lt; z) : ∃ w, x &lt; w ∧ w &lt; z :=
+  ⟨y, hxy, hyz⟩  -- ⟨y, hxy, hyz⟩ は ⟨y, ⟨hxy, hyz⟩ ⟩ と同じ
+</code></pre>
+<p><code>Exists.intro</code> には暗黙の引数があることに注意してほしい: Leanは結論 <code>∃ x, p x</code> から述語 <code>p : α → Prop</code> が何であるかを推論しなければならない。これは簡単なことではない。例えば、<code>hg : g 0 0 = 0</code> とし、<code>Exists.intro 0 hg</code> と書くとする。このとき、述語 <code>p</code> は 定理 <code>∃ x, g x x = x</code>、<code>∃ x, g x x = 0</code>、<code>∃ x, g x 0 = x</code> などに対応する様々な値を取りうる。Leanは文脈からどれが適切かを推論する。次の例では、<code>pp.explicit</code> オプションを <code>true</code> に設定し、<code>#print</code> コマンドに暗黙の引数を表示するように問い合わせている。</p>
+<pre><code class="language-lean">variable (g : Nat → Nat → Nat)
+variable (hg : g 0 0 = 0)
+
+theorem gex1 : ∃ x, g x x = x := ⟨0, hg⟩
+theorem gex2 : ∃ x, g x 0 = x := ⟨0, hg⟩
+theorem gex3 : ∃ x, g 0 0 = x := ⟨0, hg⟩
+theorem gex4 : ∃ x, g x x = 0 := ⟨0, hg⟩
+
+set_option pp.explicit true  -- 暗黙の引数を表示する
+#print gex1
+#print gex2
+#print gex3
+#print gex4
+</code></pre>
+<p><code>Exists.intro</code> は主張本体の証人(存在量化を受けた主張を満たす項)を隠すため、情報を隠す操作であると解釈することができる。存在量化子の除去則 <code>Exists.elim</code> はその逆の操作を行う。<code>Exists.elim</code> は任意の値 <code>w : α</code> に対して <code>p w</code> ならば <code>q</code> が成立することを示すことで、<code>∃ x : α, p x</code> から命題 <code>q</code> を証明することを可能にする。大雑把に言えば、<code>∃ x : α, p x</code> が成立するなら <code>p x</code> を満たす <code>x</code> が存在することがわかるので、その <code>x</code> に名前、例えば <code>w</code> を与えることができる。もし <code>q</code> が <code>w</code> に言及していなければ、<code>q</code> が <code>p w</code> から導かれることを示すことは、<code>q</code> が <code>p w</code> を満たす <code>x</code> の存在から導かれることを示すことに等しい。次はその例である:</p>
+<pre><code class="language-lean">variable (α : Type) (p q : α → Prop)
+
+example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
+  Exists.elim h
+    (fun w =&gt;
+     fun hw : p w ∧ q w =&gt;
+     show ∃ x, q x ∧ p x from ⟨w, hw.right, hw.left⟩)
+
+#check @Exists.elim  -- ∀ {α : Sort u_1} {p : α → Prop} {b : Prop}, (∃ x, p x) → (∀ (a : α), p a → b) → b
+</code></pre>
+<p>ここで、無名コンストラクタ表記 <code>⟨w, hw.right, hw.left⟩</code> が入れ子になったコンストラクタの適用を省略していることに注意。<code>⟨w, hw.right, hw.left⟩</code> は <code>⟨w, ⟨hw.right, hw.left⟩⟩</code> と書いたのと同じである。</p>
+<p>存在量化子除去則と選言除去則を比較することは有用であろう: 主張 <code>∃ x : α, p x</code> は、 <code>a</code> が型 <code>α</code> の全ての項をわたるときの、命題 <code>p a</code> 全てを選言で繋げたものと考えることができる。</p>
+<p>存在命題は、2章の従属型の節で説明したシグマ型(依存直積型)に非常に似ていることに注目しよう。<code>a : α</code> と <code>h : p a</code> が与えられたとき、項 <code>Exists.intro a h</code> は型 <code>(∃ x : α, p x) : Prop</code> を持つ一方で、<code>Sigma.mk a h</code> は型 <code>(Σ x : α, p x) : Type</code> を持つ。この <code>∃</code> と <code>Σ</code> の類似性はカリー=ハワード同型のもう一つの例である。</p>
+<pre><code class="language-lean">section exist_prop
+variable (a : α) (p : α → Prop) (h : p a)
+
+#check Exists.intro a h  -- Exists p
+end exist_prop
+
+section sigma_type
+variable (a : α) (p : α → Type) (h : p a)
+
+#check Sigma.mk a h      -- Sigma p
+end sigma_type
+</code></pre>
+<p>Leanは、<code>match</code> 式を用いた、存在量化子を除去するためのより便利な方法を提供する:</p>
+<pre><code class="language-lean">variable (α : Type) (p q : α → Prop)
+
+example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
+  match h with
+  | ⟨w, hw⟩ =&gt; ⟨w, hw.right, hw.left⟩
+</code></pre>
+<p><code>match</code> 式はLeanの関数定義システムの一部であり、複雑な関数を定義する便利で表現力豊かな方法を提供する。再びカリー=ハワード同型により、この関数定義方法 <code>match</code> を証明の記述にも応用させることができる。<code>match</code> 式は存在量化された主張を <code>w</code> と <code>hw</code> に「分解」する。これらは命題の証明記述内で使うことができる。より明確にするために、マッチで分解されてできた要素に型の注釈を付けることができる:</p>
+<pre><code class="language-lean"><span class="boring">variable (α : Type) (p q : α → Prop)
+</span>example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
+  match h with
+  | ⟨(w : α), (hw : p w ∧ q w)⟩ =&gt; ⟨w, hw.right, hw.left⟩
+</code></pre>
+<p>match 式を使って、存在量化子と連言を同時に分解することもできる:</p>
+<pre><code class="language-lean"><span class="boring">variable (α : Type) (p q : α → Prop)
+</span>example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
+  match h with
+  | ⟨(w : α), (hpw : p w), (hqw : q w)⟩ =&gt; ⟨w, hqw, hpw⟩
+</code></pre>
+<p>Leanは <code>let</code> キーワードにもパターンマッチングを提供する:</p>
+<pre><code class="language-lean"><span class="boring">variable (α : Type) (p q : α → Prop)
+</span>example (h : ∃ x, p x ∧ q x) : ∃ x, q x ∧ p x :=
+  let ⟨w, hpw, hqw⟩ := h
+  ⟨w, hqw, hpw⟩
+</code></pre>
+<p>これは、基本的に上記の <code>match</code> 式の代替表記に過ぎない。Leanでは、<code>fun</code> キーワードの中で暗黙の <code>match</code> を使うこともできる:</p>
+<pre><code class="language-lean"><span class="boring">variable (α : Type) (p q : α → Prop)
+</span>example : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x :=
+  fun ⟨w, hpw, hqw⟩ =&gt; ⟨w, hqw, hpw⟩
+</code></pre>
+<p><a href="./induction_and_recursion.html">8章 Induction and Recursion (帰納と再帰)</a> では、これらの派生構文は全てより一般的なパターンマッチング構文の特殊例であることを説明する。</p>
+<p>次の例では、<code>is_even a</code> を <code>∃ b, a = 2 * b</code> と定義し、2つの偶数の和は偶数であることを示す。</p>
+<pre><code class="language-lean">def is_even (a : Nat) : Prop := ∃ b : Nat, a = 2 * b
+
+theorem even_plus_even {a b : Nat} (h1 : is_even a) (h2 : is_even b) : is_even (a + b) :=
+  Exists.elim h1 (fun w1 (hw1 : a = 2 * w1) =&gt;
+  Exists.elim h2 (fun w2 (hw2 : b = 2 * w2) =&gt;
+    Exists.intro (w1 + w2)
+      (calc a + b
+        _ = 2 * w1 + 2 * w2 := by rw [hw1, hw2]
+        _ = 2 * (w1 + w2)   := by rw [Nat.mul_add])))
+
+theorem even_plus_even2 : ∀ a b : Nat, is_even a → is_even b → is_even (a + b) :=
+  fun a : Nat =&gt;
+  fun b : Nat =&gt; 
+  fun ⟨(w1 : Nat), (hw1 : a = 2 * w1)⟩ =&gt;
+  fun ⟨(w2 : Nat), (hw2 : b = 2 * w2)⟩ =&gt;
+    have hw3 : a + b = 2 * (w1 + w2) :=
+      calc a + b
+        _ = 2 * w1 + 2 * w2 := by rw [hw1, hw2]
+        _ = 2 * (w1 + w2)   := by rw [Nat.mul_add]
+    ⟨(w1 + w2 : Nat), (hw3 : a + b = 2 * (w1 + w2))⟩
+</code></pre>
+<p>マッチ式、無名コンストラクタ、<code>rewrite</code> タクティク……、この章で説明した様々な小道具を使ってこの証明を簡潔に書くと次のようになる:</p>
+<pre><code class="language-lean"><span class="boring">def is_even (a : Nat) := ∃ b, a = 2 * b
+</span>theorem even_plus_even (h1 : is_even a) (h2 : is_even b) : is_even (a + b) :=
+  match h1, h2 with
+  | ⟨w1, hw1⟩, ⟨w2, hw2⟩ =&gt; ⟨w1 + w2, by rw [hw1, hw2, Nat.mul_add]⟩
+</code></pre>
+<p>構成的(構成的論理の)「または」が古典的「または」よりも強いように、構成的「存在する」も古典的「存在する」より強い。次の例に挙げるような含意命題を証明するためには、古典論理的な推論を必要とする。なぜなら、構成的論理では、「全ての <code>x</code> が <code>¬ p</code> を満たす」の否定が真であることと、「<code>p</code> を満たす <code>x</code> が存在する」が真であることは同じではないからである。</p>
+<pre><code class="language-lean">open Classical
+universe u
+variable (α : Sort u) (p : α → Prop)
+
+example (h : ¬ ∀ x, ¬ p x) : ∃ x, p x :=
+  byContradiction
+    (fun h1 : ¬ ∃ x, p x =&gt;
+      have h2 : ∀ x, ¬ p x :=
+        fun x =&gt;
+        fun h3 : p x =&gt;
+        have h4 : ∃ x, p x := ⟨x, h3⟩
+        show False from h1 h4
+      show False from h h2)
+</code></pre>
+<p>以下に、練習問題として存在量化子を含む一般的な恒等式を挙げる。ここでは、できる限り多くの命題を証明することを勧める。また、どの命題が非構成的で、古典論理的な推論を必要とするかは、読者の判断に委ねる。</p>
+<pre><code class="language-lean">open Classical
+
+variable (α : Type) (p q : α → Prop)
+variable (r : Prop)
+
+example : (∃ x : α, r) → r := sorry
+example (a : α) : r → (∃ x : α, r) := sorry
+example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := sorry
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := sorry
+
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := sorry
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := sorry
+example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := sorry
+
+example : (∀ x, p x → r) ↔ (∃ x, p x) → r := sorry
+example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := sorry
+example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := sorry
+</code></pre>
+<p>2番目の例と最後の2つの例は、型 <code>α</code> には少なくとも1つの要素 <code>a</code> が存在するという前提を必要とすることに注意してほしい。</p>
+<p>以下は2つの難しい問題への解答である:</p>
+<pre><code class="language-lean">open Classical
+
+variable (α : Type) (p q : α → Prop)
+variable (a : α)
+variable (r : Prop)
+
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
+  Iff.intro
+    (fun ⟨a, (h1 : p a ∨ q a)⟩ =&gt;
+      Or.elim h1
+        (fun hpa : p a =&gt; Or.inl ⟨a, hpa⟩)
+        (fun hqa : q a =&gt; Or.inr ⟨a, hqa⟩))
+    (fun h : (∃ x, p x) ∨ (∃ x, q x) =&gt;
+      Or.elim h
+        (fun ⟨a, hpa⟩ =&gt; ⟨a, (Or.inl hpa)⟩)
+        (fun ⟨a, hqa⟩ =&gt; ⟨a, (Or.inr hqa)⟩))
+
+example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
+  Iff.intro
+    (fun ⟨b, (hb : p b → r)⟩ =&gt;
+     fun h2 : ∀ x, p x =&gt;
+     show r from hb (h2 b))
+    (fun h1 : (∀ x, p x) → r =&gt;
+     show ∃ x, p x → r from
+       byCases
+         (fun hap : ∀ x, p x =&gt; ⟨a, fun h' : p a =&gt; h1 hap⟩)
+         (fun hnap : ¬ ∀ x, p x =&gt;
+          byContradiction
+            (fun hnex : ¬ ∃ x, p x → r =&gt;
+              have hap : ∀ x, p x :=
+                fun x =&gt;
+                byContradiction
+                  (fun hnp : ¬ p x =&gt;
+                    have hex : ∃ x, p x → r := ⟨x, (fun hp : p x =&gt; absurd hp hnp)⟩
+                    show False from hnex hex)
+              show False from hnap hap)))
+</code></pre>
+<h2 id="more-on-the-proof-language-証明言語の詳細"><a class="header" href="#more-on-the-proof-language-証明言語の詳細">More on the Proof Language (証明言語の詳細)</a></h2>
+<p><code>fun</code>、<code>have</code>、<code>show</code> などのキーワードにより、非形式的な数学的証明の構造を反映した形式的証明項を書くことができることを見てきた。この節では、証明言語の他の便利な機能について説明する。</p>
+<p>まず、ラベルを付けることなく補助ゴールを導入するために、無名の「have」式を使うことができる。<code>this</code> キーワードを用いると、無名の「have」式を使って導入された最後の項を参照することができる:</p>
+<pre><code class="language-lean">variable (f : Nat → Nat)
+variable (h : ∀ x : Nat, f x ≤ f (x + 1))
+
+example : f 0 ≤ f 3 :=
+  have : f 0 ≤ f 1 := h 0
+  have : f 0 ≤ f 2 := Nat.le_trans this (h 1)
+  show f 0 ≤ f 3 from Nat.le_trans this (h 2)
+</code></pre>
+<p>証明の中ではいくつもの事実を使い捨てることが多いので、ラベルの付いた項が増えすぎてごちゃごちゃするのを防ぐには無名の「have」式が有効である。</p>
+<p>ゴール(今ここで使いたい項の型)が推論できる場合は、<code>by assumption</code> と書くことでLeanに証明を埋めるよう頼むこともできる:</p>
+<pre><code class="language-lean"><span class="boring">variable (f : Nat → Nat)
+</span><span class="boring">variable (h : ∀ x : Nat, f x ≤ f (x + 1))
+</span>example : f 0 ≤ f 3 :=
+  have : f 0 ≤ f 1 := h 0
+  have : f 0 ≤ f 2 := Nat.le_trans (by assumption) (h 1)
+  show f 0 ≤ f 3 from Nat.le_trans (by assumption) (h 2)
+</code></pre>
+<p><code>by assumption</code> はLeanに <code>assumption</code> タクティクを使うように指示し、<code>assumption</code> タクティクはローカルなコンテキストで適切な前提命題(の証明項)を見つけることでゴールを証明する。<code>assumption</code> タクティクについては次の章で詳しく説明する。</p>
+<p><code>‹p›</code> と書くことで、Leanに証明を埋めるよう頼むこともできる。ここで、<code>‹p›</code> はLeanにコンテキストから証明を見つけてもらいたい命題である。この角ばった括弧はそれぞれ <code>\f&lt;</code> と <code>\f&gt;</code> と打つと入力できる。&quot;f&quot; は &quot;フランス語&quot; を意味する。なぜならこのunicode記号はフランス語における引用符としても使われるからである。この表記はLeanにおいて次のように定義されている:</p>
+<pre><code class="language-lean">notation &quot;‹&quot; p &quot;›&quot; =&gt; show p by assumption
+</code></pre>
+<p>このアプローチは、推論してほしい前提の型が明示的に与えられるため、<code>by assumption</code> を用いるよりもロバストである。また、証明も読みやすくなる。以下は、より詳細な例である:</p>
+<pre><code class="language-lean">variable (f : Nat → Nat)
+variable (h : ∀ x : Nat, f x ≤ f (x + 1))
+
+example : f 0 ≥ f 1 → f 1 ≥ f 2 → f 0 = f 2 :=
+  fun _ : f 0 ≥ f 1 =&gt;
+  fun _ : f 1 ≥ f 2 =&gt;
+  have : f 0 ≥ f 2 := Nat.le_trans ‹f 1 ≥ f 2› ‹f 0 ≥ f 1›
+  have : f 0 ≤ f 2 := Nat.le_trans (h 0) (h 1)
+  show f 0 = f 2 from Nat.le_antisymm this ‹f 0 ≥ f 2›
+</code></pre>
+<p>フランス語の引用符は、名無しで導入されたものだけでなくコンテキスト中の「あらゆるもの」を参照できることを覚えておこう。フランス語の引用符の適用範囲は命題だけにとどまらないが、これをデータに対して使うのはやや奇妙である:</p>
+<pre><code class="language-lean">example (n : Nat) : Nat := ‹Nat›
+</code></pre>
+<p>以降の章で、Leanのマクロシステムを使って証明言語を拡張する方法を紹介する。</p>
+<h2 id="exercises-練習問題"><a class="header" href="#exercises-練習問題">Exercises (練習問題)</a></h2>
+<ol>
+<li>以下の命題を証明せよ:</li>
+</ol>
+<pre><code class="language-lean">variable (α : Type) (p q : α → Prop)
+
+example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) := sorry
+example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := sorry
+example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := sorry
+</code></pre>
+<p>最後の例について、逆の命題が導出できないのはなぜかを理解してみよう。</p>
+<ol start="2">
+<li>式の一部が全称量化された変数に依存しない場合、それを全称量化子の外側に持ってくることはしばしば可能である。以下の命題を証明してみよう(このうち2つ目の命題の1方向は古典論理を必要とする):</li>
+</ol>
+<pre><code class="language-lean">variable (α : Type) (p q : α → Prop)
+variable (r : Prop)
+
+example : α → ((∀ x : α, r) ↔ r) := sorry
+example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := sorry
+example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := sorry
+</code></pre>
+<ol start="3">
+<li>「理髪師のパラドックス」について考えてみよう。これは、ある町において、「自分で髭を剃らない男性全員の髭を剃り、自分で髭を剃る男性の髭は一切剃らない男性の理髪師がいる」という主張である。この主張が矛盾することを示せ:</li>
+</ol>
+<pre><code class="language-lean">variable (men : Type) (barber : men)
+variable (shaves : men → men → Prop)
+
+example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := sorry
+</code></pre>
+<ol start="4">
+<li>パラメータを持たない <code>Prop</code> 型の項は(それが真か偽かを問わない)単なる主張である。まず以下の <code>prime</code> と <code>Fermat_prime</code> の定義を埋め、それらを使って他の定義を構築せよ。例えば、任意の自然数 <code>n</code> に対して、<code>n</code> より大きな素数が存在すると主張することで、素数は無限に存在すると言うことができる。弱いゴールドバッハ予想は、5より大きい任意の奇数は3つの素数の和で表されることを主張している。必要であれば、フェルマー素数や他の記述の定義を調べてみよう。</li>
+</ol>
+<pre><code class="language-lean">def even (n : Nat) : Prop := sorry
+
+def prime (n : Nat) : Prop := sorry
+
+def infinitely_many_primes : Prop := sorry
+
+def Fermat_prime (n : Nat) : Prop := sorry
+
+def infinitely_many_Fermat_primes : Prop := sorry
+
+def goldbach_conjecture : Prop := sorry
+
+def Goldbach's_weak_conjecture : Prop := sorry
+
+def Fermat's_last_theorem : Prop := sorry
+</code></pre>
+<ol start="5">
+<li>存在量化子の節で列挙した恒真式をできるだけ多く証明せよ。</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="propositions_and_proofs.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="tactics.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="propositions_and_proofs.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="tactics.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>

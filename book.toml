@@ -1,0 +1,16 @@
+[book]
+authors = ["Jeremy Avigad", "Leonardo de Moura", "Soonho Kong", "Sebastian Ullrich"]
+language = "ja"
+multilingual = false
+src = "."
+title = "Theorem Proving in Lean 4 日本語訳"
+
+[build]
+build-dir = "out"
+
+[output.html]
+additional-js = ["assets/fzf.umd.js", "assets/elasticlunr.js"]
+git-repository-url = "https://github.com/aconite-ac/theorem_proving_in_lean4"
+
+[output.html.playground.boring-prefixes]
+lean = "# "

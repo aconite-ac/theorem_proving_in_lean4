@@ -1,0 +1,1229 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>帰納と再帰 - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html" class="active"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="induction-and-recursion-帰納と再帰"><a class="header" href="#induction-and-recursion-帰納と再帰">Induction and Recursion (帰納と再帰)</a></h1>
+<p>前章では、帰納的定義がLeanに新しい型を導入する強力な手段となることを説明した。さらに言えば、コンストラクタと再帰子(エリミネータ)は、帰納型から他の型への関数を定義する唯一の手段である。型としての命題対応により、この事実は帰納法が証明の基本的な方法であることを意味する。</p>
+<p>Leanは再帰関数の定義、パターンマッチングの実行、帰納的証明の記述に対して自然な方法を提供する。関数を定義するには、その関数が満たすべき等式を指定する。定理を証明するには、起こりうる全てのケースをどのように扱うかを指定する。裏では、これらの記述は<em>equation compiler</em>(等式コンパイラ)と呼ばれるものを用いて、プリミティブな再帰子へと「コンパイル」される。等式コンパイラはtrusted code base(システムの信頼性保証において最も基礎的で重要なコード)の一部ではない。等式コンパイラの出力はカーネルによって独立にチェックされる項で構成される。</p>
+<h2 id="用語に関する注意"><a class="header" href="#用語に関する注意">用語に関する注意</a></h2>
+<p>この節は翻訳に際して追加した節である。</p>
+<p>この章では、次のような定義</p>
+<pre><code class="language-lean">open Nat
+def foo : Nat → Nat → Nat
+  | zero  , zero   =&gt; 0
+  | zero  , succ y =&gt; 1
+  | succ x, zero   =&gt; 2
+  | succ x, succ y =&gt; 3
+</code></pre>
+<p>があるとき、<code>zero</code> や <code>succ y</code> などを「パターン(pattern)」、<code>| zero  , zero</code> などを「ケース(case)」、定義として与えられたケース全てをまとめたものを「ケースリスト(list of cases)」、不足なくケースが与えられたケースリストを用いてパターンマッチングすることを「場合分け(by cases)」あるいは「場合分けする(split on cases)」と呼ぶ。</p>
+<h2 id="pattern-matching-パターンマッチング"><a class="header" href="#pattern-matching-パターンマッチング">Pattern Matching (パターンマッチング)</a></h2>
+<p>schematic patternsの解釈は、コンパイルの最初のステップである。帰納型のコンストラクタと <code>casesOn</code> 再帰子を使って、関数を定義したり、場合分けによる定理の証明が行えることを見てきた。しかし、複雑な定義は、入れ子になった <code>casesOn</code> 適用をいくつも使うことがあり、そのような記述は読みにくく理解しにくいかもしれない。パターンマッチングはより便利で、関数型プログラミング言語ユーザーに馴染みのあるアプローチを提供する。</p>
+<p>帰納的に定義された自然数の型について考える。全ての自然数は <code>zero</code> か <code>succ x</code> のどちらかの形をとるため、それぞれのケースにおいて出力の値を指定することで、自然数から任意の型への関数を定義することができる:</p>
+<pre><code class="language-lean">open Nat
+
+/- 等式コンパイラによるパターンマッチングを使った関数定義の構文
+
+   この構文を使って帰納型から任意の型への関数を定義する場合、
+   `:=` は不要である(書くとコンパイルエラーになる)ことに注意。
+   定義したい項が型Tを持つとき、この構文は型Tの(1つ以上の)前件とパターンマッチングする -/
+
+def sub1 : Nat → Nat
+  | zero   =&gt; zero
+  | succ x =&gt; x
+
+def isZero : Nat → Bool
+  | zero   =&gt; true
+  | succ x =&gt; false
+</code></pre>
+<p>以上の関数を定義するために使われる等式の集まり(例えば、<code>sub1 zero = zero</code> は上記の関数定義の一部だとみなせる)はdefinitionallyに成立する:</p>
+<pre><code class="language-lean"><span class="boring">open Nat
+</span><span class="boring">def sub1 : Nat → Nat
+</span><span class="boring">  | zero   =&gt; zero
+</span><span class="boring">  | succ x =&gt; x
+</span><span class="boring">def isZero : Nat → Bool
+</span><span class="boring">  | zero   =&gt; true
+</span><span class="boring">  | succ x =&gt; false
+</span>example : sub1 0 = 0 := rfl
+example (x : Nat) : sub1 (succ x) = x := rfl
+
+example : isZero 0 = true := rfl
+example (x : Nat) : isZero (succ x) = false := rfl
+
+example : sub1 7 = 6 := rfl
+example (x : Nat) : isZero (x + 3) = false := rfl
+</code></pre>
+<p><code>zero</code> や <code>succ</code> の代わりに、より馴染みのある表記を使うことができる:</p>
+<pre><code class="language-lean">def sub1 : Nat → Nat
+  | 0   =&gt; 0
+  | x+1 =&gt; x
+
+def isZero : Nat → Bool
+  | 0   =&gt; true
+  | x+1 =&gt; false
+</code></pre>
+<p>加法とゼロ表記には <code>[match_pattern]</code> 属性が割り当てられているため、これらの表記をパターンマッチングで使うことができる。Leanは、コンストラクタ <code>zero</code> や <code>succ</code> が出現するまで、加法やゼロ表記を含む式を単純に正規化する。</p>
+<p>パターンマッチングは直積型や <code>Option</code> 型など、任意の帰納型に対して機能する:</p>
+<pre><code class="language-lean">def swap : α × β → β × α
+  | (a, b) =&gt; (b, a)
+
+def foo : Nat × Nat → Nat
+  | (m, n) =&gt; m + n
+
+def bar : Option Nat → Nat
+  | some n =&gt; n + 1
+  | none   =&gt; 0
+</code></pre>
+<p>パターンマッチングは関数定義だけでなく、場合分けによる証明にも使うことができる:</p>
+<pre><code class="language-lean">namespace Hidden
+def not : Bool → Bool
+  | true  =&gt; false
+  | false =&gt; true
+
+theorem not_not : ∀ (b : Bool), not (not b) = b
+  | true  =&gt; rfl  -- proof that not (not true) = true
+  | false =&gt; rfl  -- proof that not (not false) = false
+
+theorem not_not' : (b : Bool) → not (not b) = b
+  | true  =&gt; rfl
+  | false =&gt; rfl
+end Hidden
+</code></pre>
+<p>パターンマッチングは帰納的に定義された命題を分解するためにも使うことができる:</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∧ q → q ∧ p
+  | And.intro h₁ h₂ =&gt; And.intro h₂ h₁
+
+example (p q : Prop) : p ∨ q → q ∨ p
+  | Or.inl hp =&gt; Or.inr hp
+  | Or.inr hq =&gt; Or.inl hq
+</code></pre>
+<p>パターンマッチングは論理的結合子を含む仮説を分解するコンパクトな方法も提供する。</p>
+<p>以上の全ての例で、パターンマッチングは「フラットな」場合分けを実行するために使われている。さらに興味深いことに、パターンは次のように入れ子になったコンストラクタを含むこともある。</p>
+<pre><code class="language-lean">def sub2 : Nat → Nat
+  | 0   =&gt; 0
+  | 1   =&gt; 0
+  | x+2 =&gt; x
+</code></pre>
+<p>この例において、等式コンパイラはまず入力が <code>zero</code> か <code>succ x</code> の形であるかで最初の場合分けを行う。入力が <code>zero</code> のときは <code>0</code> を返す。入力が <code>succ x</code> の形のときは、その <code>x</code> が <code>zero</code> か <code>succ x</code> の形であるかで2回目の場合分けを行う。等式コンパイラは提示されたケースリストから場合分けの方法を決定し、適切な場合分けに失敗したときはエラーを生じる。ここでも、次のように算術の記法を使うことができる。いずれにせよ、関数を定義する等式はdefinitionallyに成立する。</p>
+<pre><code class="language-lean"><span class="boring">def sub2 : Nat → Nat
+</span><span class="boring">  | 0   =&gt; 0
+</span><span class="boring">  | 1   =&gt; 0
+</span><span class="boring">  | x+2 =&gt; x
+</span>example : sub2 0 = 0 := rfl
+example : sub2 1 = 0 := rfl
+example : sub2 (x+2) = x := rfl
+
+example : sub2 5 = 3 := rfl
+</code></pre>
+<p><code>#print sub2</code> と書けば、この関数が再帰子を含むどんな式にコンパイルされたかが分かる。(Leanは <code>sub2</code> が内部の補助関数 <code>sub2.match_1</code> を使って定義されていることを伝えるかもしれないが、<code>#print</code> コマンドを使って <code>sub2.match_1</code> の定義を表示させることもできる。)Leanはこれらの補助関数を使って <code>match</code> 式をコンパイルする。実際には、上記の定義 <code>sub2</code> は次のように展開される。</p>
+<pre><code class="language-lean">def sub2 : Nat → Nat :=
+  fun x =&gt;
+    match x with
+    | 0   =&gt; 0
+    | 1   =&gt; 0
+    | x+2 =&gt; x
+</code></pre>
+<p>入れ子になったパターンマッチングの例をさらに挙げる:</p>
+<pre><code class="language-lean">example (p q : α → Prop)
+        : (∃ x, p x ∨ q x) → (∃ x, p x) ∨ (∃ x, q x)
+  | Exists.intro x (Or.inl px) =&gt; Or.inl (Exists.intro x px)
+  | Exists.intro x (Or.inr qx) =&gt; Or.inr (Exists.intro x qx)
+
+def foo : Nat × Nat → Nat
+  | (0, n)     =&gt; 0
+  | (m+1, 0)   =&gt; 1
+  | (m+1, n+1) =&gt; 2
+</code></pre>
+<p>等式コンパイラは複数の引数を連続して処理することができる。例えば、一つ上の例 <code>foo</code> は2つの引数を持つ関数として定義する方が自然だろう:</p>
+<pre><code class="language-lean">def foo : Nat → Nat → Nat
+  | 0,   n   =&gt; 0
+  | m+1, 0   =&gt; 1
+  | m+1, n+1 =&gt; 2
+</code></pre>
+<p>別の例を挙げる:</p>
+<pre><code class="language-lean">-- `a :: as` は `cons a as` の糖衣構文
+
+def bar : List Nat → List Nat → Nat
+  | [],      []      =&gt; 0
+  | a :: as, []      =&gt; a
+  | [],      b :: bs =&gt; b
+  | a :: as, b :: bs =&gt; a + b
+</code></pre>
+<p>複数の引数を持つケースは、パターン毎にカンマで区切られることに注意してほしい。</p>
+<p>以下の各例では、2番目以降の引数がケースに含まれているが、最初の引数での場合分けのみが行われる。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>def and : Bool → Bool → Bool
+  | true,  a =&gt; a
+  | false, _ =&gt; false
+
+def or : Bool → Bool → Bool
+  | true,  _ =&gt; true
+  | false, a =&gt; a
+
+def cond : Bool → α → α → α
+  | true,  x, y =&gt; x
+  | false, x, y =&gt; y
+<span class="boring">end Hidden
+</span></code></pre>
+<p>また、ある引数の値が出力を定義するのに必要ない場合は、その引数のパターンにアンダースコアを使うことができることに注意してほしい。このアンダースコアは<em>wildcard pattern</em>(ワイルドカードパターン)あるいは<em>anonymous variable</em>(無名変数)として知られている。等式コンパイラ以外での使い方とは違い、ここでアンダースコアは暗黙の引数を表すものでは<strong>ない</strong>。ワイルドカードにアンダースコアを使うのは関数型プログラミング言語では一般的なので、Leanもその表記を採用した。節<a href="#wildcards-and-overlapping-patterns-%E3%83%AF%E3%82%A4%E3%83%AB%E3%83%89%E3%82%AB%E3%83%BC%E3%83%89%E3%81%A8%E3%82%B1%E3%83%BC%E3%82%B9%E3%81%AE%E9%87%8D%E8%A4%87">Wildcards and Overlapping Patterns (ワイルドカードとケースの重複)</a>ではワイルドカードの概念を拡張し、節<a href="#inaccessible-patterns-%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E4%B8%8D%E8%83%BD%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Inaccessible Patterns (アクセス不能パターン)</a>ではパターン内で暗黙の引数を使用する方法を説明する。</p>
+<p><a href="./inductive_types.html">7章 Inductive Types (帰納型)</a>で説明したように、帰納データ型はパラメータに依存しうる。次の例では、パターンマッチングを用いて <code>tail</code> 関数を定義している。引数 <code>α : Type u</code> は帰納データ型のパラメータであり、パターンマッチングに参加しないことを示すために(関数名・引数リストと型名を区切る)コロンの前に置かれる。Leanは <code>:</code> の後に帰納型のパラメータが来ることも許可するが、パラメータをパターンマッチさせることはできない。</p>
+<pre><code class="language-lean">def tail1 {α : Type u} : List α → List α
+  | []      =&gt; []
+  | a :: as =&gt; as
+
+def tail2 : {α : Type u} → List α → List α
+  | α, []      =&gt; []
+  | α, a :: as =&gt; as
+</code></pre>
+<p>この2つの例では、パラメータ <code>α</code> の出現位置が異なるにもかかわらず、どちらの例でも場合分けに参加しないという意味で同じように扱われている。</p>
+<p>Leanは、依存型の引数が場合分けにおいて「このケースが生じることはない」という追加の制約を与えるような、より複雑な形のパターンマッチングも扱うことができる。このような<em>dependent pattern matching</em>(依存パターンマッチング)の例については、<a href="#dependent-pattern-matching-%E4%BE%9D%E5%AD%98%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">Dependent Pattern Matching (依存パターンマッチング)</a>の節で説明する。</p>
+<h2 id="wildcards-and-overlapping-patterns-ワイルドカードとケースの重複"><a class="header" href="#wildcards-and-overlapping-patterns-ワイルドカードとケースの重複">Wildcards and Overlapping Patterns (ワイルドカードとケースの重複)</a></h2>
+<p>前節の例の1つについて考える:</p>
+<pre><code class="language-lean">def foo : Nat → Nat → Nat
+  | 0,   n   =&gt; 0
+  | m+1, 0   =&gt; 1
+  | m+1, n+1 =&gt; 2
+</code></pre>
+<p>この例は次のように表現することもできる:</p>
+<pre><code class="language-lean">def foo : Nat → Nat → Nat
+  | 0, n =&gt; 0
+  | m, 0 =&gt; 1
+  | m, n =&gt; 2
+</code></pre>
+<p>2つ目の表現では、ケースが重複している。例えば、引数のペア <code>0 0</code> は3つのケース全てにマッチする。しかし、Leanは上のケースから順にパターンマッチングを試し、一番最初にマッチしたケースを使うことで曖昧さを解消するので、この2つの例は結果的に同じ関数を定義している。実際、2つ目の表現について以下の等式がdefinitionallyに成立する:</p>
+<pre><code class="language-lean">def foo : Nat → Nat → Nat
+  | 0, n =&gt; 0
+  | m, 0 =&gt; 1
+  | m, n =&gt; 2
+example : foo 0     0     = 0 := rfl
+example : foo 0     (n+1) = 0 := rfl
+example : foo (m+1) 0     = 1 := rfl
+example : foo (m+1) (n+1) = 2 := rfl
+</code></pre>
+<p><code>m</code> と <code>n</code> の値は出力の定義に必要ないので、代わりにワイルドカードパターンを使ってもよい。</p>
+<pre><code class="language-lean">def foo : Nat → Nat → Nat
+  | 0, _ =&gt; 0
+  | _, 0 =&gt; 1
+  | _, _ =&gt; 2
+</code></pre>
+<p>直前の定義と同様に、この <code>foo</code> の定義が4つの恒等式をdefinitionallyに満たすことは容易に確認できる。</p>
+<p>関数型プログラミング言語の中には、<em>incomplete pattern matching</em>(不完全なパターンマッチング)をサポートするものがある。これらの言語では、インタプリタはケースリスト内のどのケースともマッチしない入力に対して例外を生成するか、任意の値を返す。Leanでは、<code>Inhabited</code> 型クラスを使うと、「どのケースともマッチしない入力に対して任意の値を返す」アプローチをシミュレートできる。大雑把に言うと、<code>Inhabited α</code> は <code>α</code> の要素が存在することの証人である。<a href="./type_classes.html">10章 Type Classes (型クラス)</a>では、Leanに適切な基底型がinhabited(有項)であることを指示でき、Leanはその指示に基づいて、他の構築された型が有項であることを自動的に推論できることを説明する。これに基づいて、標準ライブラリは任意の有項型のデフォルト項 <code>default</code> を提供する。</p>
+<p>型 <code>Option α</code> を使って不完全なパターンマッチングをシミュレートすることもできる。このアプローチでは、入力が適切に提供されたケースとマッチしたときは <code>some a</code> を返し、不完全なケースとマッチしたときは <code>none</code> を返す。次の例は、両方のアプローチを示している。</p>
+<pre><code class="language-lean">def f1 : Nat → Nat → Nat
+  | 0, _  =&gt; 1
+  | _, 0  =&gt; 2
+  | _, _  =&gt; default  -- the &quot;incomplete&quot; case
+
+example : f1 0     0     = 1       := rfl
+example : f1 0     (a+1) = 1       := rfl
+example : f1 (a+1) 0     = 2       := rfl
+example : f1 (a+1) (b+1) = default := rfl
+
+def f2 : Nat → Nat → Option Nat
+  | 0, _  =&gt; some 1
+  | _, 0  =&gt; some 2
+  | _, _  =&gt; none     -- the &quot;incomplete&quot; case
+
+example : f2 0     0     = some 1 := rfl
+example : f2 0     (a+1) = some 1 := rfl
+example : f2 (a+1) 0     = some 2 := rfl
+example : f2 (a+1) (b+1) = none   := rfl
+</code></pre>
+<p>等式コンパイラは賢い。以下の定義のどれかのケースを省くと、エラーメッセージでどんなケースがカバーされていないかを知らせてくれる。</p>
+<pre><code class="language-lean">def bar : Nat → List Nat → Bool → Nat
+  | 0,   _,      false =&gt; 0
+  | 0,   b :: _, _     =&gt; b
+  | 0,   [],     true  =&gt; 7
+  | a+1, [],     false =&gt; a
+  | a+1, [],     true  =&gt; a + 1
+  | a+1, b :: _, _     =&gt; a + b
+</code></pre>
+<p>また、等式コンパイラは適切な状況では <code>casesOn</code> の代わりに &quot;if ... then ... else&quot; 構文を用いる。</p>
+<pre><code class="language-lean">def foo : Char → Nat
+  | 'A' =&gt; 1
+  | 'B' =&gt; 2
+  | _   =&gt; 3
+
+#print foo.match_1
+</code></pre>
+<h2 id="structural-recursion-and-induction-構造的再帰と構造的帰納法"><a class="header" href="#structural-recursion-and-induction-構造的再帰と構造的帰納法">Structural Recursion and Induction (構造的再帰と構造的帰納法)</a></h2>
+<p>再帰的定義もサポートしていることが、等式コンパイラを強力なものにしている。次の3つの節では、ここに挙げる3つの概念それぞれについて説明する:</p>
+<ul>
+<li>structurally recursive definitions(構造的再帰的定義)</li>
+<li>well-founded recursive definitions(整礎再帰的定義)</li>
+<li>mutually recursive definitions(相互再帰的定義)</li>
+</ul>
+<p>一般的に、等式コンパイラは次の形式の入力を処理する:</p>
+<pre><code>def foo (a : α) : (b : β) → γ
+  | [patterns₁] =&gt; t₁
+  ...
+  | [patternsₙ] =&gt; tₙ
+</code></pre>
+<p>ここで、<code>(a : α)</code> はパラメータの列、<code>(b : β)</code> はパターンマッチングが行われる引数の列、<code>γ</code> は任意の型であり、<code>γ</code> は <code>a</code> と <code>b</code> に依存することができる。<code>[patterns₁]</code> から <code>[patternsₙ]</code> は同じ数のパターンを含むべきであり、1つのパターンが <code>β</code> の各要素と対応する。これまで見てきたように、パターンは変数、他のパターンにコンストラクタを適用したもの、またはそのような形式に正規化される式のいずれかである(ここで、コンストラクタでないものは <code>[match_pattern]</code> 属性でマークされる)。コンストラクタの出現はケースの分割を促す。ここで、コンストラクタへの引数は与えられた変数で表される。節<a href="#dependent-pattern-matching-%E4%BE%9D%E5%AD%98%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">Dependent Pattern Matching (依存パターンマッチング)</a>では、パターンマッチングでは何の役割も果たさないが、式の型チェックを行うために必要となる明示的な項をパターンに含める必要がある場合があることを説明する。この明示的な項は今述べた理由により<em>inaccessible patterns</em>(アクセス不能パターン)と呼ばれる。しかし、節<a href="#dependent-pattern-matching-%E4%BE%9D%E5%AD%98%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">Dependent Pattern Matching (依存パターンマッチング)</a>より前では、アクセス不能パターンを使う必要はない。</p>
+<p>前節で見たように、出力を定義する項 <code>t₁, ..., tₙ</code> は、任意のパラメータ <code>a</code> だけでなく、対応するパターン内で導入された変数を利用することができる。再帰と帰納が可能なのは、出力を定義する項が <code>foo</code> への再帰的呼び出しを含むことすら可能だからである。この節では、<em>structural recursion</em>(構造的再帰)を扱う。構造的再帰では、<code>=&gt;</code> の右辺に現れる <code>foo</code> への引数は <code>=&gt;</code> の左辺のパターンの部分項である。これは、部分項はマッチした引数よりstructurally small(構造的に小さい)であるため、帰納型の項としてマッチした引数より先に構築されるという考え方である。前章の構造的再帰の例を、今度は等式コンパイラを使って定義しよう:</p>
+<pre><code class="language-lean">open Nat
+def add : Nat → Nat → Nat
+  | m, zero   =&gt; m
+  | m, succ n =&gt; succ (add m n)
+
+theorem add_zero (m : Nat)   : add m zero = m := rfl
+theorem add_succ (m n : Nat) : add m (succ n) = succ (add m n) := rfl
+
+theorem zero_add : ∀ n, add zero n = n
+  | zero   =&gt; rfl
+  | succ n =&gt; congrArg succ (zero_add n)
+
+def mul : Nat → Nat → Nat
+  | n, zero   =&gt; zero
+  | n, succ m =&gt; add (mul n m) n
+
+theorem mul_zero (m : Nat)   : mul m zero = zero := rfl
+theorem mul_succ (m n : Nat) : mul m (succ n) = add (mul m n) m := rfl
+</code></pre>
+<p>この <code>zero_add</code> の証明は、Leanにおいて帰納法による証明が再帰の一つの形であることを明らかにしている。</p>
+<p>上の例は、<code>add</code> と <code>mul</code> を定義する式がdefinitionallyに成立することを示している。等式コンパイラは構造的帰納法による証明内でも、可能な限り関数を定義する式がdefinitionallyに成立するようにする。例えば、<code>zero_add</code> の証明において、引数が <code>zero</code> のケースは <code>rfl</code> を使うだけで示せる。しかしながら、他の状況では、引数の部分項に関する当該定理(例えば <code>zero_add n</code>)は<em>propositionally</em>にしか成立しない。つまり、これは明示的に適用されなければならない等式定理である。等式コンパイラは <code>zero_add n</code> のような定理を内部的に作成するが、これらの定理はユーザーが直接使うものではなく、<code>simp</code> タクティクが必要に応じて使うように設定されている。したがって、次の <code>zero_add</code> の証明も機能する:</p>
+<pre><code class="language-lean">open Nat
+<span class="boring">def add : Nat → Nat → Nat
+</span><span class="boring">  | m, zero   =&gt; m
+</span><span class="boring">  | m, succ n =&gt; succ (add m n)
+</span>theorem zero_add : ∀ n, add zero n = n
+  | zero   =&gt; by simp [add]
+  | succ n =&gt; by simp [add, zero_add]
+</code></pre>
+<p>パターンマッチングによる定義と同様に、構造的再帰や構造的帰納法のパラメータがコロンの前に現れることがある。このようなパラメータは、定義が処理される前にローカルコンテキストに追加される。例えば、加法の定義は次のように書くこともできる:</p>
+<pre><code class="language-lean">open Nat
+def add (m : Nat) : Nat → Nat
+  | zero   =&gt; m
+  | succ n =&gt; succ (add m n)
+</code></pre>
+<p>この例を <code>match</code> を使って書くこともできる。</p>
+<pre><code class="language-lean">
+/- `match` を使う場合はもちろん `:=` が必要になる -/
+
+open Nat
+def add (m n : Nat) : Nat :=
+  match n with
+  | zero   =&gt; m
+  | succ n =&gt; succ (add m n)
+</code></pre>
+<p>構造的再帰のもっと面白い例はフィボナッチ関数 <code>fib</code> である。</p>
+<pre><code class="language-lean">def fib : Nat → Nat
+  | 0   =&gt; 1
+  | 1   =&gt; 1
+  | n+2 =&gt; fib (n+1) + fib n
+
+example : fib 0 = 1 := rfl
+example : fib 1 = 1 := rfl
+example : fib (n + 2) = fib (n + 1) + fib n := rfl
+
+example : fib 7 = 21 := rfl
+</code></pre>
+<p>ここで、<code>n + 2</code>( <code>succ (succ n)</code> とdefinitionally equal)における <code>fib</code> 関数の値は、<code>n + 1</code>( <code>succ n</code> とdefinitionally equal)における値と <code>n</code> における値で定義される。しかし、これはフィボナッチ関数を計算する方法としてはきわめて非効率的で、実行時間は指数 <code>n</code> の指数関数となる。もっと良い方法がある:</p>
+<pre><code class="language-lean">def fibFast (n : Nat) : Nat :=
+  (loop n).2
+where
+  loop : Nat → Nat × Nat
+    | 0   =&gt; (0, 1)
+    | n+1 =&gt; let p := loop n; (p.2, p.1 + p.2)
+
+#eval fibFast 100
+</code></pre>
+<p><code>where</code> の代わりに <code>let rec</code> を用いた定義は次の通り:</p>
+<pre><code class="language-lean">def fibFast (n : Nat) : Nat :=
+  let rec loop : Nat → Nat × Nat
+    | 0   =&gt; (0, 1)
+    | n+1 =&gt; let p := loop n; (p.2, p.1 + p.2)
+  (loop n).2
+</code></pre>
+<p>どちらの例でも、Leanは補助関数 <code>fibFast.loop</code> を生成する。</p>
+<p>構造的再帰を処理するために、等式コンパイラは各帰納型の定義時に自動生成される定数 <code>below</code> と <code>brecOn</code> を用いて、<em>course-of-values recursion</em>(累積再帰)を使用する。<code>Nat.below</code> と <code>Nat.brecOn</code> の型を見れば、それらがどのように機能するかを知ることができる:</p>
+<pre><code class="language-lean">variable (C : Nat → Type u)
+
+#check (@Nat.below C : Nat → Type u)
+
+#reduce @Nat.below C (3 : Nat)
+
+#check (@Nat.brecOn C : (n : Nat) → ((n : Nat) → @Nat.below C n → C n) → C n)
+</code></pre>
+<p>型 <code>@Nat.below C (3 : nat)</code> は、<code>C 0</code>、<code>C 1</code>、<code>C 2</code> の項を格納するデータ構造である。累積再帰は <code>Nat.brecOn</code> によって実装される。<code>Nat.brecOn</code> は型 <code>(n : Nat) → C n</code> を持つ依存関数の入力 <code>m</code> における値を、(<code>@Nat.below C m</code> の要素として表される)その関数の以前の全ての値を使って定義することを可能にする。</p>
+<p>累積再帰の利用は、等式コンパイラがLeanのカーネルに対して特定の関数が停止することを正当に主張するために使うテクニックの一つである。他の関数型プログラミング言語のコンパイラと同様、再帰関数をコンパイルするコードジェネレータに影響を与えることはない。<code>#eval fib n</code> の実行時間は指数 <code>n</code> の指数関数となることを思い出してほしい。一方で、<code>#reduce fib n</code> は <code>brecOn</code> による構築に基づいた定義を使用するため効率的である。</p>
+<pre><code class="language-lean">def fib : Nat → Nat
+  | 0   =&gt; 1
+  | 1   =&gt; 1
+  | n+2 =&gt; fib (n+1) + fib n
+
+-- #eval fib 50 -- slow
+#reduce fib 50  -- fast
+
+#print fib
+</code></pre>
+<p>再帰的定義のもう一つの良い例がリストの <code>append</code> 関数である。</p>
+<pre><code class="language-lean">def append : List α → List α → List α
+  | [],    bs =&gt; bs
+  | a::as, bs =&gt; a :: append as bs
+
+example : append [1, 2, 3] [4, 5] = [1, 2, 3, 4, 5] := rfl
+</code></pre>
+<p>もう一つ例を挙げる: <code>listAdd x y</code> は2つのリストのどちらかの要素がなくなるまで、最初のリストの先頭の要素 <code>a</code> と2番目のリストの先頭の要素 <code>b</code> を削除して <code>a + b</code> をリスト <code>z</code> に追加する操作を繰り返し、最後に <code>z</code> を返す。</p>
+<pre><code class="language-lean">def listAdd [Add α] : List α → List α → List α
+  | [],      _       =&gt; []
+  | _,       []      =&gt; []
+  | a :: as, b :: bs =&gt; (a + b) :: listAdd as bs
+
+#eval listAdd [1, 2, 3] [4, 5, 6, 6, 9, 10]
+-- [5, 7, 9]
+</code></pre>
+<p>以下の練習問題で、これに似た例に関して実験してみることをお勧めする。</p>
+<h2 id="local-recursive-declarations-ローカルな再帰的定義"><a class="header" href="#local-recursive-declarations-ローカルな再帰的定義">Local Recursive Declarations (ローカルな再帰的定義)</a></h2>
+<p><code>let rec</code> キーワードを使うと、ローカルな再帰的定義を宣言することができる。</p>
+<pre><code class="language-lean">def replicate (n : Nat) (a : α) : List α :=
+  let rec loop : Nat → List α → List α
+    | 0,   as =&gt; as
+    | n+1, as =&gt; loop n (a::as)
+  loop n []
+
+#check @replicate.loop
+-- {α : Type} → α → Nat → List α → List α
+</code></pre>
+<p>Leanは各 <code>let rec</code> に対して補助定義を作成する。上の例では、<code>replicate</code> の定義内にある <code>let rec loop</code> のために <code>replicate.loop</code> の定義を作成している。Leanは、<code>let rec</code> 宣言内で使われたローカル変数を定義中の関数のパラメータに追加することで、宣言を「閉じる」ことに注意してほしい。例えば、ローカル変数 <code>a</code> は <code>let rec loop</code> 内で使われている。</p>
+<p><code>let rec</code> をタクティクモード内で使うこともできる。また、帰納法による証明を作るために <code>let rec</code> を使うこともできる。</p>
+<pre><code class="language-lean"><span class="boring">def replicate (n : Nat) (a : α) : List α :=
+</span><span class="boring"> let rec loop : Nat → List α → List α
+</span><span class="boring">   | 0,   as =&gt; as
+</span><span class="boring">   | n+1, as =&gt; loop n (a::as)
+</span><span class="boring"> loop n []
+</span>theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
+  let rec aux (n : Nat) (as : List α)
+              : (replicate.loop a n as).length = n + as.length := by
+    match n with
+    | 0   =&gt; simp [replicate.loop]
+    | n+1 =&gt; simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
+  exact aux n []
+</code></pre>
+<p>定義を記述した後に <code>where</code> キーワードを使って補助再帰的定義を導入することもできる。Leanはこれらを <code>let rec</code> に変換する。</p>
+<pre><code class="language-lean">def replicate (n : Nat) (a : α) : List α :=
+  loop n []
+where
+  loop : Nat → List α → List α
+    | 0,   as =&gt; as
+    | n+1, as =&gt; loop n (a::as)
+
+theorem length_replicate (n : Nat) (a : α) : (replicate n a).length = n := by
+  exact aux n []
+where
+  aux (n : Nat) (as : List α)
+      : (replicate.loop a n as).length = n + as.length := by
+    match n with
+    | 0   =&gt; simp [replicate.loop]
+    | n+1 =&gt; simp [replicate.loop, aux n, Nat.add_succ, Nat.succ_add]
+</code></pre>
+<h2 id="well-founded-recursion-and-induction-整礎再帰と整礎帰納法"><a class="header" href="#well-founded-recursion-and-induction-整礎再帰と整礎帰納法">Well-Founded Recursion and Induction (整礎再帰と整礎帰納法)</a></h2>
+<p>構造的再帰が使えない場合は、整礎再帰を使えば再帰的定義中の関数が停止することを証明できる。整礎再帰に必要なのは、整礎関係と、各再帰適用(<code>f t</code> の形をとる)が特定の項 <code>t</code> をこの関係において「減少させる」ことの証明である。依存型理論は整礎再帰を表現し、その正当性を証明するのに十分強力である。これらの仕組みを理解するために必要な論理的背景の説明から始めよう。</p>
+<p>Leanの標準ライブラリは2つの述語 <code>Acc r a</code> と <code>WellFounded r</code> を定義している。ここで、<code>r</code> は型 <code>α</code> 上の二項関係であり、<code>a</code> は型 <code>α</code> の要素である。</p>
+<pre><code class="language-lean">variable (α : Sort u)
+variable (r : α → α → Prop)
+
+#check (Acc r : α → Prop)
+#check (WellFounded r : Prop)
+</code></pre>
+<p>1つ目 <code>Acc</code> は帰納的に定義された述語である。定義(唯一のコンストラクタ <code>Acc.intro</code>)によると、<code>Acc r x</code> は <code>∀ y, r y x → Acc r y</code> と同値である。<code>Acc r x</code> は <code>r</code> の下で <code>x</code> がアクセス可能であることを意味する。<code>r y x</code> が一種の順序関係 <code>y ≺ x</code> を表すと考えるなら、<code>Acc r x</code> は <code>x</code> の全ての前者がアクセス可能であることと同値である。特に、<code>x</code> が前者を持たない場合、<code>x</code> はアクセス可能である。任意の型 <code>α</code> の任意のアクセス可能な項 <code>x</code> に対して、<code>x</code> の全ての前者に先に値を割り当てることで、<code>x</code> にも値を割り当てることができるはずである。</p>
+<pre><code class="language-lean">noncomputable def f {α : Sort u}
+      (r : α → α → Prop)
+      (h : WellFounded r)
+      (C : α → Sort v)
+      (F : (x : α) → ((y : α) → r y x → C y) → C x)
+      : (x : α) → C x := WellFounded.fix h F
+</code></pre>
+<p><code>f</code> の引数が長い列をなしているが、前半はすでに見たとおりである: <code>α</code> は型、<code>r</code> は二項関係、そして <code>h</code> は「<code>r</code> が整礎である」という仮説である。変数 <code>C</code> は再帰的定義の動機を表す: 各項 <code>x : α</code> について、<code>C x</code> の項を構築したい。関数 <code>F</code> は <code>C x</code> の項を構築するための帰納的レシピを提供する: <code>F</code> は <code>x</code> の各前者 <code>y</code> について <code>C y</code> の項が与えられたとき、要素 <code>C x</code> を構築する方法を教えてくれる。</p>
+<p><code>WellFounded.fix</code> は帰納法においても同様に機能する。つまり、もし <code>≺</code> が整礎で、<code>∀ x, C x</code> を証明したいなら、任意の <code>x</code> に対して「<code>∀ y ≺ x, C y</code> ならば <code>C x</code>」を示せば十分である。</p>
+<p>上の例では、コードジェネレータが現在 <code>WellFounded.fix</code> をサポートしていないため、<code>noncomputable</code> という修飾子を使用している。関数 <code>WellFounded.fix</code> はLeanが関数の停止を正当に主張するために使う(累積再帰とは別の)ツールである。</p>
+<p>Leanは、自然数に関する通常の順序 <code>&lt;</code> が整礎であることを知っている。また、Leanは既存の順序から新しい整礎順序を構築する方法もいくつか知っている。例えば、辞書式順序を使う方法がある。</p>
+<p>以下は、標準ライブラリ内にある自然数の除法の定義である。</p>
+<pre><code class="language-lean">open Nat
+
+theorem div_lemma {x y : Nat} : 0 &lt; y ∧ y ≤ x → x - y &lt; x :=
+  fun h =&gt; sub_lt (Nat.lt_of_lt_of_le h.left h.right) h.left
+
+def div.F (x : Nat) (f : (x₁ : Nat) → x₁ &lt; x → Nat → Nat) (y : Nat) : Nat :=
+  if h : 0 &lt; y ∧ y ≤ x then
+    (f (x - y) (div_lemma h) y) + 1
+  else
+    zero
+
+noncomputable def div := WellFounded.fix (measure id).wf div.F
+
+#reduce div 8 2 -- 4
+</code></pre>
+<p>この定義はやや分かりにくい。ここで再帰は <code>x</code> に対して行われ、<code>div.F x f : Nat → Nat</code> はその固定された <code>x</code> に対する「<code>y</code> で割る」関数を返す。再帰のレシピである <code>div.F</code> の第2引数 <code>f</code> は、<code>x</code> より小さい全ての値 <code>x₁</code> に対して「<code>y</code> で割る」関数を返す(と想定される)関数であることを理解する必要がある。</p>
+<p>elaboratorはこのような定義をより便利に作成できるようにデザインされている。次のような定義の書き方が認められる:</p>
+<pre><code class="language-lean">def div (x y : Nat) : Nat :=
+  if h : 0 &lt; y ∧ y ≤ x then
+    have : x - y &lt; x := Nat.sub_lt (Nat.lt_of_lt_of_le h.1 h.2) h.1
+    (div (x - y) y) + 1
+  else
+    0
+</code></pre>
+<p>再帰的な定義に遭遇すると、Leanはまず構造的再帰を試み、それが失敗したときだけ整礎再帰を試みる。Leanは <code>decreasing_tactic</code> というタクティクを使って、再帰適用後の項が元の項より「小さい」ことを示す。上の例の補助命題 <code>x - y &lt; x</code> はこのタクティクのためのヒントとみなされる。</p>
+<p><code>div</code> を定義する等式はdefinitionallyに成立<strong>しない</strong>。しかし、<code>unfold</code> タクティクを使えば <code>div</code> を展開することはできる。<a href="./conv.html"><code>conv</code></a>を使うと、展開したい <code>div</code> 適用後の項を選択できる。</p>
+<pre><code class="language-lean"><span class="boring">def div (x y : Nat) : Nat :=
+</span><span class="boring"> if h : 0 &lt; y ∧ y ≤ x then
+</span><span class="boring">   have : x - y &lt; x := Nat.sub_lt (Nat.lt_of_lt_of_le h.1 h.2) h.1
+</span><span class="boring">   div (x - y) y + 1
+</span><span class="boring"> else
+</span><span class="boring">   0
+</span>example (x y : Nat) : div x y = if 0 &lt; y ∧ y ≤ x then div (x - y) y + 1 else 0 := by
+  conv =&gt; lhs; unfold div -- 等式の左辺の `div` を展開する
+
+example (x y : Nat) (h : 0 &lt; y ∧ y ≤ x) : div x y = div (x - y) y + 1 := by
+  conv =&gt; lhs; unfold div
+  simp [h]
+</code></pre>
+<p>次の例も同様の構文を使って整礎再帰を行う: <code>natToBin</code> は任意の自然数を0と1のリストとして表される2進表記に変換する。まず、再帰適用後の項が元の項より減少する証拠を示さなければならないが、これは <code>sorry</code> で行う。<code>sorry</code> はインタプリタが関数を正常に評価することを妨げるものではない。(訳者注: <code>#eval</code> を使って関数を評価するだけなら証拠は不要ということだと思われる。しかし証拠がない場合、任意の引数 <code>n</code> に対して <code>#eval natToBin n</code> が停止する保証はないと思われる。)</p>
+<pre><code class="language-lean">def natToBin : Nat → List Nat
+  | 0     =&gt; [0]
+  | 1     =&gt; [1]
+  | n + 2 =&gt;
+    have : (n + 2) / 2 &lt; n + 2 := sorry
+    natToBin ((n + 2) / 2) ++ [n % 2]
+
+#eval natToBin 1234567
+</code></pre>
+<p>最後の例として、Leanではアッカーマン関数が本来の定義をそのまま書くだけで定義できることを見る。なぜなら、この整礎再帰は自然数の辞書式順序の整礎性によって正当化されるからである。<code>termination_by</code> キーワードはLeanに辞書式順序を使うように指示している。実際には、このキーワードは関数の2つの引数を <code>Nat × Nat</code> 型の項にマッピングしている。そして、Leanは型クラス解決を使って <code>WellFoundedRelation (Nat × Nat)</code> 型の要素を合成する。</p>
+<pre><code class="language-lean">def ack : Nat → Nat → Nat
+  | 0,   y   =&gt; y+1
+  | x+1, 0   =&gt; ack x 1
+  | x+1, y+1 =&gt; ack x (ack (x+1) y)
+termination_by x y =&gt; (x, y)
+
+#eval ack 3 5
+-- アッカーマン関数は入力値の増加に伴い出力値が急速に増加する関数であり、
+-- 例えば `#eval ack 4 1` などはバッファオーバーフロー等のエラーを引き起こす可能性が高いため、
+-- 実行しないことをお勧めする。
+</code></pre>
+<p>インスタンス <code>WellFoundedRelation (α × β)</code> が辞書式順序を使うため、上の定義の中では辞書式順序が使われていることに注意してほしい。また、Leanは標準ライブラリ内で次のインスタンス <code>instWellFoundedRelation</code> も定義している。</p>
+<pre><code class="language-lean">instance (priority := low) [SizeOf α] : WellFoundedRelation α :=
+  sizeOfWFRel
+</code></pre>
+<p>次の例では、<code>as.size - i</code> が再帰適用によって減少することを示すことで、<code>go</code> の停止性を証明する。</p>
+<pre><code class="language-lean">-- Array `as` を先頭から見て、
+-- `as` の要素 `a` が `p a` を満たす限りArray `r` に `a` を追加し、`r` を返す関数
+def takeWhile (p : α → Bool) (as : Array α) : Array α :=
+  go 0 #[]
+where
+  go (i : Nat) (r : Array α) : Array α :=
+    if h : i &lt; as.size then
+      let a := as.get ⟨i, h⟩
+      if p a then
+        go (i+1) (r.push a)
+      else
+        r
+    else
+      r
+termination_by as.size - i
+
+#eval takeWhile (fun n : Nat =&gt; if n % 2 = 1 then true else false) #[1, 3, 5, 6, 7]
+</code></pre>
+<p>この例では、補助関数 <code>go</code> は再帰的だが、<code>takeWhile</code> は再帰的でないことに注意してほしい。</p>
+<p>デフォルトでは、Leanは <code>decreasing_tactic</code> タクティクを使って再帰適用後の項が元の項より小さいことを証明する。<code>decreasing_by</code> 修飾子を使うと、独自のタクティクを提供することができる。以下はその例である。</p>
+<pre><code class="language-lean">theorem div_lemma {x y : Nat} : 0 &lt; y ∧ y ≤ x → x - y &lt; x :=
+  fun ⟨ypos, ylex⟩ =&gt; Nat.sub_lt (Nat.lt_of_lt_of_le ypos ylex) ypos
+
+def div (x y : Nat) : Nat :=
+  if h : 0 &lt; y ∧ y ≤ x then
+    div (x - y) y + 1
+  else
+    0
+decreasing_by apply div_lemma; assumption
+</code></pre>
+<p><code>decreasing_by</code> は <code>termination_by</code> を置き換えるものではなく、互いに補完し合うものである。<code>termination_by</code> は整礎関係を指定するのに使われ、<code>decreasing_by</code> は再帰適用後の項が元の項より小さいことを示すために独自のタクティクを提供するために使われる。次の例ではその両方を使う。</p>
+<pre><code class="language-lean">def ack : Nat → Nat → Nat
+  | 0,   y   =&gt; y+1
+  | x+1, 0   =&gt; ack x 1
+  | x+1, y+1 =&gt; ack x (ack (x+1) y)
+termination_by x y =&gt; (x, y)
+decreasing_by
+  all_goals simp_wf -- unfolds well-founded recursion auxiliary definitions
+  · apply Prod.Lex.left; simp_arith
+  · apply Prod.Lex.right; simp_arith
+  · apply Prod.Lex.left; simp_arith
+</code></pre>
+<p><code>decreasing_by sorry</code> を使えば、Leanに関数が停止することを「信じ」させることができる。</p>
+<pre><code class="language-lean">def natToBin : Nat → List Nat
+  | 0     =&gt; [0]
+  | 1     =&gt; [1]
+  | n + 2 =&gt; natToBin ((n + 2) / 2) ++ [n % 2]
+decreasing_by sorry
+
+#eval natToBin 1234567
+</code></pre>
+<p><code>sorry</code> を使うことは新しい公理を導入することと同じであり、避けるべきであることを思い出してほしい。次の例では、<code>sorry</code> を使って <code>False</code> を証明した。コマンド <code>#print axioms</code> は、<code>unsound</code> が <code>sorry</code> を実装するために使われている不健全な公理 <code>sorryAx</code> に依存していることを示す。</p>
+<pre><code class="language-lean">def unsound (x : Nat) : False :=
+  unsound (x + 1)
+decreasing_by sorry
+
+#check unsound 0
+-- `unsound 0` is a proof of `False`
+
+#print axioms unsound
+-- 'unsound' depends on axioms: [sorryAx]
+</code></pre>
+<p>要約:</p>
+<ul>
+<li>
+<p><code>termination_by</code> がない場合、Leanはある引数を選択し、型クラス解決を使って選択した引数の型上の整礎関係を合成することで、(可能であれば)整礎関係が導出される。</p>
+</li>
+<li>
+<p><code>termination_by</code> が指定されている場合、<code>termination_by</code> は関数の引数を <code>α</code> 型にマッピングし、再び型クラス解決が使われる。<code>β × γ</code> に関するデフォルトインスタンスは <code>β</code> と <code>γ</code> 上の整礎関係に基づいた辞書式順序であることを思い出してほしい。</p>
+</li>
+<li>
+<p><code>Nat</code> に関するデフォルトの整礎関係インスタンスは <code>&lt;</code> である。</p>
+</li>
+<li>
+<p>デフォルトでは、選択された整礎関係について、再帰適用後の項が元の項より小さいことを示すために <code>decreasing_tactic</code> タクティクが使われる。<code>decreasing_tactic</code> が失敗した場合に表示されるエラーメッセージは残りのゴール <code>... |- G</code> を含む。<code>decreasing_tactic</code> は <code>assumption</code> タクティクを使うことに注意。つまり、<code>have</code> 式を使ってコンテキストに仮説を追加することがターゲット <code>G</code> の証明の役に立つことがある。<code>decreasing_by</code> を使って独自のタクティクを提供することもできる。</p>
+</li>
+</ul>
+<h2 id="mutual-recursion-相互再帰"><a class="header" href="#mutual-recursion-相互再帰">Mutual Recursion (相互再帰)</a></h2>
+<p>Leanは<em>mutual recursive definitions</em>(相互再帰的定義)もサポートしている。その構文は相互帰納型と似ている。以下に例を挙げる:</p>
+<pre><code class="language-lean">mutual
+  def even : Nat → Bool
+    | 0   =&gt; true
+    | n+1 =&gt; odd n
+
+  def odd : Nat → Bool
+    | 0   =&gt; false
+    | n+1 =&gt; even n
+end
+
+example : even (a + 1) = odd a := by
+  simp [even]
+
+example : odd (a + 1) = even a := by
+  simp [odd]
+
+theorem even_eq_not_odd : ∀ a, even a = not (odd a) := by
+  intro a; induction a
+  . simp [even, odd]
+  . simp [even, odd, *]
+</code></pre>
+<p><code>even</code> は <code>odd</code> を用いて定義され、<code>odd</code> は <code>even</code> を用いて定義されているため、この定義は相互定義になっている。内部では、この定義は単一の再帰的定義としてコンパイルされる。内部で定義された関数は、直和型の項を引数として取る。直和型の項の片側は <code>even</code> への入力、もう片側は <code>odd</code> への入力と解釈される。そして、入力に適した出力を返す。この関数を定義するために、Leanは適切な整礎関係を使用するが、その内部はユーザーから隠されている。このような定義を利用する正規の方法は、前節でやったように <code>simp</code> または <code>unfold</code> を使うことである。</p>
+<p>また、相互再帰的定義は相互帰納型および入れ子帰納型を扱う自然な方法を提供する。前章で示した、相互帰納述語型としての <code>Even</code> と <code>Odd</code> の定義を思い出してほしい。</p>
+<pre><code class="language-lean">mutual
+  inductive Even : Nat → Prop where
+    | even_zero : Even 0
+    | even_succ : ∀ n, Odd n → Even (n + 1)
+
+  inductive Odd : Nat → Prop where
+    | odd_succ : ∀ n, Even n → Odd (n + 1)
+end
+</code></pre>
+<p>コンストラクタ <code>even_zero</code>、<code>even_succ</code>、<code>odd_succ</code> はある自然数が偶数か奇数かを示す積極的な手段を提供する。0が奇数でないこと、そして後の2つのコンストラクタの意味が逆であることを知るには、この相互帰納型がこれらのコンストラクタによって生成されたという事実を使う必要がある。いつものように、コンストラクタは定義された型の名前を持つ名前空間に保管されており、コマンド <code>open Even Odd</code> を使えば、コンストラクタに便利にアクセスできるようになる。</p>
+<pre><code class="language-lean"><span class="boring">mutual
+</span><span class="boring"> inductive Even : Nat → Prop where
+</span><span class="boring">   | even_zero : Even 0
+</span><span class="boring">   | even_succ : ∀ n, Odd n → Even (n + 1)
+</span><span class="boring"> inductive Odd : Nat → Prop where
+</span><span class="boring">   | odd_succ : ∀ n, Even n → Odd (n + 1)
+</span><span class="boring">end
+</span>open Even Odd
+
+theorem not_odd_zero : ¬ Odd 0 :=
+  fun h =&gt; nomatch h
+
+theorem even_of_odd_succ : ∀ n, Odd (n + 1) → Even n
+  | _, odd_succ n h =&gt; h
+
+theorem odd_of_even_succ : ∀ n, Even (n + 1) → Odd n
+  | _, even_succ n h =&gt; h
+</code></pre>
+<p>別の例を挙げる。入れ子帰納型を使って、型 <code>Term</code> の項を帰納的に定義することを考える。ここで、<code>Term</code> の項は定数(文字列によって与えられる名前を持つ)か、定数のリストに定数を適用した結果のどちらかになるとする。</p>
+<pre><code class="language-lean">inductive Term where
+  | const : String → Term
+  | app   : String → List Term → Term
+</code></pre>
+<p>そして、相互再帰を使って、各項の中に登場する定数の数を数える関数と、項のリストの中に登場する要素の数を数える関数を定義することができる。</p>
+<pre><code class="language-lean"><span class="boring">inductive Term where
+</span><span class="boring"> | const : String → Term
+</span><span class="boring"> | app   : String → List Term → Term
+</span>namespace Term
+
+mutual
+  def numConsts : Term → Nat
+    | const _ =&gt; 1
+    | app _ cs =&gt; numConstsLst cs
+
+  def numConstsLst : List Term → Nat
+    | [] =&gt; 0
+    | c :: cs =&gt; numConsts c + numConstsLst cs
+end
+
+def sample := app &quot;f&quot; [app &quot;g&quot; [const &quot;x&quot;], const &quot;y&quot;]
+def sample2 := [app &quot;g&quot; [const &quot;x&quot;, const &quot;y&quot;], const &quot;y&quot;]
+
+#eval numConsts sample
+#eval numConstsLst sample2
+
+end Term
+</code></pre>
+<p>最後の例として、項 <code>e</code> 内の定数 <code>a</code> を <code>b</code> に置き換える関数 <code>replaceConst a b e</code> を定義し、<code>e</code> が持つ定数の個数と <code>replaceConst a b e</code> が持つ定数の個数が同じであることを証明する。この証明は、相互帰納法を使っていることに注意してほしい。</p>
+<pre><code class="language-lean"><span class="boring">inductive Term where
+</span><span class="boring"> | const : String → Term
+</span><span class="boring"> | app   : String → List Term → Term
+</span><span class="boring">namespace Term
+</span><span class="boring">mutual
+</span><span class="boring"> def numConsts : Term → Nat
+</span><span class="boring">   | const _ =&gt; 1
+</span><span class="boring">   | app _ cs =&gt; numConstsLst cs
+</span><span class="boring">  def numConstsLst : List Term → Nat
+</span><span class="boring">   | [] =&gt; 0
+</span><span class="boring">   | c :: cs =&gt; numConsts c + numConstsLst cs
+</span><span class="boring">end
+</span>mutual
+  def replaceConst (a b : String) : Term → Term
+    | const c =&gt; if a == c then const b else const c
+    | app f cs =&gt; app f (replaceConstLst a b cs)
+
+  def replaceConstLst (a b : String) : List Term → List Term
+    | [] =&gt; []
+    | c :: cs =&gt; replaceConst a b c :: replaceConstLst a b cs
+end
+
+mutual
+  theorem numConsts_replaceConst (a b : String) (e : Term)
+            : numConsts (replaceConst a b e) = numConsts e := by
+    match e with
+    | const c =&gt; simp [replaceConst]; split &lt;;&gt; simp [numConsts]
+    | app f cs =&gt; simp [replaceConst, numConsts, numConsts_replaceConstLst a b cs]
+
+  theorem numConsts_replaceConstLst (a b : String) (es : List Term)
+            : numConstsLst (replaceConstLst a b es) = numConstsLst es := by
+    match es with
+    | [] =&gt; simp [replaceConstLst, numConstsLst]
+    | c :: cs =&gt;
+      simp [replaceConstLst, numConstsLst, numConsts_replaceConst a b c,
+            numConsts_replaceConstLst a b cs]
+end
+</code></pre>
+<h2 id="dependent-pattern-matching-依存パターンマッチング"><a class="header" href="#dependent-pattern-matching-依存パターンマッチング">Dependent Pattern Matching (依存パターンマッチング)</a></h2>
+<p><a href="#pattern-matching-%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">Pattern Matching (パターンマッチング)</a>の節で説明した全ての例は、<code>casesOn</code> と <code>recOn</code> を使って簡単に書くことができる。しかし、<code>Vector α n</code> のような添字付き帰納族では、ケース分割が添字の値に制約を課すため、簡単に書けないことがよくある。もし等式コンパイラが無かったら、再帰子だけを使って <code>map</code>、<code>zip</code>、<code>unzip</code> などの非常に単純な関数を定義するために、多くの定型的なコードが必要になっただろう。その難しさを理解するために、ベクトル <code>v : Vector α (succ n)</code> を受け取り、最初の要素を削除したベクトルを返す関数 <code>tail</code> を定義するためには何が必要かを考えてみよう。まずは、<code>casesOn</code> 関数を使うことが考えられる:</p>
+<pre><code class="language-lean">inductive Vector (α : Type u) : Nat → Type u
+  | nil  : Vector α 0
+  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+
+namespace Vector
+
+#check @Vector.casesOn
+/-
+  {α : Type u}
+  → {motive : (a : Nat) → Vector α a → Sort v} →
+  → {a : Nat} → (t : Vector α a)
+  → motive 0 nil
+  → ((a : α) → {n : Nat} → (a_1 : Vector α n) → motive (n + 1) (cons a a_1))
+  → motive a t
+-/
+
+end Vector
+</code></pre>
+<p>しかし、入力が <code>nil</code> の場合は何を返せばいいだろうか。何かおかしなことが起こっている: <code>v</code> の型が <code>Vector α (succ n)</code> なら、<code>v</code> が <code>nil</code> である<strong>はずがない</strong>。しかし、それを <code>casesOn</code> に伝える方法は明らかではない。</p>
+<p>1つの解決策は、補助関数を定義することである:</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def tailAux (v : Vector α m) : m = n + 1 → Vector α n :=
+  Vector.casesOn (motive := fun x _ =&gt; x = n + 1 → Vector α n) v
+    (fun h : 0 = n + 1 =&gt; Nat.noConfusion h)
+    (fun (a : α) (m : Nat) (as : Vector α m) =&gt;
+     fun (h : m + 1 = n + 1) =&gt;
+       Nat.noConfusion h (fun h1 : m = n =&gt; h1 ▸ as))
+
+def tail (v : Vector α (n+1)) : Vector α n :=
+  tailAux v rfl
+<span class="boring">end Vector
+</span></code></pre>
+<p>補助関数 <code>tailAux</code> において、<code>v</code> が <code>nil</code> の場合、<code>m</code> の値は <code>0</code> に決定し、<code>noConfusion</code> は <code>0 = succ n</code> は成立しえないという事実を使う。そうでなければ、<code>v</code> は <code>a :: w</code> の形をとり、<code>w</code> を長さ <code>m</code> のベクトルから長さ <code>n</code> のベクトルへキャストした後、単純に <code>w</code> を返すことができる(<code>h1 ▸ as</code>)。</p>
+<p><code>tail</code> を定義する上で難しいのは、添字間の関係を維持することである。<code>tailAux</code> 内の仮説 <code>e : m = n + 1</code> は、<code>n</code> と小前提(<code>Vector.casesOn</code> の4番目と5番目の引数)に関連した添字(<code>0</code> と <code>m + 1</code>)の関係を <code>noConfusion</code> 等に伝えるために使われる。さらに、<code>zero = n + 1</code> のケースは到達不能である。このようなケースを破棄する正規の方法は <code>noConfusion</code> を使うことである。</p>
+<p>しかし、実際は <code>tail</code> 関数は再帰を使って簡単に定義できる。そして、等式コンパイラが全ての定型コードを自動的に生成してくれる。似た例をいくつか紹介しよう:</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def head : {n : Nat} → Vector α (n+1) → α
+  | n, cons a as =&gt; a
+
+def tail : {n : Nat} → Vector α (n+1) → Vector α n
+  | n, cons a as =&gt; as
+
+theorem eta : ∀ {n : Nat} (v : Vector α (n+1)), cons (head v) (tail v) = v
+  | n, cons a as =&gt; rfl
+
+def map (f : α → β → γ) : {n : Nat} → Vector α n → Vector β n → Vector γ n
+  | 0,   nil,       nil       =&gt; nil
+  | n+1, cons a as, cons b bs =&gt; cons (f a b) (map f as bs)
+
+def zip : {n : Nat} → Vector α n → Vector β n → Vector (α × β) n
+  | 0,   nil,       nil       =&gt; nil
+  | n+1, cons a as, cons b bs =&gt; cons (a, b) (zip as bs)
+<span class="boring">end Vector
+</span></code></pre>
+<p>再帰的定義において、<code>head nil</code> のような「到達不能」なケースはケースリストから除外できることに注意してほしい。自動生成される添字付き帰納族の定義は単純とは言いがたいものである。次の例について、<code>#print</code> コマンドの出力を見てほしい:</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def map (f : α → β → γ) : {n : Nat} → Vector α n → Vector β n → Vector γ n
+  | 0,   nil,       nil       =&gt; nil
+  | n+1, cons a as, cons b bs =&gt; cons (f a b) (map f as bs)
+
+#print map
+#print map.match_1
+<span class="boring">end Vector
+</span></code></pre>
+<p><code>map</code> 関数を手で定義するのは <code>tail</code> 関数よりもさらに面倒である。自信のある人は <code>recOn</code>、<code>casesOn</code>、<code>noConfusion</code> を使って <code>map</code> 関数を手作りしてみてほしい。</p>
+<h2 id="inaccessible-patterns-アクセス不能パターン"><a class="header" href="#inaccessible-patterns-アクセス不能パターン">Inaccessible Patterns (アクセス不能パターン)</a></h2>
+<p>依存パターンマッチングにおいて、項の型を適切に特殊化するために、定義には必要のない引数を含まなければならない場合がある。Leanでは、このような補助項を、パターンマッチングにおいて<em>inaccessible</em>(アクセス不能)なものとしてマークすることができる。例えば、左辺に出現する項が変数単体でも変数にコンストラクタを適用したものでもない場合、これらの注釈は不可欠である。なぜなら、それらの項はパターンマッチングにおいて不適切なターゲットだからである。このようなアクセス不能パターンは、ケースの左辺の<em>don't care</em>な構成要素とみなすことができる。<code>.(t)</code> と書くことで、補助項へのアクセスが不能であることを宣言することができる。アクセス不能パターンの形が推論できる場合は、<code>_</code> と書いてもよい。</p>
+<p>次の例では、「<code>f</code> のimage(像)の中にある」という性質を定義する帰納型を宣言する。型 <code>ImageOf f b</code> の項は、<code>b</code> が <code>f</code> の像の中にあることの証拠だと見なすことができる。コンストラクタ <code>imf</code> はそのような証拠を構築するために使われる。それから、<code>f</code> の像の中にある項 <code>b</code> を受け取り、証拠 <code>imf a</code> に基づいて、<code>f</code> によって <code>b</code> にマップされた要素の1つ <code>a</code> を返す「逆関数」を持つ関数 <code>f</code> を定義することができる。型付けのルールに従うと、最初の引数を <code>f a</code> と書かなければならないが、この項は変数単体でも変数にコンストラクタを適用したものでもないため、パターンマッチングを用いた定義において何の役割も果たさない。以下の逆関数 <code>inverse</code> を定義するためには、<code>f a</code> にアクセス不能であるとマーク<strong>しなければならない</strong>。</p>
+<pre><code class="language-lean">inductive ImageOf {α β : Type u} (f : α → β) : β → Type u where
+  | imf : (a : α) → ImageOf f (f a)
+
+open ImageOf
+
+/-
+def bad_inverse {f : α → β} : (b : β) → ImageOf f b → α
+  | b, imf a =&gt; a  -- `imf a` has type `ImageOf f (f a)` but is expected to have type `ImageOf f b`
+
+def bad_inverse' {f : α → β} : (b : β) → ImageOf f b → α
+  | f a, imf a =&gt; a  -- invalid pattern
+-/
+
+def inverse {f : α → β} : (b : β) → ImageOf f b → α
+  | .(f a), imf a =&gt; a
+
+def inverse' {f : α → β} : (b : β) → ImageOf f b → α
+  | _, imf a =&gt; a
+</code></pre>
+<p>上記の例では、アクセス不能注釈は <code>f</code> がパターンマッチング対象の変数では<strong>ない</strong>ことを明確にしている。</p>
+<p>アクセス不能パターンは、依存パターンマッチングを利用する定義を明確にし、制御するために使用することができる。ある型 <code>α</code> に関連する加法演算があると仮定して、<code>α</code> の項を要素に持つ2つのベクトルを足し合わせる関数 <code>Vector.add</code> を定義することを考えてみよう:</p>
+<pre><code class="language-lean">inductive Vector (α : Type u) : Nat → Type u
+  | nil  : Vector α 0
+  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+
+namespace Vector
+
+def add [Add α] : {n : Nat} → Vector α n → Vector α n → Vector α n
+  | 0,   nil,       nil       =&gt; nil
+  | n+1, cons a as, cons b bs =&gt; cons (a + b) (add as bs)
+
+end Vector
+</code></pre>
+<p>引数 <code>{n : Nat}</code> はコロンの後に現れるが、これはパターンマッチングを用いた定義内で <code>n</code> を固定し続けることができないからである。この定義を実装したとき、等式コンパイラは最初の引数が <code>0</code> か <code>n+1</code> の形をとるかのケース判別から始める。続いて、次の2つの引数についてネストされたケース判別がなされる。それぞれのケースについて、等式コンパイラは最初の引数 <code>n</code> のパターンと整合性のないケースを除外する(例えば、<code>n+1, nil, nil</code> というパターンたちを持つケースを除外する)。</p>
+<p>しかし、実際には最初の引数 <code>n</code> についてケース判別をする必要はない。<code>Vector</code> の <code>casesOn</code> エリミネータは2番目の引数でケース判別をするときに、引数 <code>n</code> の値を自動的に抽象化して <code>0</code> か <code>n + 1</code> に置き換える。アクセス不能パターンを使うことで、等式コンパイラに <code>n</code> でのケース判別を避けるように促すことができる。</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def add [Add α] : {n : Nat} → Vector α n → Vector α n → Vector α n
+  | .(_), nil,       nil       =&gt; nil
+  | .(_), cons a as, cons b bs =&gt; cons (a + b) (add as bs)
+<span class="boring">end Vector
+</span></code></pre>
+<p>この位置をアクセス不能パターンとしてマークすることは、等式コンパイラに次の2つのことを伝える。第一に、最初の引数の形式は他の引数によってもたらされる制約から推論されるべきである。第二に、最初の引数はパターンマッチングに参加すべきでは<strong>ない</strong>。</p>
+<p>アクセス不能パターン <code>.(_)</code> は簡便のため <code>_</code> と書くことができる。</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def add [Add α] : {n : Nat} → Vector α n → Vector α n → Vector α n
+  | _, nil,       nil       =&gt; nil
+  | _, cons a as, cons b bs =&gt; cons (a + b) (add as bs)
+<span class="boring">end Vector
+</span></code></pre>
+<p>上述したように、引数 <code>{n : Nat}</code> は定義内で固定し続けることができないため、パターンマッチングの一部のならざるを得ない。Leanの以前のバージョンでは、ユーザーはこのような余分な判別子を含めなければならないことが面倒だとしばしば感じていた。そこで、Lean 4は新機能<em>discriminant refinement</em>(判別子の絞り込み)を実装した。この機能は余分な判別子を自動でパターンマッチングに含める。</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def add [Add α] {n : Nat} : Vector α n → Vector α n → Vector α n
+  | nil,       nil       =&gt; nil
+  | cons a as, cons b bs =&gt; cons (a + b) (add as bs)
+<span class="boring">end Vector
+</span></code></pre>
+<p><em>auto bound implicits</em>(自動束縛暗黙引数)機能と組み合わせると、<code>add</code> の定義をより簡潔に書くことができる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def add [Add α] : Vector α n → Vector α n → Vector α n
+  | nil,       nil       =&gt; nil
+  | cons a as, cons b bs =&gt; cons (a + b) (add as bs)
+<span class="boring">end Vector
+</span></code></pre>
+<p>これらの新機能を使うことで、前節で定義した他のベクトル関数を次のようによりコンパクトに書くことができる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Vector (α : Type u) : Nat → Type u
+</span><span class="boring">  | nil  : Vector α 0
+</span><span class="boring">  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+</span><span class="boring">namespace Vector
+</span>def head : Vector α (n+1) → α
+  | cons a as =&gt; a
+
+def tail : Vector α (n+1) → Vector α n
+  | cons a as =&gt; as
+
+theorem eta : (v : Vector α (n+1)) → cons (head v) (tail v) = v
+  | cons a as =&gt; rfl
+
+def map (f : α → β → γ) : Vector α n → Vector β n → Vector γ n
+  | nil,       nil       =&gt; nil
+  | cons a as, cons b bs =&gt; cons (f a b) (map f as bs)
+
+def zip : Vector α n → Vector β n → Vector (α × β) n
+  | nil,       nil       =&gt; nil
+  | cons a as, cons b bs =&gt; cons (a, b) (zip as bs)
+<span class="boring">end Vector
+</span></code></pre>
+<h2 id="match-expressions-マッチ式"><a class="header" href="#match-expressions-マッチ式">Match Expressions (マッチ式)</a></h2>
+<p>Leanは、多くの関数型言語で見られる<em>match-with</em>式のコンパイラも提供している。</p>
+<pre><code class="language-lean">def isNotZero (m : Nat) : Bool :=
+  match m with
+  | 0   =&gt; false
+  | n+1 =&gt; true
+</code></pre>
+<p><code>match</code> は普通のパターンマッチングによる定義とあまり変わらないように見える。しかし、<code>match</code> のポイントは、定義内のどこでも使えることと、任意の引数に対して使えることである。</p>
+<pre><code class="language-lean">def isNotZero (m : Nat) : Bool :=
+  match m with
+  | 0   =&gt; false
+  | n+1 =&gt; true
+
+def filter (p : α → Bool) : List α → List α
+  | []      =&gt; []
+  | a :: as =&gt;
+    match p a with
+    | true =&gt; a :: filter p as
+    | false =&gt; filter p as
+
+example : filter isNotZero [1, 0, 0, 3, 0] = [1, 3] := rfl
+</code></pre>
+<p>別の例を挙げる:</p>
+<pre><code class="language-lean">def foo (n : Nat) (b c : Bool) :=
+  5 + match n - 5, b &amp;&amp; c with
+      | 0,   true  =&gt; 0
+      | m+1, true  =&gt; m + 7
+      | 0,   false =&gt; 5
+      | m+1, false =&gt; m + 3
+
+#eval foo 7 true false
+
+example : foo 7 true false = 9 := rfl
+</code></pre>
+<p>Leanは、システムの全ての部分で、パターンマッチングを実装するために内部で <code>match</code> 式を使用する。したがって、以下の4つの定義は全て同じ効果を持つ。</p>
+<pre><code class="language-lean">def bar₁ : Nat × Nat → Nat
+  | (m, n) =&gt; m + n
+
+def bar₂ (p : Nat × Nat) : Nat :=
+  match p with
+  | (m, n) =&gt; m + n
+
+def bar₃ : Nat × Nat → Nat :=
+  fun (m, n) =&gt; m + n
+
+def bar₄ (p : Nat × Nat) : Nat :=
+  let (m, n) := p; m + n
+</code></pre>
+<p>命題を分解する際には、上記の変形版が役に立つ:</p>
+<pre><code class="language-lean">variable (p q : Nat → Prop)
+
+example : (∃ x, p x) → (∃ y, q y) → ∃ x y, p x ∧ q y
+  | ⟨x, px⟩, ⟨y, qy⟩ =&gt; ⟨x, y, px, qy⟩
+
+example (h₀ : ∃ x, p x) (h₁ : ∃ y, q y)
+        : ∃ x y, p x ∧ q y :=
+  match h₀, h₁ with
+  | ⟨x, px⟩, ⟨y, qy⟩ =&gt; ⟨x, y, px, qy⟩
+
+example : (∃ x, p x) → (∃ y, q y) → ∃ x y, p x ∧ q y :=
+  fun ⟨x, px⟩ ⟨y, qy⟩ =&gt; ⟨x, y, px, qy⟩
+
+example (h₀ : ∃ x, p x) (h₁ : ∃ y, q y)
+        : ∃ x y, p x ∧ q y :=
+  let ⟨x, px⟩ := h₀
+  let ⟨y, qy⟩ := h₁
+  ⟨x, y, px, qy⟩
+</code></pre>
+<h2 id="exercises-練習問題"><a class="header" href="#exercises-練習問題">Exercises (練習問題)</a></h2>
+<ol>
+<li>
+<p>名前の衝突を避けるために名前空間 <code>Hidden</code> を開き、等式コンパイラを使って自然数上の加法、乗法、べき乗を定義せよ。次に、等式コンパイラを使って、それらの基本的な性質を証明せよ。</p>
+</li>
+<li>
+<p>同様に、等式コンパイラを使ってリストに対する基本的な操作(<code>reverse</code> 関数など)を定義し、リストに関する定理を帰納法で証明せよ。例えば、任意のリストに対して、<code>reverse (reverse xs) = xs</code> となることを示せ。</p>
+</li>
+<li>
+<p>累積再帰を実行する自然数上の関数を自分で定義せよ。同様に、<code>WellFounded.fix</code> を自分で定義する方法を見つけられるか試してみよ。</p>
+</li>
+<li>
+<p>節<a href="#dependent-pattern-matching-%E4%BE%9D%E5%AD%98%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">Dependent Pattern Matching (依存パターンマッチング)</a>の例に従って、2つのベクトル <code>va</code> <code>vb</code> を受け取り、<code>va</code> の末尾に <code>vb</code> を追加したベクトルを返す関数を定義せよ。これは厄介で、補助関数を定義しなければならないだろう。</p>
+</li>
+<li>
+<p>次のような算術式の型を考える。ここで、<code>var n</code> は変数 <code>vₙ</code>を、<code>const n</code> は値が <code>n</code> である定数を表す。</p>
+</li>
+</ol>
+<pre><code class="language-lean">inductive Expr where
+  | const : Nat → Expr
+  | var : Nat → Expr
+  | plus : Expr → Expr → Expr
+  | times : Expr → Expr → Expr
+  deriving Repr
+
+open Expr
+
+def sampleExpr : Expr :=
+  plus (times (var 0) (const 7)) (times (const 2) (var 1))
+</code></pre>
+<p>ここで、<code>sampleExpr</code> は <code>(v₀ * 7) + (2 * v₁)</code> を表す。</p>
+<p>各 <code>var n</code> を <code>v n</code> に評価した上で、このような式(<code>Expr</code> の項)を評価する関数を書け。</p>
+<pre><code class="language-lean"><span class="boring">inductive Expr where
+</span><span class="boring">  | const : Nat → Expr
+</span><span class="boring">  | var : Nat → Expr
+</span><span class="boring">  | plus : Expr → Expr → Expr
+</span><span class="boring">  | times : Expr → Expr → Expr
+</span><span class="boring">  deriving Repr
+</span><span class="boring">open Expr
+</span><span class="boring">def sampleExpr : Expr :=
+</span><span class="boring">  plus (times (var 0) (const 7)) (times (const 2) (var 1))
+</span>def eval (v : Nat → Nat) : Expr → Nat
+  | const n     =&gt; sorry
+  | var n       =&gt; v n
+  | plus e₁ e₂  =&gt; sorry
+  | times e₁ e₂ =&gt; sorry
+
+def sampleVal : Nat → Nat
+  | 0 =&gt; 5
+  | 1 =&gt; 6
+  | _ =&gt; 0
+
+-- 次のコマンドを実行せよ。`47` が出力されたら正解である。
+-- #eval eval sampleVal sampleExpr
+</code></pre>
+<p>補助関数 <code>simpConst</code> を使って、<code>5 + 7</code> のような部分項を <code>12</code> に単純化する「定数融合関数」<code>fuse</code> を実装せよ。<code>plus</code> や <code>times</code> を単純化するために、まず引数を再帰的に単純化せよ。次に <code>simpConst</code> を適用して結果の単純化を試みよ。</p>
+<pre><code class="language-lean"><span class="boring">inductive Expr where
+</span><span class="boring">  | const : Nat → Expr
+</span><span class="boring">  | var : Nat → Expr
+</span><span class="boring">  | plus : Expr → Expr → Expr
+</span><span class="boring">  | times : Expr → Expr → Expr
+</span><span class="boring">  deriving Repr
+</span><span class="boring">open Expr
+</span><span class="boring">def eval (v : Nat → Nat) : Expr → Nat
+</span><span class="boring">  | const n     =&gt; sorry
+</span><span class="boring">  | var n       =&gt; v n
+</span><span class="boring">  | plus e₁ e₂  =&gt; sorry
+</span><span class="boring">  | times e₁ e₂ =&gt; sorry
+</span>def simpConst : Expr → Expr
+  | plus (const n₁) (const n₂)  =&gt; const (n₁ + n₂)
+  | times (const n₁) (const n₂) =&gt; const (n₁ * n₂)
+  | e                           =&gt; e
+
+def fuse : Expr → Expr := sorry
+
+theorem simpConst_eq (v : Nat → Nat)
+        : ∀ e : Expr, eval v (simpConst e) = eval v e :=
+  sorry
+
+theorem fuse_eq (v : Nat → Nat)
+        : ∀ e : Expr, eval v (fuse e) = eval v e :=
+  sorry
+</code></pre>
+<p>最後の2つの定理は、<code>simpConst</code> や <code>fuse</code> が式の値を保存することを表す。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="inductive_types.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="structures_and_records.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="inductive_types.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="structures_and_records.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>

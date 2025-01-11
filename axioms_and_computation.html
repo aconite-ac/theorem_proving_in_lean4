@@ -1,0 +1,861 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>公理と計算 - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html" class="active"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="axioms-and-computation-公理と計算"><a class="header" href="#axioms-and-computation-公理と計算">Axioms and Computation (公理と計算)</a></h1>
+<p>Leanに実装された<em>Calculus of Constructions</em>には、依存関数型、帰納型、そして最下層にある<em>impredicative</em>(非可述的)で<em>proof-irrelevant</em>(証明無関係)な <code>Prop</code> 型から始まる宇宙の階層が含まれていることを見てきた。本章では、Leanに実装されている<em>Calculus of Inductive Constructions</em>(CIC)に公理と規則を追加して、CICを拡張する方法を考える。このような方法で基礎体系を拡張することは、多くの場合便利である。基礎体系を拡張することで、より多くの定理を証明することが可能になるか、そうでなければ以前は簡単に証明できなかった定理を簡単に証明できるようになる。しかし、公理を追加することで、その正しさ(無矛盾性)に関する懸念の増大以上の否定的な結果が生じることもある。特に、追加した公理の使用は、以下で紹介するように定義と定理の計算内容に影響する。</p>
+<p>Leanは計算的推論と古典論理的推論の両方をサポートするように設計されている。望むなら、ユーザーは<em>computationally pure</em>(計算上純粋)なフラグメントだけを使うことができ、そうすればシステム内の全ての閉じた式が<em>canonical normal form</em>(正規標準形)に評価されることが保証される。特に、例えば <code>Nat</code> 型の計算上純粋な閉じた式は、全て数字に簡約される。</p>
+<p>Leanの標準ライブラリでは、<em>propositional extensionality</em>(命題外延性)という追加の公理と、<em>function extensionality</em>(関数外延性)の原理を含意する<em>quotient</em>(商)の構築が定義されている。これらの公理の拡張は、例えば集合や有限集合の理論を開発するために利用される。これらの公理やそれらに依存する定理を使うと、Leanのカーネルにおける項評価がブロックされ、<code>Nat</code> 型の閉項が数字に評価されなくなることがあることを以下で見る。しかし、これらの公理は新しい命題(の証明項)を(無条件に)追加するだけであり、Leanは仮想マシン評価器用のバイトコード(中間コード)に定義をコンパイルする際に型と命題の情報を消去するため、これらの公理は計算的解釈と両立する。計算に傾倒したユーザーであっても、計算における推論を行うために古典的な排中律を使いたいと思うかもしれない。排中律もカーネルでの項評価をブロックするが、排中律は定義のバイトコードへのコンパイルと両立する。</p>
+<p>また、標準ライブラリは、計算的解釈とは全く相反する<em>choice principle</em>(選択原理)も定義している。選択原理は「データ(証明以外の項)」の存在を主張する命題から魔法のようにデータを生成することができ、便利だからである。いくつかの古典的な構文を使うには選択原理が必須であり、ユーザーは必要なときに選択原理をインポートすることができる。しかし、古典的な構文を使ってデータを生成する式は、計算可能な内容を持っていない。Leanでは、その事実を示すために、このような定義を <code>noncomputable</code> とマークする必要がある。</p>
+<p>(<em>Diaconescu's theorem</em>として知られる)巧妙なトリックを使うと、命題外延性、関数外延性、選択原理から排中律を導くことができる。しかし、上述の通り、データを作るために使用されない限り、排中律や他の古典的な原理の使用はバイトコードコンパイルやコード抽出と両立する。(訳者注: 上記の公理たちに関して言えば、データを作るために古典的な原理を使用したときに限り計算不可能になる。)</p>
+<p>要約すると、宇宙、依存関数型、帰納型という基本的なフレームワークの上に、標準ライブラリはさらに3つの公理を追加している:</p>
+<ul>
+<li>命題外延性の公理 <code>propext</code></li>
+<li>商型 <code>Quot</code> の構築 : 関数外延性 <code>funext</code> を含意する</li>
+<li>選択原理 <code>Classical.choice</code> : 存在命題 <code>Nonempty α</code> からデータ <code>a : α</code> を生成する</li>
+</ul>
+<p>ここで、最初の2つはLeanにおける項の正規化をブロックするが、バイトコード評価とは両立する。一方で、3つ目は計算的に解釈することができない。以下でこれらの詳細について述べる。</p>
+<h2 id="historical-and-philosophical-context-歴史的文脈と哲学的文脈"><a class="header" href="#historical-and-philosophical-context-歴史的文脈と哲学的文脈">Historical and Philosophical Context (歴史的文脈と哲学的文脈)</a></h2>
+<p>数学の歴史の大半において、数学は本質的に計算可能なものであった: 幾何学は幾何学的なオブジェクトの作図を扱い、代数学は連立方程式の計算可能な解法と関係があり、解析学は時間発展する物理系の将来の振る舞いを計算する手段を提供した。「任意の <code>x</code> について、...を満たす <code>y</code> が存在する(<code>∀ x, ∃ y, ...</code>)」という定理の証明から、<code>x</code> が与えられたときにそのような <code>y</code> を計算するアルゴリズムを抽出するのは、一般的に簡単なことだった。</p>
+<p>しかし、19世紀になり数学的議論の複雑さが増すと、数学者たちはアルゴリズム的情報を必須としない、数学的対象の具体的な表現方法の詳細を抽象化した数学的対象の記述を使う新たな推論様式を開発した。その目的は計算の細部に拘泥することなく強力な「概念的」理解を得ることだったが、結果として直観的で計算可能な体系では単に<strong>偽</strong>である数学的定理を認めることになった。</p>
+<p>今日においても、計算が数学にとって重要であることはほとんど一律に合意されている。しかし、計算にまつわる問題にどのように対処するのが最善かについては、様々な見解がある。<em>constructive</em>(構成的)な観点からすれば、数学をその計算的ルーツから切り離すのは間違いである: 全ての意味のある数学の定理は、直観的で計算的な解釈を持つべきである。<em>classical</em>(古典的)な観点からすると、問題の分離を維持した方が有益である: 私たちは、プログラムについて推論するために非構成的な理論やメソッドを使う自由を維持しながら、コンピュータプログラムを書くためにある言語と付属するメソッドを使うことができる。Leanは構成的アプローチと古典的アプローチの両方をサポートするように設計されている。ライブラリのコア部分は構成的に開発されている(そのため古典的な原理を使わない選択ができる)が、システムは古典的な数学的推論を行うためのサポートも提供している。</p>
+<p>依存型理論の最も計算上純粋な部分は <code>Prop</code> 型の使用を完全に避けている。帰納型と依存関数型はデータ型とみなすことができ、これらの型の項は、これ以上簡約規則を適用できなくなるまで簡約規則を適用することで「評価」することができる。原理的には、<code>Nat</code> 型の任意の閉項(自由変数を持たない項)は <code>succ (succ (... (succ zero)...))</code> という数字に評価されるはずである。</p>
+<p>証明無関係な <code>Prop</code> 型を導入し、定理に <code>irreducible</code> とマークすることは、問題分離への第一歩である。このマークの意図は、型 <code>p : Prop</code> の項は計算において何の役割も果たすべきでないということであり、その意味で項 <code>t : p</code> の具体的な構成は計算に「無関係」である。<code>Prop</code> 型の項を組み込んだ計算可能オブジェクトを定義することはできる。ポイントは、<code>Prop</code> 型の項は「計算結果を推論」する役に立つが、項から「コードを抽出」するときには無視できるということである。しかし、<code>Prop</code> 型の項はまったく無害というわけではない。<code>Prop</code> 型の項には任意の型 <code>α</code> とその項 <code>s : α</code>、<code>t : α</code> に対する等式 <code>s = t : Prop</code> が含まれる。このような等式は項を型チェックするためにキャストとして使用される。以下では、このようなキャストがどのようにシステム内の計算をブロックしうるかの例を見ていく。しかし、命題の内容を消去し、中間の型付け制約を無視し、正規形に達するまで項を簡約する評価枠組みの中では、計算は依然として可能である。これはまさにLeanの仮想マシンが行っていることである。</p>
+<p>証明無関係な <code>Prop</code> を採用した場合、任意の命題 <code>p</code> に対する排中律 <code>p ∨ ¬p</code> を使うことは正当だと考えるかもしれない。もちろん、排中律がCICの規則に従って計算をブロックする可能性はあるが、上述のようにバイトコードの評価をブロックすることはない。Leanの基礎的理論において、計算に無関係な証明と計算に関係するデータの区別を完全に消し去り、データを計算不可能にするのは、節<a href="#choice-%E9%81%B8%E6%8A%9E%E5%8E%9F%E7%90%86">Choice (選択原理)</a>で説明する選択原理だけである。</p>
+<h2 id="propositional-extensionality-命題外延性"><a class="header" href="#propositional-extensionality-命題外延性">Propositional Extensionality (命題外延性)</a></h2>
+<p>命題外延性は次のような公理である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>axiom propext {a b : Prop} : (a ↔ b) → a = b
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>propext</code> は、2つの命題が互いを含意するとき、それらは実際に等しいと主張する公理である。これは命題の集合論的な解釈と一致する。命題の集合論的な解釈において、<code>a : Prop</code> は空であるか、互いに区別されたある元 <code>*</code> のみを含むシングルトン <code>{*}</code> である。この公理は、どのようなコンテキストでも命題をそれと同値な命題に置き換えることができるという効果を持つ:</p>
+<pre><code class="language-lean">theorem thm₁ (a b c d e : Prop) (h : a ↔ b) : (c ∧ a ∧ d → e) ↔ (c ∧ b ∧ d → e) :=
+  propext h ▸ Iff.refl _
+
+theorem thm₂ (a b : Prop) (p : Prop → Prop) (h : a ↔ b) (h₁ : p a) : p b :=
+  propext h ▸ h₁
+
+#print axioms thm₁  -- 'thm₁' depends on axioms: [propext]
+#print axioms thm₂  -- 'thm₂' depends on axioms: [propext]
+</code></pre>
+<!--
+最初の定理は、命題結合子が命題の同値性を保存するという事実を使えば、手間はかかるが ``propext`` なしで証明することができる。2番目の定理はより本質的な ``propext`` の使い方である。実際、2番目の定理は ``propext`` 自体と同値である。
+
+定義や定理が与えられたとき、コマンド ``#print axioms`` を使うと、それらがどの公理に依存しているかを表示させることができる。
+
+.. code-block:: lean
+
+    variables a b c d e : Prop
+    variable p : Prop → Prop
+
+    theorem thm₁ (h : a ↔ b) : (c ∧ a ∧ d → e) ↔ (c ∧ b ∧ d → e) :=
+    propext h ▸ iff.refl _
+
+    theorem thm₂ (h : a ↔ b) (h₁ : p a) : p b :=
+    propext h ▸ h₁
+
+    -- BEGIN
+    #print axioms thm₁  -- propext
+    #print axioms thm₂  -- propext
+    -- END
+-->
+<h2 id="function-extensionality-関数外延性"><a class="header" href="#function-extensionality-関数外延性">Function Extensionality (関数外延性)</a></h2>
+<p>命題外延性と同様に、関数外延性は、全ての入力に対して出力が一致する <code>(x : α) → β x</code> 型の2つの関数は等しいことを主張する。</p>
+<pre><code class="language-lean">universe u v
+#check (@funext :
+           {α : Type u}
+         → {β : α → Type u}
+         → {f g : (x : α) → β x}
+         → (∀ (x : α), f x = g x)
+         → f = g)
+
+#print funext
+</code></pre>
+<p>古典的な集合論の観点からは、2つの関数が等しいというのはまさにこのことを意味する(<a href="https://us.metamath.org/mpeuni/eqfnfv.html">eqfnfv - Metamath Proof Explorer</a>)。これは関数の「外延的な」見方として知られている。しかし、構成的な観点からは、関数をアルゴリズム、あるいは何らかの明示的な方法で提示されるコンピュータプログラムと考える方が自然な場合もある。2つのコンピュータプログラムが、構文的には全く異なっているにも関わらず、全ての入力に対して同じ答えを計算できるという例は確かにある。同様に、同じ入出力動作をする2つの関数を同一視することを強制しないような関数の見方を維持したいと思うかもしれない。これは関数の「内包的な」見方として知られている。</p>
+<p>関数外延性は商の存在から導かれる。この事実については次の節で説明する。実際、Leanの標準ライブラリでは、<code>funext</code> は<a href="https://github.com/leanprover/lean4/blob/master/src/Init/Core.lean">商の構築から証明されている</a>。</p>
+<p><code>α : Type</code> に対して、<code>α</code> の部分集合の型を表す <code>Set α := α → Prop</code> を定義したとする。つまり、部分集合と述語を本質的に同一視するとする。<code>funext</code> と <code>propext</code> を組み合わせることで、このような集合の「外延性の定理」<code>setext</code> が得られる:</p>
+<pre><code class="language-lean">def Set (α : Type u) := α → Prop
+
+namespace Set
+
+def mem (x : α) (a : Set α) : Prop := a x
+
+infix:50 (priority := high) &quot;∈&quot; =&gt; mem
+
+theorem setext {a b : Set α} (h : ∀ (x : α), x ∈ a ↔ x ∈ b) : a = b :=
+  funext (fun x =&gt; propext (h x))
+
+theorem setext' {a b : Set α} (h : ∀ (x : α), a x ↔ b x) : a = b :=
+  funext (fun x =&gt; propext (h x))
+
+end Set
+</code></pre>
+<p>それから、例えば空集合や集合の共通部分を定義し、集合に関する恒等式を証明することができる:</p>
+<pre><code class="language-lean"><span class="boring">def Set (α : Type u) := α → Prop
+</span><span class="boring">namespace Set
+</span><span class="boring">def mem (x : α) (a : Set α) := a x
+</span><span class="boring">infix:50 (priority := high) &quot;∈&quot; =&gt; mem
+</span><span class="boring">theorem setext {a b : Set α} (h : ∀ x, x ∈ a ↔ x ∈ b) : a = b :=
+</span><span class="boring">  funext (fun x =&gt; propext (h x))
+</span>def empty : Set α := fun x =&gt; False
+
+notation (priority := high) &quot;∅&quot; =&gt; empty
+
+def inter (a b : Set α) : Set α :=
+  fun x =&gt; x ∈ a ∧ x ∈ b
+
+infix:70 &quot; ∩ &quot; =&gt; inter
+
+theorem inter_self (a : Set α) : a ∩ a = a :=
+  setext fun x =&gt; Iff.intro
+    (fun ⟨h, _⟩ =&gt; h)
+    (fun h =&gt; ⟨h, h⟩)
+
+theorem inter_empty (a : Set α) : a ∩ ∅ = ∅ :=
+  setext fun x =&gt; Iff.intro
+    (fun ⟨_, h⟩ =&gt; h)
+    (fun h =&gt; False.elim h)
+
+theorem empty_inter (a : Set α) : ∅ ∩ a = ∅ :=
+  setext fun x =&gt; Iff.intro
+    (fun ⟨h, _⟩ =&gt; h)
+    (fun h =&gt; False.elim h)
+
+theorem inter.comm (a b : Set α) : a ∩ b = b ∩ a :=
+  setext fun x =&gt; Iff.intro
+    (fun ⟨h₁, h₂⟩ =&gt; ⟨h₂, h₁⟩)
+    (fun ⟨h₁, h₂⟩ =&gt; ⟨h₂, h₁⟩)
+<span class="boring">end Set
+</span></code></pre>
+<p>以下は、Leanのカーネル内部で関数外延性がどのように計算をブロックするかの一例である。</p>
+<pre><code class="language-lean">def f (x : Nat) := x
+def g (x : Nat) := 0 + x
+
+theorem f_eq_g : f = g :=
+  funext fun x =&gt; (Nat.zero_add x).symm
+
+def val : Nat :=
+  Eq.recOn (motive := fun _ _ =&gt; Nat) f_eq_g 0
+
+-- does not reduce to 0
+#reduce val
+
+-- evaluates to 0
+#eval val
+</code></pre>
+<p>まず、関数外延性を用いて2つの関数 <code>f</code> と <code>g</code> が等しいことを示す。次に <code>0</code> の型 <code>Nat</code> の中に登場する <code>f</code> を <code>g</code> に置き換えて <code>0</code> をキャストする。もちろん <code>Nat</code> は <code>f</code> に依存しないので、このキャストは実質的に何もしない。しかし、計算をブロックするにはこれで十分である: このシステムの計算規則の下で、数字に簡約されない <code>Nat</code> の閉項 <code>val</code> を手に入れた。今回の場合、<code>val</code> を <code>0</code> に簡約してほしいと思うかもしれない。しかし、自明でない例では、このようなキャストを除去すると項の型が変わり、周囲の式の型が不正確になる可能性がある。しかしながら、仮想マシンは何の問題もなく <code>val</code> を <code>0</code> に評価できる。次は <code>propext</code> がどのように計算をブロックするかを示す、上と似た作為的な例である。</p>
+<pre><code class="language-lean">theorem tteq : (True ∧ True) = True :=
+  propext (Iff.intro (fun ⟨h, _⟩ =&gt; h) (fun h =&gt; ⟨h, h⟩))
+
+def val : Nat :=
+  Eq.recOn (motive := fun _ _ =&gt; Nat) tteq 0
+
+-- does not reduce to 0
+#reduce val
+
+-- evaluates to 0
+#eval val
+</code></pre>
+<p><em>observational type theory</em>や<em>cubical type theory</em>を含む現在の型理論の研究プログラムは、関数外延性や商などを含む型キャストに対する簡約を許可する方法で型理論を拡張することを目指している。しかし、解決策はそれほど明確ではなく、Leanの基礎となるcalculusの規則はそのようなキャストの簡約を認めていない。</p>
+<p>しかしながらある意味では、キャストは式の意味を変えるものではない。むしろ、キャストは式の型を推論するためのメカニズムだと言える。適切な意味論が与えられれば、簡約前後で型付けの正しさを保存するために必要な中間的な記録を無視して、項の意味を保持するやり方で項を簡約することは理にかなっている。</p>
+<p>簡約可能性について、<code>Prop</code> に新しい公理を追加することは問題にならない。証明無関係により、<code>Prop</code> の項は何の情報も持たない。したがって、簡約手続きにおいて <code>Prop</code> の項は安全に無視できる。</p>
+<h2 id="quotients-商"><a class="header" href="#quotients-商">Quotients (商)</a></h2>
+<p><code>α</code> を任意の型とし、<code>r</code> を <code>α</code> 上の同値関係とする。数学において、<em>quotient</em>(商) <code>α / r</code>、つまり「<code>α</code> の項の <code>r</code> による同値類」全体からなる型を作ることは一般的である。集合論的には、<code>α / r</code> を <code>α</code> の項の <code>r</code> による同値類全体からなる集合とみなすことができる。このとき、<code>∀ a b, r a b → f a = f b</code> を満たすという意味で同値関係を尊重する任意の関数 <code>f : α → β</code> を、各同値類 <code>⟦x⟧</code> に対して <code>f' ⟦x⟧ = f x</code> で定義される関数 <code>f' : α / r → β</code> に「持ち上げる」ことができる。Leanの標準ライブラリは、まさにこのような構築を実行する定数(公理)をいくつか追加することで、<em>Calculus of Constructions</em>を拡張している。そして、これらの最後の公理 <code>Quot.lift</code> をdefinitionalな除去則として導入している。</p>
+<p>最も基本的な形では、商の構築 <code>Quot.mk</code> は <code>r</code> が同値関係であることさえ要求しない。Leanには以下の定数(公理)がビルトインに(ライブラリの最初のファイル <code>Init.Prelude</code> より先に)定義されている:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>universe u v
+
+axiom Quot : {α : Sort u} → (α → α → Prop) → Sort u
+
+axiom Quot.mk : {α : Sort u} → (r : α → α → Prop) → α → Quot r
+
+axiom Quot.ind :
+    ∀ {α : Sort u} {r : α → α → Prop} {β : Quot r → Prop},
+      (∀ a, β (Quot.mk r a)) → (q : Quot r) → β q
+
+axiom Quot.lift :
+    {α : Sort u} → {r : α → α → Prop} → {β : Sort u} → (f : α → β)
+    → (∀ a b, r a b → f a = f b) → Quot r → β
+<span class="boring">end Hidden
+</span></code></pre>
+<p>最初の公理 <code>Quot</code> は、型 <code>α</code> と <code>α</code> 上の二項関係 <code>r</code> が与えられたときに型 <code>Quot r</code> を形成する。2つ目の公理 <code>Quot.mk</code> は、<code>α</code> の項を <code>Quot r</code> の項に写すもので、<code>r : α → α → Prop</code> と <code>a : α</code> があれば、<code>Quot.mk r a</code> は <code>Quot r</code> の項である。3つ目の公理 <code>Quot.ind</code> は、全ての <code>Quot r</code> の項が <code>Quot.mk r a</code> の形をとることを示す(<code>Quot r → Prop</code> を <code>Set (Quot r)</code> とみなすと分かりやすい)。4つ目の公理 <code>Quot.lift</code> は、関数 <code>f : α → β</code> が与えられたとき、<code>h</code> が「<code>f</code> は関係 <code>r</code> を尊重する」ことの証明であれば、<code>Quot.lift f h</code> は <code>f</code> に対応する <code>Quot r</code> 上の関数であることを主張する。この考え方は、<code>h</code> が「<code>f</code> はwell-definedである」ことを示す証明なら、関数 <code>Quot.lift f h</code> は <code>α</code> の各項 <code>a</code> について、<code>Quot.mk r a</code> (<code>a</code> を含む <code>r</code>-(同値)類)を <code>f a</code> に写す、というものである。以下の証明で明らかなように、計算原理 <code>Quot.Lift</code> は除去則として宣言されている。</p>
+<pre><code class="language-lean">def mod7Rel (x y : Nat) : Prop :=
+  x % 7 = y % 7
+
+-- 商型 `Quot mod7Rel`
+#check (Quot mod7Rel : Type)
+
+-- `4` を含む `mod7Rel`-(同値)類
+#check (Quot.mk mod7Rel 4 : Quot mod7Rel)
+
+def f (x : Nat) : Bool :=
+  x % 7 = 0
+
+theorem f_respects (a b : Nat) (h : mod7Rel a b) : f a = f b := by
+  simp [mod7Rel, f] at *
+  rw [h]
+
+def f' (x : Quot mod7Rel) : Bool :=
+  Quot.lift f f_respects x
+
+#check (f' : Quot mod7Rel → Bool)
+
+-- 計算原理
+example (a : Nat) : f' (Quot.mk mod7Rel a) = f a :=
+  rfl
+</code></pre>
+<p>4つの定数(公理) <code>Quot</code>、<code>Quot.mk</code>、<code>Quot.ind</code>、<code>Quot.lift</code> 自体はあまり強くない。<code>Quot r</code> を単に <code>α</code> とみなし、<code>Quot.lift</code> を(<code>h</code> を無視して) <code>α → β</code> 上の恒等関数とみなせば、<code>Quot.ind</code> が満たされることが確認できる。そのため、これら4つの公理は追加の公理とはみなさない。</p>
+<pre><code class="language-lean"><span class="boring">variable (α β : Type)
+</span><span class="boring">variable (r : α → α → Prop)
+</span><span class="boring">variable (a : α)
+</span><span class="boring">variable (f : α → β)
+</span><span class="boring">variable (h : ∀ a₁ a₂, r a₁ a₂ → f a₁ = f a₂)
+</span>theorem thm : Quot.lift f h (Quot.mk r a) = f a := rfl
+
+#print axioms thm   -- 'thm' does not depend on any axioms
+</code></pre>
+<p>これら4つの公理は、帰納型や帰納型に関連するコンストラクタと再帰子と同様に、<em>logical framework</em>(論理フレームワーク)の一部とみなされる。</p>
+<p><code>Quot</code> を正真正銘の商にするのは、次の追加公理 <code>Quot.sound</code> である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">universe u v
+</span>axiom Quot.sound :
+      ∀ {α : Type u} {r : α → α → Prop} {a b : α},
+        r a b → Quot.mk r a = Quot.mk r b
+<span class="boring">end Hidden
+</span></code></pre>
+<p>これは「<code>α</code> の任意の2つの項は、<code>r</code> によって関係しているなら、商の中で同一視される」と主張する公理である。定義や定理 <code>foo</code> が <code>Quot.sound</code> を使っている場合、コマンド <code>#print axioms foo</code> は <code>Quot.sound</code> を表示する。</p>
+<p>もちろん、商の構築は <code>r</code> が同値関係である場合に最もよく使われる。上記のように <code>r</code> が与えられたとき、<code>r' a b</code> と <code>Quot.mk r a = Quot.mk r b</code> が同値になるように <code>r'</code> を定義すれば、<code>r'</code> が同値関係であることは明らかである。実際、<code>r'</code> は関数 <code>a ↦ quot.mk r a</code> の<em>kernel</em>(核)である。公理 <code>Quot.sound</code> は、<code>r a b</code> が <code>r' a b</code> を含意すると主張している。<code>Quot.lift</code> と <code>Quot.ind</code> を使えば、「<code>r</code> を含む任意の同値関係 <code>r''</code> に対して、<code>r' a b</code> は <code>r'' a b</code> を含意する」という意味で、<code>r'</code> が <code>r</code> を含む最小の同値関係であることを証明できる。特に、<code>r</code> がそもそも同値関係であったならば、任意の <code>a</code> と <code>b</code> に対して、<code>r a b</code> と <code>r' a b</code> が同値であることが証明できる。</p>
+<p>同値関係や商の一般的なユースケースをサポートするために、標準ライブラリは<em>setoid</em>という概念を定義している。これは単に同値関係を持つ型である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>class Setoid (α : Sort u) where
+  r : α → α → Prop
+  iseqv : Equivalence r
+
+instance {α : Sort u} [Setoid α] : HasEquiv α :=
+  ⟨Setoid.r⟩
+
+namespace Setoid
+
+variable {α : Sort u} [Setoid α]
+
+theorem refl (a : α) : a ≈ a :=
+  iseqv.refl a
+
+theorem symm {a b : α} (hab : a ≈ b) : b ≈ a :=
+  iseqv.symm hab
+
+theorem trans {a b c : α} (hab : a ≈ b) (hbc : b ≈ c) : a ≈ c :=
+  iseqv.trans hab hbc
+
+end Setoid
+<span class="boring">end Hidden
+</span></code></pre>
+<p>型 <code>α</code>、<code>α</code> 上の二項関係 <code>r</code>、<code>r</code> が同値関係であることの証明 <code>p</code> が与えられたとき、<code>Setoid.mk r p</code> により <code>Setoid</code> クラスのインスタンスを定義することができる。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>def Quotient {α : Sort u} (s : Setoid α) :=
+  @Quot α Setoid.r
+<span class="boring">end Hidden
+</span></code></pre>
+<p>定数(公理) <code>Quotient.mk</code>、<code>Quotient.ind</code>、<code>Quotient.lift</code>、<code>Quotient.sound</code> は <code>Quot</code> の対応する要素の特殊化に他ならない。型クラス推論が型 <code>Setoid α</code> のインスタンスを見つけることができるという事実は、多くの利点をもたらす。まず、<code>Setoid.r a b</code> を <code>a ≈ b</code> (<code>\approx</code> と打つと入力できる)と略記することができる。ここで、<code>Setoid.r</code> という表記について、<code>Setoid</code> のインスタンスが暗黙の引数となっていることに注意してほしい。また、<code>Setoid.refl</code>、<code>Setoid.symm</code>、<code>Setoid.trans</code> という一般的な定理を使って同値関係に関する推論を行うことができる。商においては特に <code>Quot.mk Setoid.r a</code> の一般的な略記 <code>⟦a⟧</code> を使うことができる。ここでも <code>Setoid.r</code> 表記に関して <code>Setoid</code> のインスタンスが暗黙の引数となっている。<code>Quotient.exact</code> という定理もある:</p>
+<pre><code class="language-lean"><span class="boring">universe u
+</span>#check (@Quotient.exact :
+         ∀ {α : Sort u} {s : Setoid α} {a b : α},
+           Quotient.mk s a = Quotient.mk s b → a ≈ b)
+</code></pre>
+<p><code>Quotient.exact</code> と <code>Quotient.sound</code> を組み合わせると、<code>Quotient s</code> の各項が <code>α</code> の項の各同値類と正確に対応することが導かれる。</p>
+<p>標準ライブラリでは、型 <code>α × β</code> は型 <code>α</code> と <code>β</code> の直積を表すことを思い出してほしい。商の使い方を説明するために、型 <code>α</code> の項からなる<strong>非順序</strong>対の型を、型 <code>α × α</code> の商として定義してみよう。まず、関連する同値関係を定義する:</p>
+<pre><code class="language-lean">private def eqv (p₁ p₂ : α × α) : Prop :=
+  (p₁.1 = p₂.1 ∧ p₁.2 = p₂.2) ∨ (p₁.1 = p₂.2 ∧ p₁.2 = p₂.1)
+
+infix:50 &quot; ~ &quot; =&gt; eqv
+</code></pre>
+<p>次のステップは、<code>eqv</code> が実際に同値関係であること、つまり反射的、対称的、推移的であることを証明することである。依存パターンマッチングを使って場合分けし、仮説を分解し、それを組み立てて結論を出すことで、便利で読みやすい方法でこれら3つの事実を証明することができる。</p>
+<pre><code class="language-lean"><span class="boring">private def eqv (p₁ p₂ : α × α) : Prop :=
+</span><span class="boring">  (p₁.1 = p₂.1 ∧ p₁.2 = p₂.2) ∨ (p₁.1 = p₂.2 ∧ p₁.2 = p₂.1)
+</span><span class="boring">infix:50 &quot; ~ &quot; =&gt; eqv
+</span>private theorem eqv.refl (p : α × α) : p ~ p :=
+  Or.inl ⟨rfl, rfl⟩
+
+private theorem eqv.symm : ∀ {p₁ p₂ : α × α}, p₁ ~ p₂ → p₂ ~ p₁
+  | (a₁, a₂), (b₁, b₂), (Or.inl ⟨a₁b₁, a₂b₂⟩) =&gt;
+    Or.inl (by simp_all)
+  | (a₁, a₂), (b₁, b₂), (Or.inr ⟨a₁b₂, a₂b₁⟩) =&gt;
+    Or.inr (by simp_all)
+
+private theorem eqv.trans : ∀ {p₁ p₂ p₃ : α × α}, p₁ ~ p₂ → p₂ ~ p₃ → p₁ ~ p₃
+  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+    Or.inl (by simp_all)
+  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+    Or.inr (by simp_all)
+  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+    Or.inr (by simp_all)
+  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+    Or.inl (by simp_all)
+
+private theorem is_equivalence : Equivalence (@eqv α) :=
+  { refl := eqv.refl, symm := eqv.symm, trans := eqv.trans }
+</code></pre>
+<p><code>eqv</code> が同値関係であることが証明されたので、<code>Setoid (α × α)</code> のインスタンスを構築することができ、<code>Setoid (α × α)</code> を使って非順序対の型 <code>UProd α</code> を定義することができる。</p>
+<pre><code class="language-lean"><span class="boring">private def eqv (p₁ p₂ : α × α) : Prop :=
+</span><span class="boring">  (p₁.1 = p₂.1 ∧ p₁.2 = p₂.2) ∨ (p₁.1 = p₂.2 ∧ p₁.2 = p₂.1)
+</span><span class="boring">infix:50 &quot; ~ &quot; =&gt; eqv
+</span><span class="boring">private theorem eqv.refl (p : α × α) : p ~ p :=
+</span><span class="boring">  Or.inl ⟨rfl, rfl⟩
+</span><span class="boring">private theorem eqv.symm : ∀ {p₁ p₂ : α × α}, p₁ ~ p₂ → p₂ ~ p₁
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (Or.inl ⟨a₁b₁, a₂b₂⟩) =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (Or.inr ⟨a₁b₂, a₂b₁⟩) =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">private theorem eqv.trans : ∀ {p₁ p₂ p₃ : α × α}, p₁ ~ p₂ → p₂ ~ p₃ → p₁ ~ p₃
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">private theorem is_equivalence : Equivalence (@eqv α) :=
+</span><span class="boring">  { refl := eqv.refl, symm := eqv.symm, trans := eqv.trans }
+</span>instance uprodSetoid (α : Type u) : Setoid (α × α) where
+  r     := eqv
+  iseqv := is_equivalence
+
+def UProd (α : Type u) : Type u :=
+  Quotient (uprodSetoid α)
+
+namespace UProd
+
+def mk {α : Type} (a₁ a₂ : α) : UProd α :=
+  Quotient.mk' (a₁, a₂)
+
+notation &quot;{ &quot; a₁ &quot;, &quot; a₂ &quot; }&quot; =&gt; mk a₁ a₂
+
+end UProd
+</code></pre>
+<p>非順序対 <code>Quotient.mk' (a₁, a₂)</code> に対する略記 <code>{a₁, a₂}</code> をローカルに定義していることに注意してほしい。この略記は説明を目的とするなら便利であるが、レコードや集合のような対象を表すのに波括弧を使いにくくなるので、一般的には良いアイデアではない。</p>
+<p>既に <code>(a₁, a₂) ~ (a₂, a₁)</code> を証明してあるので、<code>Quot.sound</code> を使うことで <code>{a₁, a₂} = {a₂, a₁}</code> を簡単に証明することができる。</p>
+<pre><code class="language-lean"><span class="boring">private def eqv (p₁ p₂ : α × α) : Prop :=
+</span><span class="boring">  (p₁.1 = p₂.1 ∧ p₁.2 = p₂.2) ∨ (p₁.1 = p₂.2 ∧ p₁.2 = p₂.1)
+</span><span class="boring">infix:50 &quot; ~ &quot; =&gt; eqv
+</span><span class="boring">private theorem eqv.refl (p : α × α) : p ~ p :=
+</span><span class="boring">  Or.inl ⟨rfl, rfl⟩
+</span><span class="boring">private theorem eqv.symm : ∀ {p₁ p₂ : α × α}, p₁ ~ p₂ → p₂ ~ p₁
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (Or.inl ⟨a₁b₁, a₂b₂⟩) =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (Or.inr ⟨a₁b₂, a₂b₁⟩) =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">private theorem eqv.trans : ∀ {p₁ p₂ p₃ : α × α}, p₁ ~ p₂ → p₂ ~ p₃ → p₁ ~ p₃
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">private theorem is_equivalence : Equivalence (@eqv α) :=
+</span><span class="boring">  { refl := eqv.refl, symm := eqv.symm, trans := eqv.trans }
+</span><span class="boring">instance uprodSetoid (α : Type u) : Setoid (α × α) where
+</span><span class="boring">  r     := eqv
+</span><span class="boring">  iseqv := is_equivalence
+</span><span class="boring">def UProd (α : Type u) : Type u :=
+</span><span class="boring">  Quotient (uprodSetoid α)
+</span><span class="boring">namespace UProd
+</span><span class="boring">def mk {α : Type} (a₁ a₂ : α) : UProd α :=
+</span><span class="boring">  Quotient.mk' (a₁, a₂)
+</span><span class="boring">notation &quot;{ &quot; a₁ &quot;, &quot; a₂ &quot; }&quot; =&gt; mk a₁ a₂
+</span>theorem mk_eq_mk (a₁ a₂ : α) : {a₁, a₂} = {a₂, a₁} :=
+  Quot.sound (Or.inr ⟨rfl, rfl⟩)
+<span class="boring">end UProd
+</span></code></pre>
+<p>この例を完成させるため、<code>a : α</code> と <code>u : UProd α</code> に対して、<code>a</code> が非順序対 <code>u</code> の要素の1つである場合に成立する命題 <code>a ∈ u</code> を定義する。まず、順序対に対して同じような命題 <code>mem_fn a u</code> を定義する。次に <code>mem_fn</code> が同値関係 <code>eqv</code> を尊重することを補題 <code>mem_respects</code> で示す。これはLeanの標準ライブラリで広く使われているイディオムである。</p>
+<pre><code class="language-lean"><span class="boring">private def eqv (p₁ p₂ : α × α) : Prop :=
+</span><span class="boring">  (p₁.1 = p₂.1 ∧ p₁.2 = p₂.2) ∨ (p₁.1 = p₂.2 ∧ p₁.2 = p₂.1)
+</span><span class="boring">infix:50 &quot; ~ &quot; =&gt; eqv
+</span><span class="boring">private theorem eqv.refl (p : α × α) : p ~ p :=
+</span><span class="boring">  Or.inl ⟨rfl, rfl⟩
+</span><span class="boring">private theorem eqv.symm : ∀ {p₁ p₂ : α × α}, p₁ ~ p₂ → p₂ ~ p₁
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (Or.inl ⟨a₁b₁, a₂b₂⟩) =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (Or.inr ⟨a₁b₂, a₂b₁⟩) =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">private theorem eqv.trans : ∀ {p₁ p₂ p₃ : α × α}, p₁ ~ p₂ → p₂ ~ p₃ → p₁ ~ p₃
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inl ⟨a₁b₁, a₂b₂⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inl ⟨b₁c₁, b₂c₂⟩ =&gt;
+</span><span class="boring">    Or.inr (by simp_all)
+</span><span class="boring">  | (a₁, a₂), (b₁, b₂), (c₁, c₂), Or.inr ⟨a₁b₂, a₂b₁⟩, Or.inr ⟨b₁c₂, b₂c₁⟩ =&gt;
+</span><span class="boring">    Or.inl (by simp_all)
+</span><span class="boring">private theorem is_equivalence : Equivalence (@eqv α) :=
+</span><span class="boring">  { refl := eqv.refl, symm := eqv.symm, trans := eqv.trans }
+</span><span class="boring">instance uprodSetoid (α : Type u) : Setoid (α × α) where
+</span><span class="boring">  r     := eqv
+</span><span class="boring">  iseqv := is_equivalence
+</span><span class="boring">def UProd (α : Type u) : Type u :=
+</span><span class="boring">  Quotient (uprodSetoid α)
+</span><span class="boring">namespace UProd
+</span><span class="boring">def mk {α : Type} (a₁ a₂ : α) : UProd α :=
+</span><span class="boring">  Quotient.mk' (a₁, a₂)
+</span><span class="boring">notation &quot;{ &quot; a₁ &quot;, &quot; a₂ &quot; }&quot; =&gt; mk a₁ a₂
+</span><span class="boring">theorem mk_eq_mk (a₁ a₂ : α) : {a₁, a₂} = {a₂, a₁} :=
+</span><span class="boring">  Quot.sound (Or.inr ⟨rfl, rfl⟩)
+</span>private def mem_fn (a : α) : α × α → Prop
+  | (a₁, a₂) =&gt; a = a₁ ∨ a = a₂
+
+-- auxiliary lemma for proving mem_respects
+private theorem mem_swap {a : α} :
+      ∀ {p : α × α}, mem_fn a p = mem_fn a (⟨p.2, p.1⟩)
+  | (a₁, a₂) =&gt; by
+    apply propext
+    apply Iff.intro
+    . intro
+      | Or.inl h =&gt; exact Or.inr h
+      | Or.inr h =&gt; exact Or.inl h
+    . intro
+      | Or.inl h =&gt; exact Or.inr h
+      | Or.inr h =&gt; exact Or.inl h
+
+
+private theorem mem_respects
+      : {p₁ p₂ : α × α} → (a : α) → p₁ ~ p₂ → mem_fn a p₁ = mem_fn a p₂
+  | (a₁, a₂), (b₁, b₂), a, Or.inl ⟨a₁b₁, a₂b₂⟩ =&gt; by simp_all
+  | (a₁, a₂), (b₁, b₂), a, Or.inr ⟨a₁b₂, a₂b₁⟩ =&gt; by simp_all; apply mem_swap
+
+def mem (a : α) (u : UProd α) : Prop :=
+  Quot.liftOn u (fun p =&gt; mem_fn a p) (fun p₁ p₂ e =&gt; mem_respects a e)
+
+infix:50 (priority := high) &quot; ∈ &quot; =&gt; mem
+
+theorem mem_mk_left (a b : α) : a ∈ {a, b} :=
+  Or.inl rfl
+
+theorem mem_mk_right (a b : α) : b ∈ {a, b} :=
+  Or.inr rfl
+
+theorem mem_or_mem_of_mem_mk {a b c : α} : c ∈ {a, b} → c = a ∨ c = b :=
+  fun h =&gt; h
+<span class="boring">end UProd
+</span></code></pre>
+<p>利便性のため、標準ライブラリは2変数関数を「持ち上げる」ための <code>Quotient.lift₂</code> と、2変数帰納法のための <code>Quotient.ind₂</code> も定義している。</p>
+<p>最後に、なぜ商の構築が関数外延性を含意するのかについて、いくつかのヒントを示してこの節を締めくくる。型 <code>(x : α) → β x</code> を持つ関数の外延性等式が同値関係であることを示すのは難しくない。したがって、「同値関係を足した」依存関数型 <code>extfun α β</code> を考えることができる。もちろん、関数適用は <code>f₁</code> と <code>f₂</code> が同値関係にあるなら、<code>f₁ a</code> は <code>f₂ a</code> と等しいという意味で、同値関係を尊重する。したがって、関数適用は関数 <code>extfun_app : extfun α β → (x : α) → β x</code> に持ち上げられる。しかし、任意の <code>f</code> について、<code>extfun_app ⟦f⟧</code> は <code>fun x =&gt; f x</code> とdefinitionally equalであり、結果として <code>f</code> とdefinitionally equalである。したがって、<code>f₁</code> と <code>f₂</code> が外延的に等しいとき、次のような等号の連鎖が成り立つ:</p>
+<pre><code>    f₁ = extfun_app ⟦f₁⟧ = extfun_app ⟦f₂⟧ = f₂
+</code></pre>
+<p>結果として、<code>f₁</code> と <code>f₂</code> は等しい。</p>
+<h2 id="choice-選択原理"><a class="header" href="#choice-選択原理">Choice (選択原理)</a></h2>
+<p>標準ライブラリで定義されている最後の公理(選択原理)を述べるには、次のように定義される <code>Nonempty</code> 型が必要である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>class inductive Nonempty (α : Sort u) : Prop where
+  | intro (val : α) : Nonempty α
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>Nonempty α</code> 型は <code>Prop</code> 型を持ち、そのコンストラクタはデータを含むので、<a href="./inductive_types.html#inductively-defined-propositions-%E5%B8%B0%E7%B4%8D%E7%9A%84%E3%81%AB%E5%AE%9A%E7%BE%A9%E3%81%95%E3%82%8C%E3%81%9F%E5%91%BD%E9%A1%8C">Inductively Defined Propositions (帰納的に定義された命題)</a>の節で見た通り、<code>Nonempty α</code> 型を除去しても命題を作ることしかできない。実際、<code>Nonempty α</code> は <code>∃ x : α, True</code> と同値である:</p>
+<pre><code class="language-lean">example (α : Type u) : Nonempty α ↔ ∃ x : α, True :=
+  Iff.intro (fun ⟨a⟩ =&gt; ⟨a, trivial⟩) (fun ⟨a, h⟩ =&gt; ⟨a⟩)
+</code></pre>
+<p>Lean版の選択公理は次のようにシンプルに表現される:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">universe u
+</span>axiom choice {α : Sort u} : Nonempty α → α
+<span class="boring">end Hidden
+</span></code></pre>
+<p>「<code>α</code> は空でない」ことの証明 <code>h</code> さえあれば、<code>choice h</code> は魔法のように <code>α</code> の項を生成する。もちろん、<code>choice</code> の使用は意味のある計算をブロックする: 証明無関係の考え方の下では、<code>h</code> はそのような項を見つける方法に関する情報を全く含んでいない。</p>
+<p><code>choice</code> は <code>Classical</code> という名前空間の中にあるため、この公理のフルネームは <code>Classical.choice</code> である。選択原理は<em>indefinite description</em>(不定的記述)の原理と同値である。不定的記述の原理は<em>subtypes</em>(部分型)を使って次のように表すことができる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">universe u
+</span><span class="boring">axiom choice {α : Sort u} : Nonempty α → α
+</span>noncomputable def indefiniteDescription {α : Sort u} (p : α → Prop)
+                                        (h : ∃ x, p x) : {x // p x} :=
+  choice &lt;| let ⟨x, px⟩ := h; ⟨⟨x, px⟩⟩
+<span class="boring">end Hidden
+</span></code></pre>
+<p>この定義は <code>choice</code> に依存するため、Leanは <code>indefiniteDescription</code> のバイトコードを生成できない。したがって、この定義を <code>noncomputable</code> とマークする必要がある。また、<code>Classical</code> 名前空間では、関数 <code>choose</code> とプロパティ <code>choose_spec</code> は <code>indefiniteDescription</code> の(2つの要素からなる)出力を分解し、各要素を抽出する:</p>
+<pre><code class="language-lean"><span class="boring">open Classical
+</span><span class="boring">namespace Hidden
+</span>noncomputable def choose {α : Sort u} {p : α → Prop} (h : ∃ x, p x) : α :=
+  (indefiniteDescription p h).val
+
+theorem choose_spec {α : Sort u} {p : α → Prop} (h : ∃ x, p x) : p (choose h) :=
+  (indefiniteDescription p h).property
+<span class="boring">end Hidden
+</span></code></pre>
+<p>また、選択原理 <code>Choice</code> は「空でない」という性質 <code>Nonempty</code> と「有項である」というより構成的な性質 <code>Inhabited</code> の区別をなくしてしまう:</p>
+<pre><code class="language-lean"><span class="boring">open Classical
+</span>theorem inhabited_of_nonempty : Nonempty α → Inhabited α :=
+  fun h =&gt; choice (let ⟨a⟩ := h; ⟨⟨a⟩⟩)
+</code></pre>
+<p>次節では <code>propext</code>、<code>funext</code>、<code>choice</code> の3つを合わせると、排中律と任意の命題の決定可能性が導かれることを説明する。これらを用いると、不定的記述の原理を次のように強化することができる:</p>
+<pre><code class="language-lean"><span class="boring">open Classical
+</span><span class="boring">universe u
+</span>#check (@strongIndefiniteDescription :
+         {α : Sort u} → (p : α → Prop)
+         → Nonempty α → {x // (∃ (y : α), p y) → p x})
+</code></pre>
+<p>前提となる型 <code>α</code> が空でないとすると、<code>p</code> を満たす項が存在するなら、<code>strongIndefiniteDescription p</code> は <code>p</code> を満たす項 <code>x</code> を生成する(<code>p</code> を満たす項が存在しないなら、<code>strongIndefiniteDescription p</code> は <code>choice</code> により生成された型 <code>α</code> の任意の項を返す)。この関数 <code>strongIndefiniteDescription</code> の出力から値要素を抽出する関数は<em>Hilbert's epsilon function</em>(ヒルベルトのε関数)として知られている:</p>
+<pre><code class="language-lean"><span class="boring">open Classical
+</span><span class="boring">universe u
+</span>#check (@epsilon :
+         {α : Sort u} → [Nonempty α]
+         → (α → Prop) → α)
+
+#check (@epsilon_spec :
+         ∀ {α : Sort u} {p : α → Prop} (hex : ∃ (y : α), p y),
+           p (@epsilon _ (nonempty_of_exists hex) p))
+</code></pre>
+<p>関数 <code>epsilon_spec</code> は、<code>p</code> を満たす項が存在するという証明を受け取ると、<code>p (epsilon p)</code> の証明を返す。</p>
+<h2 id="the-law-of-the-excluded-middle-排中律"><a class="header" href="#the-law-of-the-excluded-middle-排中律">The Law of the Excluded Middle (排中律)</a></h2>
+<p>排中律は次のように表現される:</p>
+<pre><code class="language-lean">open Classical
+
+#check (@em : ∀ (p : Prop), p ∨ ¬p)
+</code></pre>
+<p><a href="http://en.wikipedia.org/wiki/Diaconescu%27s_theorem">Diaconescuの定理</a>は、選択公理から排中律が導かれることを述べている。より正確には、Diaconescuの定理は、<code>Classical.choice</code>、<code>propext</code>、<code>funext</code> から排中律が導かれることを示している。以下に標準ライブラリにあるDiaconescuの定理の証明を記す。</p>
+<p>まず、必要な公理をインポートして、2つの述語 <code>U</code> と <code>V</code> を定義する:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Classical
+theorem em (p : Prop) : p ∨ ¬p :=
+  let U (x : Prop) : Prop := x = True ∨ p
+  let V (x : Prop) : Prop := x = False ∨ p
+
+  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
+  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
+<span class="boring">  sorry
+</span><span class="boring">end Hidden
+</span></code></pre>
+<p>もし <code>p</code> が真なら、<code>Prop</code> 型の任意の項は <code>U</code> と <code>V</code> の両方に属する。もし <code>p</code> が偽なら、<code>U</code> はシングルトン <code>True</code> であり、<code>V</code> はシングルトン <code>False</code> である。</p>
+<p>次に、<code>choose</code> を使って <code>U</code> の元と <code>V</code> の元を1つ選ぶ:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">open Classical
+</span><span class="boring">theorem em (p : Prop) : p ∨ ¬p :=
+</span><span class="boring">  let U (x : Prop) : Prop := x = True ∨ p
+</span><span class="boring">  let V (x : Prop) : Prop := x = False ∨ p
+</span><span class="boring">  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
+</span><span class="boring">  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
+</span>  let u : Prop := choose exU
+  let v : Prop := choose exV
+
+  have u_def : U u := choose_spec exU
+  have v_def : V v := choose_spec exV
+<span class="boring">  sorry
+</span><span class="boring">end Hidden
+</span></code></pre>
+<p><code>U</code> と <code>V</code> はそれぞれ選言命題なので、<code>u_def</code> と <code>v_def</code> の組は計4つのケースを表している。これらのケースのうち1つでは <code>u = True</code> かつ <code>v = False</code> であり、他の全てのケースでは <code>p</code> が真である。したがって、次のようになる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">open Classical
+</span><span class="boring">theorem em (p : Prop) : p ∨ ¬p :=
+</span><span class="boring">  let U (x : Prop) : Prop := x = True ∨ p
+</span><span class="boring">  let V (x : Prop) : Prop := x = False ∨ p
+</span><span class="boring">  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
+</span><span class="boring">  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
+</span><span class="boring">  let u : Prop := choose exU
+</span><span class="boring">  let v : Prop := choose exV
+</span><span class="boring">  have u_def : U u := choose_spec exU
+</span><span class="boring">  have v_def : V v := choose_spec exV
+</span>  have not_uv_or_p : u ≠ v ∨ p :=
+    match u_def, v_def with
+    | Or.inr h, _ =&gt; Or.inr h
+    | _, Or.inr h =&gt; Or.inr h
+    | Or.inl hut, Or.inl hvf =&gt;
+      have hne : u ≠ v := by simp [hvf, hut, true_ne_false]
+      Or.inl hne
+<span class="boring">  sorry
+</span><span class="boring">end Hidden
+</span></code></pre>
+<p>一方、<code>p</code> が真であれば、関数外延性と命題外延性によって <code>U</code> と <code>V</code> は等しい。<code>u</code> と <code>v</code> の定義により、<code>u</code> と <code>v</code> も等しいことがわかる。 </p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">open Classical
+</span><span class="boring">theorem em (p : Prop) : p ∨ ¬p :=
+</span><span class="boring">  let U (x : Prop) : Prop := x = True ∨ p
+</span><span class="boring">  let V (x : Prop) : Prop := x = False ∨ p
+</span><span class="boring">  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
+</span><span class="boring">  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
+</span><span class="boring">  let u : Prop := choose exU
+</span><span class="boring">  let v : Prop := choose exV
+</span><span class="boring">  have u_def : U u := choose_spec exU
+</span><span class="boring">  have v_def : V v := choose_spec exV
+</span><span class="boring">  have not_uv_or_p : u ≠ v ∨ p :=
+</span><span class="boring">    match u_def, v_def with
+</span><span class="boring">    | Or.inr h, _ =&gt; Or.inr h
+</span><span class="boring">    | _, Or.inr h =&gt; Or.inr h
+</span><span class="boring">    | Or.inl hut, Or.inl hvf =&gt;
+</span><span class="boring">      have hne : u ≠ v := by simp [hvf, hut, true_ne_false]
+</span><span class="boring">      Or.inl hne
+</span>  have p_implies_uv : p → u = v :=
+    fun hp =&gt;
+    have hpred : U = V :=
+      funext fun x =&gt;
+        have hl : (x = True ∨ p) → (x = False ∨ p) :=
+          fun _ =&gt; Or.inr hp
+        have hr : (x = False ∨ p) → (x = True ∨ p) :=
+          fun _ =&gt; Or.inr hp
+        show (x = True ∨ p) = (x = False ∨ p) from
+          propext (Iff.intro hl hr)
+    have h₀ : ∀ exU exV, @choose _ U exU = @choose _ V exV := by
+      rw [hpred]; intros; rfl
+    show u = v from h₀ _ _
+<span class="boring">  sorry
+</span><span class="boring">end Hidden
+</span></code></pre>
+<p><code>not_uv_or_p</code> と <code>p_implies_uv</code> をまとめると、所望の結論が得られる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">open Classical
+</span><span class="boring">theorem em (p : Prop) : p ∨ ¬p :=
+</span><span class="boring">  let U (x : Prop) : Prop := x = True ∨ p
+</span><span class="boring">  let V (x : Prop) : Prop := x = False ∨ p
+</span><span class="boring">  have exU : ∃ x, U x := ⟨True, Or.inl rfl⟩
+</span><span class="boring">  have exV : ∃ x, V x := ⟨False, Or.inl rfl⟩
+</span><span class="boring">  let u : Prop := choose exU
+</span><span class="boring">  let v : Prop := choose exV
+</span><span class="boring">  have u_def : U u := choose_spec exU
+</span><span class="boring">  have v_def : V v := choose_spec exV
+</span><span class="boring">  have not_uv_or_p : u ≠ v ∨ p :=
+</span><span class="boring">    match u_def, v_def with
+</span><span class="boring">    | Or.inr h, _ =&gt; Or.inr h
+</span><span class="boring">    | _, Or.inr h =&gt; Or.inr h
+</span><span class="boring">    | Or.inl hut, Or.inl hvf =&gt;
+</span><span class="boring">      have hne : u ≠ v := by simp [hvf, hut, true_ne_false]
+</span><span class="boring">      Or.inl hne
+</span><span class="boring">  have p_implies_uv : p → u = v :=
+</span><span class="boring">    fun hp =&gt;
+</span><span class="boring">    have hpred : U = V :=
+</span><span class="boring">      funext fun x =&gt;
+</span><span class="boring">        have hl : (x = True ∨ p) → (x = False ∨ p) :=
+</span><span class="boring">          fun _ =&gt; Or.inr hp
+</span><span class="boring">        have hr : (x = False ∨ p) → (x = True ∨ p) :=
+</span><span class="boring">          fun _ =&gt; Or.inr hp
+</span><span class="boring">        show (x = True ∨ p) = (x = False ∨ p) from
+</span><span class="boring">          propext (Iff.intro hl hr)
+</span><span class="boring">    have h₀ : ∀ exU exV, @choose _ U exU = @choose _ V exV := by
+</span><span class="boring">      rw [hpred]; intros; rfl
+</span><span class="boring">    show u = v from h₀ _ _
+</span>  match not_uv_or_p with
+  | Or.inl hne =&gt; Or.inr (mt p_implies_uv hne)
+  | Or.inr h   =&gt; Or.inl h
+<span class="boring">end Hidden
+</span></code></pre>
+<p>排中律の系としては、二重否定除去、場合分けによる証明、矛盾による証明などがあり、これらは全て節<a href="./propositions_and_proofs.html#classical-logic-%E5%8F%A4%E5%85%B8%E8%AB%96%E7%90%86">Classical Logic (古典論理)</a>で説明されている。排中律と命題外延性は命題完全性を含意する:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Classical
+theorem propComplete (a : Prop) : a = True ∨ a = False :=
+  match em a with
+  | Or.inl ha =&gt; Or.inl (propext (Iff.intro (fun _ =&gt; ⟨⟩) (fun _ =&gt; ha)))
+  | Or.inr hn =&gt; Or.inr (propext (Iff.intro (fun h =&gt; hn h) (fun h =&gt; False.elim h)))
+<span class="boring">end Hidden
+</span></code></pre>
+<p>選択原理と合わせると、「全ての命題は決定可能である」というより強い原理も得られる。決定可能命題のクラス <code>Decidable</code> は次のように定義されることを思い出してほしい:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>class inductive Decidable (p : Prop) where
+  | isFalse (h : ¬p) : Decidable p
+  | isTrue  (h : p)  : Decidable p
+<span class="boring">end Hidden
+</span></code></pre>
+<p>除去により <code>Prop</code> 型の項しか作れない <code>p ∨ ¬ p</code> とは対照的に、型 <code>Decidable p</code> は直和型 <code>Sum p (¬ p)</code> と等価であり、除去により任意の型の項を作ることができる。型 <code>Decidable p</code> のデータはif-then-else式を書くのに必要である。</p>
+<p>古典的推論の例と同様に、「<code>f : α → β</code> が単射で <code>α</code> が有項なら、<code>f</code> は左逆写像を持つ」という定理を証明するためにも <code>choose</code> を使う。左逆写像 <code>linv</code> を定義するために、依存if-then-else式を用いる。<code>if h : c then t else e</code> は <code>dite c (fun h : c =&gt; t) (fun h : ¬ c =&gt; e)</code> の略記であることを思い出してほしい。<code>linv</code> の定義の中で、選択原理は2回使われている: 選択原理は、まず <code>(∃ a : A, f a = b)</code> が「決定可能」であることを示すために、そして <code>f a = b</code> を満たす <code>a</code> を選ぶために使われている。<code>propDecidable</code> はスコープ付きインスタンスであり、<code>open Classical</code> コマンドによって利用可能になることに注意してほしい。このインスタンスにより、このif-then-else式の使用が正当化される(節<a href="./type_classes.html#decidable-propositions-%E6%B1%BA%E5%AE%9A%E5%8F%AF%E8%83%BD%E5%91%BD%E9%A1%8C">Decidable Propositions (決定可能命題)</a>の説明も参照のこと)。</p>
+<pre><code class="language-lean">open Classical
+
+noncomputable def linv [Inhabited α] (f : α → β) : β → α :=
+  fun b : β =&gt; if ex : (∃ a : α, f a = b) then choose ex else default
+
+theorem linv_comp_self {f : α → β} [Inhabited α]
+                       (inj : ∀ {a b}, f a = f b → a = b)
+                       : linv f ∘ f = id :=
+  funext fun a =&gt;
+    have ex  : ∃ a₁ : α, f a₁ = f a := ⟨a, rfl⟩
+    have feq : f (choose ex) = f a  := choose_spec ex
+    calc linv f (f a)
+      _ = choose ex := dif_pos ex
+      _ = a         := inj feq
+</code></pre>
+<p>古典的な観点からすると、<code>linv</code> は関数である。構成的な観点からすると、<code>linv</code> の定義は受け入れがたい: 一般にこのような関数を実装する方法はないため、この構築は何の情報も持たない。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="conv.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="conv.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>

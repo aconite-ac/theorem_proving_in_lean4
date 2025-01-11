@@ -1,0 +1,1241 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>帰納型 - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html" class="active"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="inductive-types-帰納型"><a class="header" href="#inductive-types-帰納型">Inductive Types (帰納型)</a></h1>
+<p>Leanの形式的基礎は <code>Prop, Type 0, Type 1, Type 2, ...</code> という基本的な型を含み、<code>(x : α) → β</code> といった依存関数型の形成を可能にすることが分かった。例の中では、<code>Bool</code>、<code>Nat</code>、<code>Int</code> などの追加的な型や、<code>List</code>、直積型 <code>×</code> などの型コンストラクタも使用した。実際、Leanのライブラリにおいて、宇宙以外の全ての具体的な型と、依存関数型以外の全ての型コンストラクタは、<em>inductive types</em>(帰納型)と呼ばれる型コンストラクタの集まりである(逆に、宇宙と依存関数型は<em>foundational types</em>(基礎型)として知られる)。型宇宙、依存関数型、そして帰納型のみで巨大で頑丈な数学の体系を構築できることは驚くべきことである。それ以外の全てはこの3種類の型から派生する。</p>
+<p>直感的には、帰納型は指定されたコンストラクタのリストから構築される。Leanにおいて、帰納型を指定する構文は次の通りである:</p>
+<pre><code>inductive Foo where
+  | constructor₁ : ... → Foo
+  | constructor₂ : ... → Foo
+  ...
+  | constructorₙ : ... → Foo
+</code></pre>
+<p>直感的には、各コンストラクタは、以前に構築された項から <code>Foo</code> の新しい項を構築する方法を指定する。<code>Foo</code> 型は各コンストラクタによって構築された項全てからなり、それ以外は何も含まない。帰納的宣言の最初の文字 <code>|</code> は省略可能である。<code>|</code> の代わりにコンマ <code>,</code> を使ってコンストラクタを区切ることもできる。</p>
+<p>以下では、コンストラクタの引数に <code>Foo</code> 型の項を含めることができるが、その際に <code>Foo</code> の任意の要素がボトムアップで構築されることを保証する、ある「正の」制約が適用されることを説明する。大雑把に言えば、各コンストラクタの引数は <code>Foo</code> 型と以前に定義された型からなる任意の依存関数型を持つことができる。その依存関数型の中で、<code>Foo</code> は、もし現れるとすれば、「ターゲット」としてのみ現れる。</p>
+<p>以下に帰納型の例をいくつか提供する。また、上記のスキームを少し一般化して、相互に定義された帰納型や、いわゆる<em>inductive families</em>(帰納族)についても考える。</p>
+<p>論理的結合子と同様、全ての帰納型には導入則と除去則がある。導入則はその型の項の構築方法を示す。除去則は、その型の項を別の項の構築のために「使う」方法を示す。論理的結合子と帰納型の類似性は驚くにはあたらない。なぜなら、後述するように、論理的結合子たちも帰納的な型構築の例だからである。帰納型の導入則とは、すでに見た通りで型の定義で指定されるコンストラクタにすぎない。除去則はその型における再帰の原理を規定するものである。帰納法の原理は再帰の原理の特別な場合である。</p>
+<p>次の章では、Leanの関数定義パッケージについて説明する。このパッケージは帰納型上の関数を定義し、帰納的証明を実行するためのさらに便利な方法を提供する。しかし、帰納型の概念は非常に基礎的で重要なため、低レベルで実践的な理解から始めることが重要だと考えている。ここでは、帰納型の基本的な例から始め、より精巧で複雑な例へとステップアップしていく。</p>
+<h2 id="enumerated-types-列挙型"><a class="header" href="#enumerated-types-列挙型">Enumerated Types (列挙型)</a></h2>
+<p>最も単純な帰納型は、列挙型、すなわち有限個の項を列挙したリストを持つ型である。</p>
+<pre><code class="language-lean">inductive Weekday where
+  | sunday : Weekday
+  | monday : Weekday
+  | tuesday : Weekday
+  | wednesday : Weekday
+  | thursday : Weekday
+  | friday : Weekday
+  | saturday : Weekday
+</code></pre>
+<p><code>inductive</code> コマンドは新しい型 <code>Weekday</code> を作成する。全てのコンストラクタは <code>Weekday</code> 名前空間の中に格納される。</p>
+<pre><code class="language-lean"><span class="boring">inductive Weekday where
+</span><span class="boring"> | sunday : Weekday
+</span><span class="boring"> | monday : Weekday
+</span><span class="boring"> | tuesday : Weekday
+</span><span class="boring"> | wednesday : Weekday
+</span><span class="boring"> | thursday : Weekday
+</span><span class="boring"> | friday : Weekday
+</span><span class="boring"> | saturday : Weekday
+</span>#check Weekday.sunday
+#check Weekday.monday
+
+open Weekday
+
+#check sunday
+#check monday
+</code></pre>
+<p>帰納型 <code>Weekday</code> を宣言する際は、<code>: Weekday</code> を省略できる。</p>
+<pre><code class="language-lean">inductive Weekday where
+  | sunday
+  | monday
+  | tuesday
+  | wednesday
+  | thursday
+  | friday
+  | saturday
+</code></pre>
+<p><code>sunday</code>、<code>monday</code>、...、<code>saturday</code> は <code>Weekday</code> の互いに異なる項であり、それ以外に互いに異なる項はないと考えてほしい。除去則 <code>Weekday.rec</code> は 型 <code>Weekday</code> とそのコンストラクタを用いて定義されている。除去則は<em>recursor</em>(再帰子)とも呼ばれ、この型を<em>inductive</em>(帰納的)にしている: 除去則は、各コンストラクタに対応する値を割り当てることで、<code>Weekday</code> 上の関数を定義することを可能にしている。直感的には、帰納型の項は各コンストラクタによって網羅的に生成され、帰納型はコンストラクタが構築する項以外の項を持たないということである。</p>
+<p><code>Weekday</code> から自然数への関数を定義するには、<code>match</code> 式を使うことができる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Weekday where
+</span><span class="boring"> | sunday : Weekday
+</span><span class="boring"> | monday : Weekday
+</span><span class="boring"> | tuesday : Weekday
+</span><span class="boring"> | wednesday : Weekday
+</span><span class="boring"> | thursday : Weekday
+</span><span class="boring"> | friday : Weekday
+</span><span class="boring"> | saturday : Weekday
+</span>open Weekday
+
+def numberOfDay (d : Weekday) : Nat :=
+  match d with
+  | sunday    =&gt; 1
+  | monday    =&gt; 2
+  | tuesday   =&gt; 3
+  | wednesday =&gt; 4
+  | thursday  =&gt; 5
+  | friday    =&gt; 6
+  | saturday  =&gt; 7
+
+#eval numberOfDay Weekday.sunday  -- 1
+#eval numberOfDay Weekday.monday  -- 2
+#eval numberOfDay tuesday         -- 3
+</code></pre>
+<p><code>match</code> 式は帰納型を宣言したときに生成された再帰子 <code>Weekday.rec</code> を使ってコンパイルされることに注意してほしい。</p>
+<pre><code class="language-lean"><span class="boring">inductive Weekday where
+</span><span class="boring"> | sunday : Weekday
+</span><span class="boring"> | monday : Weekday
+</span><span class="boring"> | tuesday : Weekday
+</span><span class="boring"> | wednesday : Weekday
+</span><span class="boring"> | thursday : Weekday
+</span><span class="boring"> | friday : Weekday
+</span><span class="boring"> | saturday : Weekday
+</span>open Weekday
+
+def numberOfDay (d : Weekday) : Nat :=
+  match d with
+  | sunday    =&gt; 1
+  | monday    =&gt; 2
+  | tuesday   =&gt; 3
+  | wednesday =&gt; 4
+  | thursday  =&gt; 5
+  | friday    =&gt; 6
+  | saturday  =&gt; 7
+
+set_option pp.all true    -- 詳細な情報を表示させるオプション
+#print numberOfDay
+-- 定義中に``numberOfDay.match_1``というものが現れている
+#print numberOfDay.match_1
+-- 定義中に``Weekday.casesOn``というものが現れている
+#print Weekday.casesOn
+-- 定義中に``Weekday.rec``というものが現れている
+#check @Weekday.rec
+/-
+@Weekday.rec.{u}
+ : {motive : Weekday → Sort u} →
+    motive Weekday.sunday →
+    motive Weekday.monday →
+    motive Weekday.tuesday →
+    motive Weekday.wednesday →
+    motive Weekday.thursday →
+    motive Weekday.friday →
+    motive Weekday.saturday →
+    (t : Weekday) → motive t
+-/
+</code></pre>
+<p>帰納データ型を宣言するとき、<code>deriving Repr</code> と書くと、<code>Weekday</code> の項をテキストに変換する関数を生成するようLeanに指示することができる。<code>#eval</code> コマンドはこの関数を使って <code>Weekday</code> の項を表示する。</p>
+<pre><code class="language-lean">inductive Weekday where
+  | sunday
+  | monday
+  | tuesday
+  | wednesday
+  | thursday
+  | friday
+  | saturday
+  deriving Repr
+
+open Weekday
+
+#eval tuesday   -- Weekday.tuesday (``deriving Repr`` を外すとエラーになる)
+</code></pre>
+<p>ある帰納型に関連する定義や定理を、型と同じ名前の名前空間にまとめると便利なことが多い。例えば、<code>numberOfDay</code> 関数を <code>Weekday</code> 名前空間に置くとよい。そうすると、名前空間 <code>Weekday</code> を開いたときに、コンストラクタにも定義・定理・関数にも短い名前を用いてアクセスすることができる。</p>
+<p><code>Weekday</code> から <code>Weekday</code> への関数を定義することができる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Weekday where
+</span><span class="boring"> | sunday : Weekday
+</span><span class="boring"> | monday : Weekday
+</span><span class="boring"> | tuesday : Weekday
+</span><span class="boring"> | wednesday : Weekday
+</span><span class="boring"> | thursday : Weekday
+</span><span class="boring"> | friday : Weekday
+</span><span class="boring"> | saturday : Weekday
+</span><span class="boring"> deriving Repr
+</span>namespace Weekday
+def next (d : Weekday) : Weekday :=
+  match d with
+  | sunday    =&gt; monday
+  | monday    =&gt; tuesday
+  | tuesday   =&gt; wednesday
+  | wednesday =&gt; thursday
+  | thursday  =&gt; friday
+  | friday    =&gt; saturday
+  | saturday  =&gt; sunday
+
+def previous (d : Weekday) : Weekday :=
+  match d with
+  | sunday    =&gt; saturday
+  | monday    =&gt; sunday
+  | tuesday   =&gt; monday
+  | wednesday =&gt; tuesday
+  | thursday  =&gt; wednesday
+  | friday    =&gt; thursday
+  | saturday  =&gt; friday
+
+#eval next (next tuesday)      -- Weekday.thursday
+#eval next (previous tuesday)  -- Weekday.tuesday
+
+example : next (previous tuesday) = tuesday :=
+  rfl
+
+end Weekday
+</code></pre>
+<p>どうすればより一般的な定理「任意のWeekday <code>d</code> に対して、<code>next (previous d) = d</code>」が証明できるだろうか。<code>match</code> を使うと各コンストラクタに対して主張の証明を与えることができる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Weekday where
+</span><span class="boring"> | sunday : Weekday
+</span><span class="boring"> | monday : Weekday
+</span><span class="boring"> | tuesday : Weekday
+</span><span class="boring"> | wednesday : Weekday
+</span><span class="boring"> | thursday : Weekday
+</span><span class="boring"> | friday : Weekday
+</span><span class="boring"> | saturday : Weekday
+</span><span class="boring"> deriving Repr
+</span><span class="boring">namespace Weekday
+</span><span class="boring">def next (d : Weekday) : Weekday :=
+</span><span class="boring"> match d with
+</span><span class="boring"> | sunday    =&gt; monday
+</span><span class="boring"> | monday    =&gt; tuesday
+</span><span class="boring"> | tuesday   =&gt; wednesday
+</span><span class="boring"> | wednesday =&gt; thursday
+</span><span class="boring"> | thursday  =&gt; friday
+</span><span class="boring"> | friday    =&gt; saturday
+</span><span class="boring"> | saturday  =&gt; sunday
+</span><span class="boring">def previous (d : Weekday) : Weekday :=
+</span><span class="boring"> match d with
+</span><span class="boring"> | sunday    =&gt; saturday
+</span><span class="boring"> | monday    =&gt; sunday
+</span><span class="boring"> | tuesday   =&gt; monday
+</span><span class="boring"> | wednesday =&gt; tuesday
+</span><span class="boring"> | thursday  =&gt; wednesday
+</span><span class="boring"> | friday    =&gt; thursday
+</span><span class="boring"> | saturday  =&gt; friday
+</span>theorem next_previous (d : Weekday) : next (previous d) = d :=
+  match d with
+  | sunday    =&gt; rfl
+  | monday    =&gt; rfl
+  | tuesday   =&gt; rfl
+  | wednesday =&gt; rfl
+  | thursday  =&gt; rfl
+  | friday    =&gt; rfl
+  | saturday  =&gt; rfl
+</code></pre>
+<p>タクティク証明を使えば、定理 <code>next_previous</code> の証明はより簡潔になる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Weekday where
+</span><span class="boring"> | sunday : Weekday
+</span><span class="boring"> | monday : Weekday
+</span><span class="boring"> | tuesday : Weekday
+</span><span class="boring"> | wednesday : Weekday
+</span><span class="boring"> | thursday : Weekday
+</span><span class="boring"> | friday : Weekday
+</span><span class="boring"> | saturday : Weekday
+</span><span class="boring"> deriving Repr
+</span><span class="boring">namespace Weekday
+</span><span class="boring">def next (d : Weekday) : Weekday :=
+</span><span class="boring"> match d with
+</span><span class="boring"> | sunday    =&gt; monday
+</span><span class="boring"> | monday    =&gt; tuesday
+</span><span class="boring"> | tuesday   =&gt; wednesday
+</span><span class="boring"> | wednesday =&gt; thursday
+</span><span class="boring"> | thursday  =&gt; friday
+</span><span class="boring"> | friday    =&gt; saturday
+</span><span class="boring"> | saturday  =&gt; sunday
+</span><span class="boring">def previous (d : Weekday) : Weekday :=
+</span><span class="boring"> match d with
+</span><span class="boring"> | sunday    =&gt; saturday
+</span><span class="boring"> | monday    =&gt; sunday
+</span><span class="boring"> | tuesday   =&gt; monday
+</span><span class="boring"> | wednesday =&gt; tuesday
+</span><span class="boring"> | thursday  =&gt; wednesday
+</span><span class="boring"> | friday    =&gt; thursday
+</span><span class="boring"> | saturday  =&gt; friday
+</span>def next_previous (d : Weekday) : next (previous d) = d := by
+  cases d &lt;;&gt; rfl
+</code></pre>
+<p>以下の節 <a href="#tactics-for-inductive-types-%E5%B8%B0%E7%B4%8D%E5%9E%8B%E3%81%AE%E3%81%9F%E3%82%81%E3%81%AE%E3%82%BF%E3%82%AF%E3%83%86%E3%82%A3%E3%82%AF">Tactics for Inductive Types (帰納型のためのタクティク)</a> では、帰納型を利用するのに特化したタクティクを紹介する。</p>
+<p>「型としての命題対応」の下では、定理証明と関数定義の両方に <code>match</code> を使えることに注目してほしい。言い換えれば、「型としての命題対応」の下では、場合分けによる証明は場合分けによる定義の一種なのである。そこには「定義」されるものが「データ型の項」なのか「命題型の証明」なのかの違いしかない。</p>
+<p>Leanのライブラリにおいて、<code>Bool</code> 型は列挙型の一例である。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Bool where
+  | false : Bool
+  | true  : Bool
+<span class="boring">end Hidden
+</span></code></pre>
+<p>(この例において、標準ライブラリ内の <code>Bool</code> と今定義する <code>Bool</code> の衝突を防ぐために、今定義する <code>Bool</code> を名前空間 <code>Hidden</code> の中に置いた。この処置は必須である。なぜなら、<code>Bool</code> はLeanの標準ライブラリ内の最初のファイル <code>Init/Prelude.lean</code> の一部であり、Leanが起動したときに自動的にインポートされるからである。)</p>
+<p>練習として、「<code>Bool</code> 型の導入則と除去則は何か」を考えるといいだろう。発展問題として、名前空間 <code>Hidden</code> の中で、自分の手で <code>Bool</code> 型と <code>Bool</code> 型上の演算子(ブーリアン演算子) <code>and</code>、<code>or</code>、<code>not</code> を定義し、それらに関する基本的な恒等式を証明してみることをお勧めする。<code>and</code> のような2項演算子は <code>match</code> を使って定義できることに注目してほしい:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>def and (a b : Bool) : Bool :=
+  match a with
+  | true  =&gt; b
+  | false =&gt; false
+<span class="boring">end Hidden
+</span></code></pre>
+<p>同様に、ほとんどの恒等式は適切に <code>match</code> を使ってから <code>rfl</code> を使うことで証明できる。</p>
+<h2 id="constructors-with-arguments-引数を持つコンストラクタ"><a class="header" href="#constructors-with-arguments-引数を持つコンストラクタ">Constructors with Arguments (引数を持つコンストラクタ)</a></h2>
+<p>列挙型は、そのコンストラクタが全く引数を取らないという点で帰納型の非常に特殊な例である。一般的に、コンストラクタは入力データ(引数)を使って項を構築することができる。ライブラリ内の直積型と直和型の定義について考えてみよう:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Prod (α : Type u) (β : Type v)
+  | mk : α → β → Prod α β
+
+inductive Sum (α : Type u) (β : Type v) where
+  | inl : α → Sum α β
+  | inr : β → Sum α β
+<span class="boring">end Hidden
+</span></code></pre>
+<p>この例の中で何が起きているか考えてみよう。直積型は唯一のコンストラクタ <code>Prod.mk</code> を持ち、これは2つの引数を取る。<code>Prod α β</code> 型の項を引数にとる関数を定義するには、入力が <code>Prod.mk a b</code> の形であると仮定し、<code>a</code> と <code>b</code> を用いて出力を指定する必要がある。この関数定義法は <code>Prod α β</code> 型の項のための2つの射影を定義する際にも使える。標準ライブラリにおいて、記法 <code>α × β</code> は <code>Prod α β</code> を表し、<code>(a, b)</code> は <code>Prod.mk a b</code> を表すことを覚えてほしい。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">inductive Prod (α : Type u) (β : Type v)
+</span><span class="boring">  | mk : α → β → Prod α β
+</span>def fst {α : Type u} {β : Type v} (p : Prod α β) : α :=
+  match p with
+  | Prod.mk a b =&gt; a
+
+def snd {α : Type u} {β : Type v} (p : Prod α β) : β :=
+  match p with
+  | Prod.mk a b =&gt; b
+<span class="boring">end Hidden
+</span></code></pre>
+<p>関数 <code>fst</code> はペア <code>p</code> を受け取る。<code>match</code> は <code>p</code> をペア <code>Prod.mk a b</code> として解釈する。<a href="./dependent_type_theory.html">2章 Dependent Type Theory (依存型理論)</a>において、これらの定義に出来るだけ強い普遍性を与えるには、型 <code>α</code> と <code>β</code> がどの型宇宙に属していてもよいように定義を書く必要がある、と学んだことを思い出してほしい。</p>
+<p>以下は <code>match</code> の代わりに再帰子 <code>Prod.casesOn</code> を使った例である。</p>
+<pre><code class="language-lean">def prod_example (p : Bool × Nat) : Nat :=
+  Prod.casesOn (motive := fun _ =&gt; Nat) p (fun b n =&gt; cond b (2 * n) (2 * n + 1))
+
+#eval prod_example (true, 3)
+#eval prod_example (false, 3)
+</code></pre>
+<p>引数 <code>motive</code> は構築したい項の型を指定するために使われる。そして、構築したい項の型は入力データ(この場合はペア)に依存して変わりうるので、<code>motive</code> は関数である。<code>cond</code> 関数はブール値を用いた条件分岐を実現する: <code>cond b t1 t2</code> は <code>b</code> が真なら <code>t1</code> を返し、そうでなければ <code>t2</code> を返す。上記の例で、関数 <code>prod_example</code> はブール値 <code>b</code> と自然数 <code>n</code> を取り、<code>b</code> が真なら <code>2 * n</code> を返し、<code>b</code> が偽なら <code>2 * n + 1</code> を返す。</p>
+<p>対照的に、直和型は<strong>2つの</strong>コンストラクタ <code>inl</code> と <code>inr</code> (&quot;insert left&quot;と&quot;insert right&quot;の略) を持ち、それぞれは<strong>1つの</strong>(明示的な)引数を取る。<code>Sum α β</code> 型の項を引数にとる関数を定義するには、2つの場合に対応しなければならない: 入力が <code>inl a</code> の形なら <code>a</code> を使って出力する値を指定する必要がある。入力が <code>inr b</code> の形なら <code>b</code> を使って出力する値を指定する必要がある。</p>
+<pre><code class="language-lean">def sum_example (s : Sum Nat Nat) : Nat :=
+  Sum.casesOn (motive := fun _ =&gt; Nat) s
+    (fun n =&gt; 2 * n)
+    (fun n =&gt; 2 * n + 1)
+
+#eval sum_example (Sum.inl 3)
+#eval sum_example (Sum.inr 3)
+
+def sum_example2 (s : Sum Nat Nat) : Nat :=
+  match s with
+  | Sum.inl a =&gt; 2 * a
+  | Sum.inr b =&gt; 2 * b + 1
+
+#eval sum_example2 (Sum.inl 3)
+#eval sum_example2 (Sum.inr 3)
+</code></pre>
+<p>この例は1つ前の例に似ている。しかし、この例では <code>sum_example</code> への入力は暗黙的に <code>inl n</code> か <code>inr n</code> のいずれかの形をとる。1つ目の場合なら関数は <code>2 * n</code> を返し、2つ目の場合なら関数は <code>2 * n + 1</code> を返す。</p>
+<p>直積型は引数 <code>α β : Type</code> を持つことに注意してほしい。これらは <code>Prod</code> の引数であると同時に、<code>Prod</code> のコンストラクタの引数の型でもある。引数 <code>α β</code> がコンストラクタへの後続の引数や戻り値の型から推論できる場合、Leanは引数 <code>α β</code> が何であるかを特定し、それらを暗黙の引数にする。</p>
+<p><a href="#defining-the-natural-numbers-%E8%87%AA%E7%84%B6%E6%95%B0%E3%82%92%E5%AE%9A%E7%BE%A9%E3%81%99%E3%82%8B">Defining the Natural Numbers (自然数を定義する)</a>の節では、帰納型のコンストラクタがその帰納型自体の項を引数として取るときに何が起こるかを説明する。その節で考える例の特徴は、各コンストラクタが当該型の項として既に特定された項のみを引数として取ることである。</p>
+<p>複数のコンストラクタを持つ型は「選言的」であることに注意してほしい: <code>Sum α β</code> の項は <code>inl a</code> <strong>または</strong> <code>inr b</code> の形をしている。複数の引数を取るコンストラクタは「連言的」な情報を提供する: <code>Prod α β</code> の項 <code>Prod.mk a b</code> からは <code>a</code> <strong>と</strong> <code>b</code> を抽出することができる。任意の帰納型は、任意個のコンストラクタを持つことができ、各コンストラクタは任意個の引数を取ることができるので、選言的かつ連言的な特徴を持つ可能性がある。</p>
+<p>関数定義と同様に、Leanの帰納型定義構文内では、コンストラクタ名とコロンの間に名前付き引数を与えることができる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Prod (α : Type u) (β : Type v) where
+  | mk (fst : α) (snd : β) : Prod α β
+
+inductive Sum (α : Type u) (β : Type v) where
+  | inl (a : α) : Sum α β
+  | inr (b : β) : Sum α β
+<span class="boring">end Hidden
+</span></code></pre>
+<p>これらの定義は上で与えた定義と本質的に同じである。</p>
+<p><code>Prod</code> のように、ただ1つのコンストラクタを持つ型は純粋に連言的である: そのコンストラクタは単に引数のリストを1つのデータにまとめる。このようなデータは後続の要素の型が最初の要素の型に依存することができるタプルと本質的に同じである。このような型は<em>record</em>(レコード)あるいは<em>structure</em>(構造体)と呼ばれる。Leanでは、キーワード <code>structure</code> を使うと、レコードや構造体の定義とその射影の定義を同時に行うことができる。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>structure Prod (α : Type u) (β : Type v) where
+  mk :: (fst : α) (snd : β)
+<span class="boring">end Hidden
+</span></code></pre>
+<p>この例では、帰納型 <code>Prod</code>、そのコンストラクタ <code>mk</code>、通常のエリミネータ(<code>rec</code> と <code>recOn</code>)と射影 <code>fst</code> と <code>snd</code> (上で定義したものと同じ)を同時に定義している。</p>
+<p>コンストラクタに名前を付けなかった場合、デフォルトのコンストラクタの名前として <code>mk</code> が使われる。次の例は、RGB値の3つ組として色を保存するレコードを定義する:</p>
+<pre><code class="language-lean">structure Color where
+  (red : Nat) (green : Nat) (blue : Nat)
+  deriving Repr
+
+def yellow := Color.mk 255 255 0
+
+#print Color.red  -- ``structure`` キーワードにより生成された射影関数
+#eval Color.red yellow
+</code></pre>
+<p><code>yellow</code> の定義は3つの値を持ったレコードを形成する。そして射影 <code>Color.red</code> は赤の要素を返す。</p>
+<p>各フィールドの間に改行を挟めば、括弧の使用を避けることができる。</p>
+<pre><code class="language-lean">structure Color where
+  red : Nat
+  green : Nat
+  blue : Nat
+  deriving Repr
+</code></pre>
+<p><code>structure</code> コマンドは代数的構造を定義するときに特に有用である。Leanは代数的構造を扱うための実質的なインフラを提供している。例えば、以下は半群の定義である:</p>
+<pre><code class="language-lean">structure Semigroup where
+  carrier : Type u
+  mul : carrier → carrier → carrier
+  mul_assoc : ∀ a b c, mul (mul a b) c = mul a (mul b c)
+</code></pre>
+<p><a href="./structures_and_records.html">9章 Structures and Records</a>ではさらに例を見ていく。</p>
+<p>依存直積型 <code>Sigma</code> は既に紹介した:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Sigma {α : Type u} (β : α → Type v) where
+  | mk : (a : α) → β a → Sigma β
+<span class="boring">end Hidden
+</span></code></pre>
+<p>次はライブラリ内にあるさらに2つの帰納型の例である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Option (α : Type u) where
+  | none : Option α
+  | some : α → Option α
+
+inductive Inhabited (α : Type u) where
+  | mk : α → Inhabited α
+<span class="boring">end Hidden
+</span></code></pre>
+<p>依存型理論の意味論では、全ての関数は全域関数である。関数型 <code>α → β</code> または依存関数型 <code>(a : α) → β</code> の各項は、全ての入力に対して一意の値を持つと想定される。したがって、依存型理論の意味論に部分関数の概念は組み込まれていない。しかし、<code>Option</code> 型を使うと(全域関数を使って)部分関数を表現することができる。<code>Option β</code> の項は、<code>none</code> か <code>some b</code>(ここで、<code>b : β</code>) の形をとる。したがって、<code>α → Option β</code> 型の項 <code>f</code> は、<code>α</code> から <code>β</code> への部分関数であると考えることができる: 任意の <code>a : α</code> に対して、<code>f a</code> は <code>none</code> か <code>some b</code> を返す。<code>none</code> は <code>f a</code> が「未定義」であることを表す。</p>
+<p><code>Inhabited α</code> の項は、単に <code>α</code> の項が存在することの証人となる。後ほど、Leanにおいて <code>Inhabited</code> が<em>type class</em>(型クラス)の一例であることを説明する: Leanに適切な基底型が<em>inhabited</em>(有項)であると指示することができる。Leanはその指示に基づいて、他の構築された型が有項であることを自動的に推論することができる。</p>
+<p>練習として、<code>α</code> から <code>β</code> への部分関数と <code>β</code> から <code>γ</code> への部分関数の合成の概念を定義し、それが期待通りの振る舞いをすることを示すことを勧める。また、<code>Bool</code> と <code>Nat</code> が有項であること、2つの有項な型の直積型が有項であること、有項な型への関数の型は有項であることを示すことも勧める。</p>
+<h2 id="inductively-defined-propositions-帰納的に定義された命題"><a class="header" href="#inductively-defined-propositions-帰納的に定義された命題">Inductively Defined Propositions (帰納的に定義された命題)</a></h2>
+<p>帰納的に定義された型は、一番下の型である <code>Prop</code> を含め、どの階層の型宇宙にも住むことができる。実際、論理的結合子は次のように定義されている。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive False : Prop
+
+inductive True : Prop where
+  | intro : True
+
+inductive And (a b : Prop) : Prop where
+  | intro : a → b → And a b
+
+inductive Or (a b : Prop) : Prop where
+  | inl : a → Or a b
+  | inr : b → Or a b
+<span class="boring">end Hidden
+</span></code></pre>
+<p>これらの定義が、すでに見た論理的結合子の導入則と除去則をどのように生み出すのかを考える必要がある。帰納型のエリミネータがその型を除去して<strong>何の型を作れるか</strong>を規定するルールがある。つまり、どのような型を再帰子の対象とすることができるかを規定するルールがある。大雑把に言えば、<code>Prop</code> に属する帰納型には、その型を除去することで <code>Prop</code> に属する他の型しか作ることができないというルールがある。これは、「もし <code>p : Prop</code>なら、<code>hp : p</code> は何のデータも持たない」という理解と矛盾しない。しかしながら、<a href="#inductive-families-%E5%B8%B0%E7%B4%8D%E6%97%8F">Inductive Families (帰納族)</a>の節で説明するように、このルールには小さな例外がある。</p>
+<p>存在量化子でさえ帰納的に定義されている:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Exists {α : Sort u} (p : α → Prop) : Prop where
+  | intro (w : α) (h : p w) : Exists p
+<span class="boring">end Hidden
+</span></code></pre>
+<p>記法 <code>∃ x : α, p</code> は <code>Exists (fun x : α =&gt; p)</code> の糖衣構文であることを思い出してほしい。</p>
+<p><code>False</code>、<code>True</code>、<code>And</code>、<code>Or</code> の定義は、<code>Empty</code>、<code>Unit</code>、<code>Prod</code>、<code>Sum</code> の定義と完全に類似している。違いは、最初のグループは <code>Prop</code> の項を生成し、2番目のグループはある宇宙パラメータ <code>u</code> に対して <code>Type u</code> の項を生成することである。同様に、<code>∃ x : α, p</code> と <code>Σ x : α, p</code> は類似しているが、前者は <code>Prop</code> の項で、後者は <code>Type u</code> の項である。</p>
+<p>もうひとつの帰納型 <code>{x : α // p}</code> に触れる良い機会だろう。これは、<code>∃ x : α, P</code> と <code>Σ x : α, P</code> のハイブリッドのようなものである。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Subtype {α : Type u} (p : α → Prop) where
+  | mk : (x : α) → p x → Subtype p
+<span class="boring">end Hidden
+</span></code></pre>
+<p>実際には、Leanでは <code>Subtype</code> は <code>structure</code> コマンドを使って定義されている:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>structure Subtype {α : Sort u} (p : α → Prop) where
+  val : α
+  property : p val
+<span class="boring">end Hidden
+</span></code></pre>
+<p>記法 <code>{x : α // p x}</code> は <code>Subtype (fun x : α =&gt; p x)</code> の糖衣構文である。これは集合論における部分集合の内包的表記をモデルにしている: <code>{x : α // p x}</code> は性質 <code>p</code> を持つ <code>α</code> の要素全体からなる集合を表す。</p>
+<h2 id="defining-the-natural-numbers-自然数を定義する"><a class="header" href="#defining-the-natural-numbers-自然数を定義する">Defining the Natural Numbers (自然数を定義する)</a></h2>
+<p>これまで見てきた帰納型は「フラット」である: コンストラクタはデータ(引数)を包んである型の項を作り、対応する再帰子はその項を展開してそれに作用する。コンストラクタがそのコンストラクタたちによってまさに今帰納的に定義されている型の項を受け取ると、物事はもっと面白くなる。典型的な例が自然数の型 <code>Nat</code> である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Nat where
+  | zero : Nat
+  | succ : Nat → Nat
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>Nat</code> のコンストラクタは2つある。まずは <code>zero : Nat</code> から始める。コンストラクタ <code>zero</code> は引数を取らないので、<code>Nat</code> は最初から項 <code>zero</code> を持っている。対照的に、コンストラクタ <code>succ</code> は既に構築された <code>Nat</code> の項に対してのみ適用できる。これを <code>zero</code> に適用すると、<code>succ zero : Nat</code> が得られる。もう一度適用すると <code>succ (succ zero) : Nat</code> が得られる。直感的には、<code>Nat</code> はこのようなコンストラクタを持つ「最小の」型であるといえる。このようなコンストラクタを持つことは、<code>Nat</code> の項は、 <code>zero</code> から始めて <code>succ</code> を繰り返し適用することで網羅的に(そして自由に)生成されることを意味する。</p>
+<p>以前と同様に、<code>Nat</code> のための再帰子は、<code>Nat</code> から任意の型への依存関数 <code>f</code>、つまりある <code>motive : Nat → Sort u</code> について <code>(n : Nat) → motive n</code> の項 <code>f</code> を定義するように設計されている。再帰子は、入力が <code>zero</code> の場合と、入力がある <code>n : Nat</code> について <code>succ n</code> の形をとる場合の2種類の場合に対応しなければならない。最初のケースでは、先ほどと同じように、適切な型を持つ出力値を指定するだけでよい。2番目のケースはそうはいかない。しかし、2番目のケースでは、再帰子は <code>n</code> における <code>f</code> の値がすでに計算されていると想定することができる。その結果、再帰子の次の引数は <code>n</code> と <code>f n</code> を用いて <code>f (succ n)</code> の値を指定する。再帰子 <code>Nat.rec</code> の型をチェックしてみると、</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">inductive Nat where
+</span><span class="boring"> | zero : Nat
+</span><span class="boring"> | succ : Nat → Nat
+</span>#check @Nat.rec
+<span class="boring">end Hidden
+</span></code></pre>
+<p>次のような表示が得られる:</p>
+<pre><code>  {motive : Nat → Sort u}
+  → motive Nat.zero
+  → ((n : Nat) → motive n → motive (Nat.succ n))
+  → (t : Nat) → motive t
+</code></pre>
+<p>暗黙の引数 <code>motive</code> は、定義される関数のコドメインである。型理論では、<code>motive</code> は除去/再帰の<em>motive</em>(動機)であると言うのが一般的である。それは <code>motive t</code> が入力 <code>t</code> に対して構築したい項の型を表しているからである。<code>motive</code> の次の2つの引数は、上述した2つの場合、つまり入力が <code>zero</code> の場合と <code>succ n</code> の形をとる場合の計算方法をそれぞれ指定する。この2つの引数は<em>minor premises</em>(小前提)としても知られている。最後に、<code>t : Nat</code> は定義したい関数への入力である。入力 <code>t</code> は<em>major premise</em>(大前提)としても知られている。 </p>
+<p><code>Nat.recOn</code> は <code>Nat.rec</code> とほとんど同じだが、大前提が小前提の前に現れている。</p>
+<pre><code>@Nat.recOn :
+  {motive : Nat → Sort u}
+  → (t : Nat)
+  → motive Nat.zero
+  → ((n : Nat) → motive n → motive (Nat.succ n))
+  → motive t
+</code></pre>
+<p>例えば、自然数に対する加法関数 <code>add m n</code> を定義することを考えてみよう。<code>m</code> を固定すると、<code>n</code> に関する再帰によって加法を定義することができる。base caseでは、<code>add m zero</code> を <code>m</code> と定義する。successor stepでは、<code>add m n</code> の値が既に決定されていると仮定して、<code>add m (succ n)</code> を <code>succ (add m n)</code> と定義する。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Nat where
+  | zero : Nat
+  | succ : Nat → Nat
+  deriving Repr
+
+def add (m n : Nat) : Nat :=
+  match n with
+  | Nat.zero   =&gt; m
+  | Nat.succ n =&gt; Nat.succ (add m n)
+
+open Nat
+
+#eval add (succ (succ zero)) (succ zero)
+<span class="boring">end Hidden
+</span></code></pre>
+<p>このような関数定義は名前空間 <code>Nat</code> に入れておくと便利である。それから、その名前空間の中でお馴染みの記法 <code>+</code> を定義することができる。ここまですると、加法に関する2つの等式が成立することが定義により示せる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">inductive Nat where
+</span><span class="boring"> | zero : Nat
+</span><span class="boring"> | succ : Nat → Nat
+</span><span class="boring"> deriving Repr
+</span>namespace Nat
+
+def add (m n : Nat) : Nat :=
+  match n with
+  | Nat.zero   =&gt; m
+  | Nat.succ n =&gt; Nat.succ (add m n)
+
+instance : Add Nat where
+  add := add
+
+theorem add_zero (m : Nat) : m + zero = m := rfl
+theorem add_succ (m n : Nat) : m + succ n = succ (m + n) := rfl
+
+end Nat
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>instance</code> コマンドがどのように機能するかは、<a href="./type_classes.html">10章 Type Classes (型クラス)</a>で説明する。以下の例では、Leanの標準ライブラリで定義された自然数を使う。</p>
+<p>上記では <code>rfl</code> を使うだけで定理が証明できた。しかし、<code>zero + m = m</code> のような定理は帰納法による証明を必要とする。上述の通り、帰納法の原理は再帰の原理の特殊な場合にすぎない。帰納法において、<code>motive n</code> のコドメインは一般的な型 <code>Sort u</code> ではなく <code>Prop</code> である。これは帰納法による証明のお馴染みのパターンを表現している: <code>∀ n, motive n</code> を証明するために、まず <code>motive 0</code> を証明する。次に任意の <code>n : Nat</code> について <code>ih : motive n</code> を仮定し、その上で <code>motive (succ n)</code> を証明する。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Nat
+
+theorem zero_add (n : Nat) : 0 + n = n :=
+  Nat.recOn (motive := fun x =&gt; 0 + x = x)
+   n
+   (show 0 + 0 = 0 from rfl)
+   (fun (n : Nat) (ih : 0 + n = n) =&gt;
+    show 0 + succ n = succ n from
+    calc 0 + succ n
+      _ = succ (0 + n) := rfl
+      _ = succ n       := by rw [ih])
+<span class="boring">end Hidden
+</span></code></pre>
+<p>繰り返しになるが、証明内で <code>Nat.recOn</code> を使うことは、証明内で帰納法の原理を使うことを意味することに注意してほしい。このような証明において、<code>rewrite</code> タクティクと <code>simp</code> タクティクは非常に効果的である。今回の場合、<code>simp</code> タクティクを使うと次のように証明を短くすることができる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Nat
+
+theorem zero_add (n : Nat) : 0 + n = n :=
+  Nat.recOn (motive := fun x =&gt; 0 + x = x) n
+    rfl
+    (fun n ih =&gt; by simp [add_succ, ih])
+<span class="boring">end Hidden
+</span></code></pre>
+<p>もう一つの例として、加法の結合性 <code>∀ m n k, m + n + k = m + (n + k)</code> を証明しよう。ここで、<code>+</code> という記法は左結合的なので、<code>m + n + k</code> とは <code>(m + n) + k</code> のことである。一番難しいのは、どの変数に関して帰納法を行うかの見当をつけることだ。加法は2番目の引数に関する再帰によって定義されるため、<code>k</code> を選ぶのはよい判断である。一度変数を選択すれば、証明はほとんど自ずと導かれる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Nat
+theorem add_assoc (m n k : Nat) : m + n + k = m + (n + k) :=
+  Nat.recOn (motive := fun k =&gt; m + n + k = m + (n + k)) k
+    (show m + n + 0 = m + (n + 0) from rfl)
+    (fun k (ih : m + n + k = m + (n + k)) =&gt;
+      show m + n + succ k = m + (n + succ k) from
+      calc m + n + succ k
+        _ = succ (m + n + k)   := rfl
+        _ = succ (m + (n + k)) := by rw [ih]
+        _ = m + succ (n + k)   := rfl
+        _ = m + (n + succ k)   := rfl)
+<span class="boring">end Hidden
+</span></code></pre>
+<p>再び、<code>simp</code> タクティクを使って証明を短くすることができる:</p>
+<pre><code class="language-lean">open Nat
+theorem add_assoc (m n k : Nat) : m + n + k = m + (n + k) :=
+  Nat.recOn (motive := fun k =&gt; m + n + k = m + (n + k)) k
+    rfl
+    (fun k ih =&gt; by simp [Nat.add_succ, ih])
+</code></pre>
+<p>次は加法の可換性を証明してみよう。2番目の引数に関して帰納法を行うことを選択すると、次のように証明を始めることができる:</p>
+<pre><code class="language-lean">open Nat
+theorem add_comm (m n : Nat) : m + n = n + m :=
+  Nat.recOn (motive := fun x =&gt; m + x = x + m) n
+   (show m + 0 = 0 + m by rw [Nat.zero_add, Nat.add_zero])
+   (fun (n : Nat) (ih : m + n = n + m) =&gt;
+    show m + succ n = succ n + m from
+    calc m + succ n
+      _ = succ (m + n) := rfl
+      _ = succ (n + m) := by rw [ih]
+      _ = succ n + m   := sorry)
+</code></pre>
+<p>ここで、もう1つの補題 <code>succ n + m = succ (n + m)</code> が必要であるとわかる。これは <code>m</code> に関する帰納法で証明できる:</p>
+<pre><code class="language-lean">open Nat
+
+theorem succ_add (n m : Nat) : succ n + m = succ (n + m) :=
+  Nat.recOn (motive := fun x =&gt; succ n + x = succ (n + x)) m
+    (show succ n + 0 = succ (n + 0) from rfl)
+    (fun (m : Nat) (ih : succ n + m = succ (n + m)) =&gt;
+     show succ n + succ m = succ (n + succ m) from
+     calc succ n + succ m
+       _ = succ (succ n + m)   := rfl
+       _ = succ (succ (n + m)) := by rw [ih]
+       _ = succ (n + succ m)   := rfl)
+</code></pre>
+<p>それから、上記の証明の <code>sorry</code> を <code>succ_add</code> に置き換えて、証明を完結させることができる。再び、これらの証明は短くできる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Nat
+theorem succ_add (n m : Nat) : succ n + m = succ (n + m) :=
+  Nat.recOn (motive := fun x =&gt; succ n + x = succ (n + x)) m
+    rfl
+    (fun m ih =&gt; by simp only [add_succ, ih])
+
+theorem add_comm (m n : Nat) : m + n = n + m :=
+  Nat.recOn (motive := fun x =&gt; m + x = x + m) n
+    (by simp)
+    (fun m ih =&gt; by simp [add_succ, succ_add, ih])
+<span class="boring">end Hidden
+</span></code></pre>
+<h2 id="other-recursive-data-types-他の再帰データ型"><a class="header" href="#other-recursive-data-types-他の再帰データ型">Other Recursive Data Types (他の再帰データ型)</a></h2>
+<p>帰納的に定義された型の例をもう少し考えてみよう。任意の型 <code>α</code> に対して、いくつかの <code>α</code> の項からなるリストの型 <code>List α</code> がライブラリで定義されている。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive List (α : Type u) where
+  | nil  : List α
+  | cons : α → List α → List α
+
+namespace List
+
+def append (as bs : List α) : List α :=
+  match as with
+  | nil       =&gt; bs
+  | cons a as =&gt; cons a (append as bs)
+
+theorem nil_append (as : List α) : append nil as = as :=
+  rfl
+
+theorem cons_append (a : α) (as bs : List α)
+                    : append (cons a as) bs = cons a (append as bs) :=
+  rfl
+
+end List
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>α</code> 型の項を要素に持つリストは、空リスト <code>nil</code> か <code>cons h t</code> の形をとるかのいずれかである。ここで、<code>cons h t</code> は項 <code>h : α</code> の後にリスト <code>t : List α</code> が続くリストである。最初の要素 <code>h</code> は一般にリストの&quot;head&quot;と呼ばれ、残りの要素 <code>t</code> は&quot;tail&quot;と呼ばれる。</p>
+<p>練習問題として、以下の定理を証明せよ:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">inductive List (α : Type u) where
+</span><span class="boring">| nil  : List α
+</span><span class="boring">| cons : α → List α → List α
+</span><span class="boring">namespace List
+</span><span class="boring">def append (as bs : List α) : List α :=
+</span><span class="boring"> match as with
+</span><span class="boring"> | nil       =&gt; bs
+</span><span class="boring"> | cons a as =&gt; cons a (append as bs)
+</span><span class="boring">theorem nil_append (as : List α) : append nil as = as :=
+</span><span class="boring"> rfl
+</span><span class="boring">theorem cons_append (a : α) (as bs : List α)
+</span><span class="boring">                    : append (cons a as) bs = cons a (append as bs) :=
+</span><span class="boring"> rfl
+</span>theorem append_nil (as : List α) : append as nil = as :=
+  sorry
+
+theorem append_assoc (as bs cs : List α)
+        : append (append as bs) cs = append as (append bs cs) :=
+  sorry
+<span class="boring">end List
+</span><span class="boring">end Hidden
+</span></code></pre>
+<p>また、リストの長さを返す関数 <code>length : {α : Type u} → List α → Nat</code> を定義せよ。さらにそれが期待通りに振る舞うことを証明せよ。例えば、<code>length (append as bs) = length as + length bs</code> を証明せよ。</p>
+<p>別の例として、binary trees((全)二分木)の型を定義することができる:</p>
+<pre><code class="language-lean">/- 1. ただ1つの頂点からなる有向グラフは全二分木である。
+   2. 次数0の頂点vと2つの全二分木A,Bを用意し、
+   ラベル付き有向辺(左,v,Aの根)と(右,v,Bの根)を追加し、vを根としたものは全二分木である。
+   3. 以上の手続きで全二分木だとわかるものだけが全二分木である。 -/
+inductive BinaryTree where
+  | leaf : BinaryTree
+  | root (left : BinaryTree) (right : BinaryTree) : BinaryTree
+</code></pre>
+<p>countably branching trees((全)可算無限分木)の型を定義することさえできる:</p>
+<pre><code class="language-lean">/- 1. ただ1つの頂点からなる有向グラフは全可算無限分木である。
+   2. 次数0の頂点vと2つの全可算無限分木T_0,T_1,...を用意し、
+   ラベル付き有向辺(0,v,T_0の根),(1,v,T_1の根),...を追加し、vを根としたものは全可算無限分木である。
+   3. 以上の手続きで全可算無限分木だとわかるものだけが全可算無限分木である。 -/
+inductive CBTree where
+  | leaf : CBTree
+  | sup : (Nat → CBTree) → CBTree
+
+namespace CBTree
+
+def succ (t : CBTree) : CBTree :=
+  sup (fun _ =&gt; t)
+
+def toCBTree : Nat → CBTree
+  | 0 =&gt; leaf
+  | n+1 =&gt; succ (toCBTree n)
+
+def omega : CBTree :=
+  sup toCBTree
+
+end CBTree
+</code></pre>
+<h2 id="tactics-for-inductive-types-帰納型のためのタクティク"><a class="header" href="#tactics-for-inductive-types-帰納型のためのタクティク">Tactics for Inductive Types (帰納型のためのタクティク)</a></h2>
+<p>Leanにおける帰納型の基礎的な重要性を鑑みれば、帰納型を効率的に扱うためにデザインされたタクティクが数多くあることは驚くことではない。ここではそのようなタクティクのいくつかを紹介する。</p>
+<p><code>cases</code> タクティクは帰納的に定義された型の項に対して機能し、その名前が示す通りの働きをする: <code>cases</code> タクティクは存在する各コンストラクタに従って項を分解する。最も基本的な形では、<code>cases</code> タクティクは現在のコンテキスト内の項 <code>x</code> に適用される。そして、<code>x</code> を各コンストラクタで置換して、ゴールを場合分けする。</p>
+<pre><code class="language-lean">example (p : Nat → Prop) (hz : p 0) (hs : ∀ n, p (Nat.succ n)) : ∀ n, p n := by
+  intro n
+  cases n
+  . exact hz  -- goal is p 0
+  . apply hs  -- goal is a : Nat ⊢ p (succ a)
+</code></pre>
+<p>さらに便利な機能がある。まず、<code>with</code> キーワードを使うと、<code>cases</code> タクティク使用時の各場合分けにおいて変数に名前を付けることができる。次の例では、<code>succ</code> の引数に <code>m</code> という名前を付け、2番目の場合で <code>n</code> を <code>succ m</code> で置換するように指示している。さらに重要なのは、<code>cases</code> タクティクが、現在のコンテキスト内にある、場合分け対象の変数に依存する型を持つ項を検出することである。<code>cases</code> タクティクはこれらの項をゴールのターゲットに戻し、ゴールを場合分けし、再び項をゴールのコンテキストに導入する。次の例では、仮説 <code>h : n ≠ 0</code> が最初の分岐では <code>h : 0 ≠ 0</code> になり、2番目の分岐では <code>h : succ m ≠ 0</code> になることに注目してほしい。</p>
+<pre><code class="language-lean">open Nat
+
+example (n : Nat) (h : n ≠ 0) : succ (pred n) = n := by
+  cases n with
+  | zero =&gt;
+    -- goal: h : 0 ≠ 0 ⊢ succ (pred 0) = 0
+    apply absurd rfl h
+  | succ m =&gt;
+    -- second goal: h : succ m ≠ 0 ⊢ succ (pred (succ m)) = succ m
+    rfl
+</code></pre>
+<p><code>cases</code> は命題を証明するだけでなく、データを生成するためにも使用できることに注目してほしい。</p>
+<pre><code class="language-lean">def f (n : Nat) : Nat := by
+  cases n; exact 3; exact 7
+
+example : f 0 = 3 := rfl
+example : f 5 = 7 := rfl
+</code></pre>
+<p>繰り返しになるが、<code>cases x</code> はコンテキスト内にある <code>x</code> に依存する型を持つ項をターゲットに戻し、ゴールを場合分けし、再び項をコンテキストに導入する。</p>
+<pre><code class="language-lean">def Tuple (α : Type) (n : Nat) :=
+  { as : List α // as.length = n }
+
+def f {n : Nat} (t : Tuple α n) : Nat := by
+  cases n; exact 3; exact 7
+
+def myTuple : Tuple Nat 3 :=
+  ⟨[0, 1, 2], rfl⟩
+
+example : f myTuple = 7 :=
+  rfl
+</code></pre>
+<p>次は引数をとる複数のコンストラクタを持つ帰納型における例である。</p>
+<pre><code class="language-lean">inductive Foo where
+  | bar1 : Nat → Nat → Foo
+  | bar2 : Nat → Nat → Nat → Foo
+
+def silly (x : Foo) : Nat := by
+  cases x with
+  | bar1 a b =&gt; exact b
+  | bar2 c d e =&gt; exact e
+
+#eval silly (Foo.bar1 1 2)    -- 2
+#eval silly (Foo.bar2 3 4 5)  -- 5
+</code></pre>
+<p>各コンストラクタによって生成された各ゴールは、帰納型の定義におけるコンストラクタの宣言順に解く必要はない。</p>
+<pre><code class="language-lean">inductive Foo where
+  | bar1 : Nat → Nat → Foo
+  | bar2 : Nat → Nat → Nat → Foo
+
+def silly (x : Foo) : Nat := by
+  cases x with
+  | bar2 c d e =&gt; exact e
+  | bar1 a b =&gt; exact b
+</code></pre>
+<p><code>with</code> の構文は構造化された証明を書くのに便利である。また、Leanは <code>cases</code> を補完する <code>case</code> タクティクを提供する。これを使うと、各ケースで変数名を割り当てることに集中することができる。</p>
+<pre><code class="language-lean"><span class="boring">inductive Foo where
+</span><span class="boring">  | bar1 : Nat → Nat → Foo
+</span><span class="boring">  | bar2 : Nat → Nat → Nat → Foo
+</span>def silly (x : Foo) : Nat := by
+  cases x
+  case bar1 a b =&gt; exact b
+  case bar2 c d e =&gt; exact e
+</code></pre>
+<p><code>case</code> タクティクは賢く、各コンストラクタを適切なゴールにマッチさせることができる。例えば、上記のゴールを逆順で埋めることができる:</p>
+<pre><code class="language-lean"><span class="boring">inductive Foo where
+</span><span class="boring">  | bar1 : Nat → Nat → Foo
+</span><span class="boring">  | bar2 : Nat → Nat → Nat → Foo
+</span>def silly (x : Foo) : Nat := by
+  cases x
+  case bar2 c d e =&gt; exact e
+  case bar1 a b =&gt; exact b
+</code></pre>
+<p>さらに、任意の式 <code>e</code> に対して <code>cases e</code> を使うこともできる。もしその式がゴールのターゲットに現れるなら、<code>cases</code> タクティクはその式を一般化し、その結果生じる全称量化された変数を導入し、その上でゴールを場合分けする。</p>
+<pre><code class="language-lean">open Nat
+
+example (p : Nat → Prop) (hz : p 0) (hs : ∀ n, p (succ n)) (m k : Nat)
+        : p (m + 3 * k) := by
+  cases m + 3 * k
+  . exact hz   -- goal is p 0
+  . apply hs   -- goal is a : Nat ⊢ p (succ a)
+</code></pre>
+<p>これは、「(<code>m + 3 * k</code> は自然数なので、)<code>m + 3 * k</code> が0か、ある数の後者かで場合分けする」と言っているのだと考えてほしい。この結果は機能的には次の例と等価である:</p>
+<pre><code class="language-lean">open Nat
+
+example (p : Nat → Prop) (hz : p 0) (hs : ∀ n, p (succ n)) (m k : Nat)
+        : p (m + 3 * k) := by
+  generalize m + 3 * k = n
+  cases n
+  . exact hz   -- goal is p 0
+  . apply hs   -- goal is a : Nat ⊢ p (succ a)
+</code></pre>
+<p>式 <code>m + 3 * k</code> は <code>generalize</code> によって消去されることに注意してほしい; 重要なのは、それが <code>0</code> か <code>succ a</code> のどちらの形式を持つかだけである。 この使い方の場合、<code>cases</code> は等式(この場合は <code>m + 3 * k = n</code>)中の項について言及している仮説をゴールのターゲットに戻さ<strong>ない</strong>。そのような仮説がコンテキストの中にあり、それについても一般化したい場合は、明示的にそれを <code>revert</code> で戻す必要がある。</p>
+<p>場合分けの対象となる式がゴールのターゲット内にない場合、<code>cases</code> タクティクは <code>have</code> を使い、分解後の式を型として持つ項をコンテキストに導入する。以下はその例である:</p>
+<pre><code class="language-lean">example (p : Prop) (m n : Nat)
+        (h₁ : m &lt; n → p) (h₂ : m ≥ n → p) : p := by
+  cases Nat.lt_or_ge m n
+  case inl hlt =&gt; exact h₁ hlt
+  case inr hge =&gt; exact h₂ hge
+</code></pre>
+<p><code>Nat.lt_or_ge m n</code> とは <code>m &lt; n ∨ m ≥ n</code> の証明項であり、上の証明はこの2つの場合に分かれると考えるのが自然である。最初の分岐では仮説 <code>hlt : m &lt; n</code> を持つ。2番目の分岐では仮説 <code>hge : m ≥ n</code> を持つ。上の証明は、機能的には次と等価である:</p>
+<pre><code class="language-lean">example (p : Prop) (m n : Nat)
+        (h₁ : m &lt; n → p) (h₂ : m ≥ n → p) : p := by
+  have h : m &lt; n ∨ m ≥ n := Nat.lt_or_ge m n
+  cases h
+  case inl hlt =&gt; exact h₁ hlt
+  case inr hge =&gt; exact h₂ hge
+</code></pre>
+<p><code>have</code> タクティクにより仮説 <code>h : m &lt; n ∨ m ≥ n</code> が得られるので、その仮説に対して <code>cases</code> を適用する。</p>
+<p>次の例では、自然数における等式の決定可能性を利用して、<code>m = n</code> と <code>m ≠ n</code> の場合に分けて証明する。</p>
+<pre><code class="language-lean">#check Nat.sub_self
+
+theorem t1 (m n : Nat) : m - n = 0 ∨ m ≠ n := by
+  cases Decidable.em (m = n) with
+  | inl heq =&gt; rw [heq]; apply Or.inl; exact Nat.sub_self n
+  | inr hne =&gt; apply Or.inr; exact hne
+
+/- ``Decidable.em`` は排中律 ``Classical.em`` を必要としない -/
+#print axioms t1  -- 't1' does not depend on any axioms
+</code></pre>
+<p><code>open Classical</code> を使えば、任意の命題に対して排中律 <code>em</code> が使えることを思い出してほしい。しかし、型クラス推論(<a href="./type_classes.html">10章 Type Classes (型クラス)</a>を参照)を使えば、Leanは排中律に似て非なる決定手続きを見つけることができる。つまり、計算可能関数において場合分け <code>p ∨ ¬p</code> を使うことができるのである。</p>
+<p><code>cases</code> タクティクが場合分けによる証明を行うのに使えるように、<code>induction</code> タクティクは帰納法による証明を行うのに使える。<code>induction</code> タクティクの構文は <code>cases</code> タクティクの構文と似ているが、前者は引数が現在のコンテキストの項でなければならない点が異なる。以下はその例である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>theorem zero_add (n : Nat) : 0 + n = n := by
+  induction n with
+  | zero =&gt; rfl
+  | succ n ih =&gt; rw [Nat.add_succ, ih]
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>cases</code> と同様に、<code>induction</code> タクティクでは <code>with</code> キーワードの代わりに <code>case</code> タクティクを使うことができる。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>theorem zero_add (n : Nat) : 0 + n = n := by
+  induction n
+  case zero =&gt; rfl
+  case succ n ih =&gt; rw [Nat.add_succ, ih]
+<span class="boring">end Hidden
+</span></code></pre>
+<p>以下に例を追加する:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span><span class="boring">theorem add_zero (n : Nat) : n + 0 = n := Nat.add_zero n
+</span>open Nat
+
+theorem zero_add (n : Nat) : 0 + n = n := by
+  induction n &lt;;&gt; simp [*, add_zero, add_succ]
+
+theorem succ_add (m n : Nat) : succ m + n = succ (m + n) := by
+  induction n &lt;;&gt; simp [*, add_zero, add_succ]
+
+theorem add_comm (m n : Nat) : m + n = n + m := by
+  induction n &lt;;&gt; simp [*, add_zero, add_succ, succ_add, zero_add]
+
+theorem add_assoc (m n k : Nat) : m + n + k = m + (n + k) := by
+  induction k &lt;;&gt; simp [*, add_zero, add_succ]
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>induction</code> タクティクは複数の引数(大前提)をとるユーザー定義の帰納法原理もサポートしている。</p>
+<pre><code class="language-lean">/-
+theorem Nat.mod.inductionOn
+      {motive : Nat → Nat → Sort u}
+      (x y  : Nat)
+      (ind  : ∀ x y, 0 &lt; y ∧ y ≤ x → motive (x - y) y → motive x y)
+      (base : ∀ x y, ¬(0 &lt; y ∧ y ≤ x) → motive x y)
+      : motive x y :=
+-/
+
+example (x : Nat) {y : Nat} (h : y &gt; 0) : x % y &lt; y := by
+  induction x, y using Nat.mod.inductionOn with
+  | ind x y h₁ ih =&gt;
+    rw [Nat.mod_eq_sub_mod h₁.2]
+    exact ih h
+  | base x y h₁ =&gt;
+    have : ¬ 0 &lt; y ∨ ¬ y ≤ x := Iff.mp (Decidable.not_and_iff_or_not ..) h₁
+    match this with
+    | Or.inl h₁ =&gt; exact absurd h h₁
+    | Or.inr h₁ =&gt;
+      have hgt : y &gt; x := Nat.gt_of_not_le h₁
+      rw [← Nat.mod_eq_of_lt hgt] at hgt
+      assumption
+</code></pre>
+<p>タクティク証明の中で <code>match</code> を使うこともできる:</p>
+<pre><code class="language-lean">example : p ∨ q → q ∨ p := by
+  intro h
+  match h with
+  | Or.inl _  =&gt; apply Or.inr; assumption
+  | Or.inr h2 =&gt; apply Or.inl; exact h2
+</code></pre>
+<p>便利なことに、パターンマッチングは <code>intro</code> や <code>funext</code> のようなタクティクに統合されている。</p>
+<pre><code class="language-lean">example : s ∧ q ∧ r → p ∧ r → q ∧ p := by
+  intro ⟨_, ⟨hq, _⟩⟩ ⟨hp, _⟩
+  exact ⟨hq, hp⟩
+
+example :
+    (fun (x : Nat × Nat) (y : Nat × Nat) =&gt; x.1 + y.2)
+    =
+    (fun (x : Nat × Nat) (z : Nat × Nat) =&gt; z.2 + x.1) := by
+  funext (a, b) (c, d)
+  show a + d = d + a
+  rw [Nat.add_comm]
+</code></pre>
+<p>最後に、<code>injection</code> タクティクを紹介してセクションを閉じる。このタクティクは帰納型を扱いやすくするためにデザインされている。Leanの設計上、帰納型の項は自由に生成される。つまり、各コンストラクタは単射であり、各コンストラクタの値域は互いに交わりを持たない。<code>injection</code> タクティクはこの事実を利用するようにデザインされている:</p>
+<pre><code class="language-lean">open Nat
+
+example (m n k : Nat) (h : succ (succ m) = succ (succ n))
+        : n + k = m + k := by
+  injection h with h'
+  injection h' with h''
+  rw [h'']
+</code></pre>
+<p>証明の1行目は仮説 <code>h' : succ m = succ n</code> をコンテキストに追加し、証明の2行目は仮説 <code>h'' : m = n</code> をコンテキストに追加する。</p>
+<p>また、<code>injection</code> タクティクは「異なるコンストラクタ(あるいは異なる入力を受けたコンストラクタ)の出力が互いに等しい」としたときに生じる矛盾を検出し、その矛盾を使ってゴールを閉じる。</p>
+<pre><code class="language-lean">open Nat
+
+example (m n : Nat) (h : succ m = 0) : n = n + 7 := by
+  injection h
+
+example (m n : Nat) (h : succ m = 0) : n = n + 7 := by
+  contradiction
+
+example (h : 7 = 4) : False := by
+  contradiction
+</code></pre>
+<p>2番目の例は、<code>contradiction</code> タクティクもこの形の矛盾を検出することを示している。</p>
+<h2 id="inductive-families-帰納族"><a class="header" href="#inductive-families-帰納族">Inductive Families (帰納族)</a></h2>
+<p>Leanが受け入れる帰納的定義のほとんど全てを説明し終えた。ここまでの説明で、Leanでは任意個の再帰的コンストラクタを持つ帰納型を導入できることが分かった。実際、今までの知識を応用して、これから説明する方法を使うと、ただ1つの帰納的定義を使って帰納型の添字付き<em>family</em>(族)を導入することもできる。</p>
+<p>帰納族とは、次のような形の1つの帰納的定義によって同時に定義される、添字を持つ型の族である:</p>
+<pre><code>inductive foo : ... → Sort u where
+  | constructor₁ : ... → foo ...
+  | constructor₂ : ... → foo ...
+  ...
+  | constructorₙ : ... → foo ...
+</code></pre>
+<p>ある <code>Sort u</code> の項を構築する通常の帰納的定義に対して、より一般的な帰納的定義は関数 <code>... → Sort u</code> を構築する。ここで、<code>...</code> は<em>indices</em>(添字)とも呼ばれる引数の型の列を表す。そして、各コンストラクタは族のいくつかの要素を構築する。その一例が <code>Vector α n</code> の定義である。これは <code>α</code> の項を要素に持つ長さ <code>n</code> のベクトルの型である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Vector (α : Type u) : Nat → Type u where
+  | nil  : Vector α 0
+  | cons : α → {n : Nat} → Vector α n → Vector α (n+1)
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>cons</code> コンストラクタは <code>α</code> と <code>Vector α n</code> の項を取り、<code>Vector α (n+1)</code> の項を返す。これにより、族の1つの要素(型)の項を利用して別の要素(型)の項を構築することができる。</p>
+<p>より風変わりな例は、Leanにおける等式型の定義である:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>inductive Eq {α : Sort u} (a : α) : α → Prop where
+  | refl : Eq a a
+<span class="boring">end Hidden
+</span></code></pre>
+<p>固定された各 <code>α : Sort u</code> と各 <code>a : α</code> に対して、この定義は <code>x : α</code> を添字とする型の族 <code>Eq a x</code> を構築する。しかし、注目すべきは、族 <code>Eq a x</code> には <code>Eq a a</code> の項を構築するただ1つのコンストラクタ <code>refl</code> しかないことである。直感的には、<code>Eq a x</code> の証明を構築するには、<code>x</code> が <code>a</code> である場合に反射律を使うしかないと言い換えることができる。<code>Eq a a</code> は型の族 <code>Eq a x</code> の中で唯一の有項型であることに注意してほしい。</p>
+<p>Leanにより生成された等号の除去則は次の通り:</p>
+<pre><code class="language-lean">universe u v
+
+#check (@Eq.rec : {α : Sort u} → {a : α} → {motive : (x : α) → a = x → Sort v}
+                  → motive a rfl → {b : α} → (h : a = b) → motive b h)
+</code></pre>
+<p>コンストラクタ <code>refl</code> とエリミネータ <code>Eq.rec</code> だけから等式の基本的な公理の全てが導かれるのは驚くべき事実である。ただし、節 <a href="#axiomatic-details-%E5%85%AC%E7%90%86%E3%81%AE%E8%A9%B3%E7%B4%B0">Axiomatic Details (公理の詳細)</a> で説明するように、等式の定義は非典型的である。</p>
+<p>再帰子 <code>Eq.rec</code> は代入の定義にも使われる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>theorem subst {α : Type u} {a b : α} {p : α → Prop} (h₁ : Eq a b) (h₂ : p a) : p b :=
+  Eq.rec (motive := fun x _ =&gt; p x) h₂ h₁
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>match</code> を使って <code>subst</code> を定義(証明)することもできる。 </p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>theorem subst {α : Type u} {a b : α} {p : α → Prop} (h₁ : Eq a b) (h₂ : p a) : p b :=
+  match h₁ with
+  | rfl =&gt; h₂
+<span class="boring">end Hidden
+</span></code></pre>
+<p>実際、Leanは <code>Eq.rec</code> に基づいた定義を用いて <code>match</code> 式をコンパイルする。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>theorem subst {α : Type u} {a b : α} {p : α → Prop} (h₁ : Eq a b) (h₂ : p a) : p b :=
+  match h₁ with
+  | rfl =&gt; h₂
+
+set_option pp.all true
+#print subst
+  -- ... subst.match_1 ...
+#print subst.match_1
+  -- ... Eq.casesOn ...
+#print Eq.casesOn
+  -- ... Eq.rec ...
+<span class="boring">end Hidden
+</span></code></pre>
+<p><code>h₁ : a = b</code> に対して再帰子 <code>Eq.rec</code> または <code>match</code> を使うと、<code>a</code> と <code>b</code> が同じだと仮定することができる。その下で、<code>p b</code> と <code>p a</code> は同じである。</p>
+<p><code>Eq</code> が対称的かつ推移的であることを証明するのは難しくない。以下の例では、等号の対称性 <code>symm</code> を示す。推移性 <code>trans</code> と<em>congruence</em>(合同性) <code>congr</code> の証明は練習問題として残す。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>theorem symm {α : Type u} {a b : α} (h : Eq a b) : Eq b a :=
+  match h with
+  | rfl =&gt; rfl
+
+theorem trans {α : Type u} {a b c : α} (h₁ : Eq a b) (h₂ : Eq b c) : Eq a c :=
+  sorry
+
+theorem congr {α β : Type u} {a b : α} (f : α → β) (h : Eq a b) : Eq (f a) (f b) :=
+  sorry
+<span class="boring">end Hidden
+</span></code></pre>
+<p>型理論の研究においては、帰納的定義の更なる一般化が存在する。例えば、<em>induction-recursion</em> と <em>induction-induction</em> の原理がある。これらはLeanではサポートされていない。</p>
+<h2 id="axiomatic-details-公理の詳細"><a class="header" href="#axiomatic-details-公理の詳細">Axiomatic Details (公理の詳細)</a></h2>
+<p>これまで、例を通して帰納型とその構文について説明してきた。この節では、公理的な基礎に興味のある人のために、追加の情報を提供する。</p>
+<p>帰納型のコンストラクタは、<em>parameters</em>(パラメータ, 帰納的な構築の間、固定されたままの引数)と<em>indices</em>(添字, 同時進行で構築される型の族をパラメータ化する引数)を取りうることを見てきた。各コンストラクタは、型を持つ必要がある。ここで、コンストラクタの引数の型は既に定義された型、パラメータと添字の型、現在定義中の帰納族の要素だけから構成される必要がある。コンストラクタの引数の型に現在定義中の帰納族の要素が現れる場合、それは<em>strictly positively</em>に出現しなければならないという要件がある。これは単純に、任意のコンストラクタの任意の引数の型は、定義中の帰納型が結果としてのみ出現する依存関数型でなければならないことを意味する。ここで、添字は定数と前の引数を使って与えられる。</p>
+<p>帰納型はある <code>u</code> が存在して <code>Sort u</code> の項なので、当該帰納型を項としてみたとき、その項が持つ型宇宙として<strong>どの</strong>宇宙レベル <code>u</code> がふさわしいかを問うのは合理的である。帰納族 <code>C</code> の定義内の各コンストラクタ <code>c</code> は以下の形式をとる。</p>
+<pre><code>  c : (a : α) → (b : β[a]) → C a p[a,b]
+</code></pre>
+<p>ここで、<code>a</code> はデータ型パラメータの列、<code>b</code> はコンストラクタへの引数の列、<code>p[a, b]</code> は添字である。この添字 <code>p[a, b]</code> によって、そのコンストラクタが帰納族のどの要素の項を構築するかが決まる。(この説明はやや不正確である。実際には、コンストラクタへの引数は、依存関係が意味をなす限りどのような順番で現れてもよい。)<code>C</code> の宇宙レベルは、その帰納型が <code>Prop</code>(つまり、<code>Sort 0</code>)に属するように指定されているかどうかによって、2種類の制約を持つ。</p>
+<p>まず、帰納型が <code>Prop</code> に属するように指定されて<strong>いない</strong>場合を考えよう。このとき、宇宙レベル <code>u</code> は次を満たすように制約される:</p>
+<blockquote>
+<p>上記の各コンストラクタ <code>c</code> と、列 <code>β[a]</code> 内の各 <code>βk[a]</code> に対して、もし <code>βk[a] : Sort v</code> なら、<code>u</code> ≥ <code>v</code> である。</p>
+</blockquote>
+<p>言い換えれば、当該帰納型の宇宙レベル <code>u</code> は、各コンストラクタの各引数の型の宇宙レベル以上であることが要求される。</p>
+<p>帰納型が <code>Prop</code> に属するように指定されている場合、コンストラクタの引数の型の宇宙レベルには制約がない。しかし、コンストラクタの引数の型の宇宙レベルは除去則に影響を与える。一般的に、<code>Prop</code> に属する帰納型の場合、除去則のmotive(動機)の型は <code>Prop</code> に属することが要求される。</p>
+<p>この最後のルールには例外がある: コンストラクタが1つしかなく、コンストラクタの各引数が <code>Prop</code> の項あるいは添字である場合、除去則によって帰納的に定義された <code>Prop</code> を除去して任意の <code>Sort</code> の項を作ることが許される。この場合、直感的には、エリミネータは引数の型が有項であるという事実なしに引数の情報を利用することはない、と言うことができる。この特別なケースは<em>singleton elimination</em>(シングルトン除去)として知られている。</p>
+<p>帰納的に定義された等式型のエリミネータ <code>Eq.rec</code> の実用例で、シングルトン除去が活躍するのをすでに見てきた。<code>p a</code> と <code>p b</code> が <code>Prop</code> に限らない任意の型を持つ場合でも、項 <code>h : Eq a b</code> を使って項 <code>t' : p a</code> を <code>p b</code> にキャストすることができる。なぜなら、このキャストは新しいデータを生成せず、すでに持っているデータを再解釈するだけだからだ。シングルトン除去はheterogeneous equality(異型等式)やwell-founded recursion(整礎再帰)でも使われるが、これについては次章の<a href="./induction_and_recursion.html#well-founded-recursion-and-induction-%E6%95%B4%E7%A4%8E%E5%86%8D%E5%B8%B0%E3%81%A8%E6%95%B4%E7%A4%8E%E5%B8%B0%E7%B4%8D%E6%B3%95">Well-Founded Recursion and Induction (整礎再帰と整礎帰納法)</a>の節で説明する。</p>
+<h2 id="mutual-and-nested-inductive-types-相互帰納型と入れ子帰納型"><a class="header" href="#mutual-and-nested-inductive-types-相互帰納型と入れ子帰納型">Mutual and Nested Inductive Types (相互帰納型と入れ子帰納型)</a></h2>
+<p>ここで、帰納型を一般化して得られるしばしば便利な2つの型の概念<em>Mutual Inductive Types</em>(相互帰納型)と<em>Nested Inductive Types</em>(入れ子帰納型)について考えよう。Leanは、これらを上で説明したようなよりプリミティブな種類の帰納型に「コンパイル」することでこの2つの概念をサポートする。言い換えると、Leanはより一般的な定義を構文解析し、それに基づいて補助的な帰納型を定義し、その補助的な型を使って本当に必要なものを定義する。これらの型を効果的に利用するためには、次の章で説明するLeanの等式コンパイラが必要である。それでも、これらの型の宣言は通常の帰納的定義の簡単な変化形であるため、ここで説明することに意味がある。</p>
+<p>まず、Leanは<em>mutually defined</em>(相互に定義された)帰納型をサポートする。これは、同時に定義される、それぞれが定義中の他の型を参照する帰納型たちである。</p>
+<pre><code class="language-lean">mutual
+  inductive Even : Nat → Prop where
+    | even_zero : Even 0
+    | even_succ : (n : Nat) → Odd n → Even (n + 1)
+
+  inductive Odd : Nat → Prop where
+    | odd_succ : (n : Nat) → Even n → Odd (n + 1)
+end
+
+open Even Odd
+
+example : Even 2 := even_succ 1 (odd_succ 0 even_zero)
+</code></pre>
+<p>この例では、2つの帰納型が同時に定義されている: 自然数 <code>n</code> は、<code>0</code> であるか奇数 <code>Odd</code> より1大きいときは偶数 <code>Even</code> であり、偶数 <code>Even</code> より1大きいときは奇数 <code>Odd</code> である。以下の練習問題では、その詳細を記述せよ。</p>
+<p>相互帰納型は、<code>α</code> の項でラベル付けされた頂点を持つ有限木を定義するのにも使える:</p>
+<pre><code class="language-lean">mutual
+    inductive Tree (α : Type u) where
+      | node : α → TreeList α → Tree α
+
+    inductive TreeList (α : Type u) where
+      | nil  : TreeList α
+      | cons : Tree α → TreeList α → TreeList α
+end
+</code></pre>
+<p>この定義により、<code>α</code> の項 <code>a</code> と、空であってもよい部分木のリストを与えることで、<code>a</code> を根とする <code>Tree α</code> の項を構築することができる。部分木のリストは型 <code>TreeList α</code> の項として表現され、これは空リスト <code>nil</code> か、<code>Tree α</code> の項と <code>TreeList α</code> の項の <code>cons</code> のいずれかであると定義される。</p>
+<p>しかしながら、この <code>Tree</code> と <code>TreeList</code> の定義は扱いにくい。特にLeanのライブラリにはリストを扱うための関数や定理が数多く含まれているため、部分木のリストが型 <code>List (Tree α)</code> の項として与えられたら、これらの定義はもっと扱いやすくなるだろう。型 <code>TreeList α</code> が <code>List (Tree α)</code> と「同型」であることを示すことはできる。しかし、この同型に沿って片方で得られた結果を他方へ翻訳するのは面倒である。</p>
+<p>実際、Leanでは本当に必要としている帰納型を定義することができる:</p>
+<pre><code class="language-lean">inductive Tree (α : Type u) where
+  | mk : α → List (Tree α) → Tree α
+</code></pre>
+<p>これは<em>nested inductive type</em>(入れ子帰納型)として知られている。この <code>Tree</code> の定義は前節で示した帰納型の厳密な仕様から外れている。なぜなら、<code>mk</code> の引数の型の中で、<code>Tree</code> はstrictly positivelyに現れず、<code>List</code> 型コンストラクタの中に入れ子になっているからである。Leanはカーネルの中で <code>TreeList α</code> と <code>List (Tree α)</code> の間に同型を構築し、その同型の観点からこの入れ子帰納型 <code>Tree</code> のコンストラクタを定義する。</p>
+<h2 id="exercises-練習問題"><a class="header" href="#exercises-練習問題">Exercises (練習問題)</a></h2>
+<ol>
+<li>
+<p>自然数に対する他の演算、例えば乗法、前者関数(<code>pred 0 = 0</code> とする)、切り捨て減法(<code>m</code> が <code>n</code>以上のとき <code>n - m = 0</code>)、べき乗などを定義してみよ。次に、既に証明した定理を基に、それらの基本的な性質をいくつか証明してみよ。</p>
+<p>それらの多くはLeanのコアライブラリで既に定義されている。名前衝突を避けるため、<code>Hidden</code> のような名前の名前空間の中で作業することを勧める。</p>
+</li>
+<li>
+<p>リストに関する <code>length</code> 関数や <code>reverse</code> 関数のような操作をいくつか定義せよ。それらについて、次のような性質をいくつか証明せよ。</p>
+<p>a. <code>length (s ++ t) = length s + length t</code></p>
+<p>b. <code>length (reverse t) = length t</code></p>
+<p>c. <code>reverse (reverse t) = t</code></p>
+</li>
+<li>
+<p>以下のコンストラクタから構築される項からなる帰納データ型を定義せよ:</p>
+<ul>
+<li><code>const n</code>, 自然数 <code>n</code> を表す定数</li>
+<li><code>var n</code>, <code>n</code> 番目の変数</li>
+<li><code>plus s t</code>, <code>s</code> と <code>t</code> の和を表す</li>
+<li><code>times s t</code>, <code>s</code> と <code>t</code> の積を表す</li>
+</ul>
+<p>今定義した型の項を評価する関数を再帰的に定義せよ。ただし、変数には値を割り当てることができるとする。</p>
+</li>
+<li>
+<p>同様に、命題論理式の型と、その型に関する関数を定義せよ:
+例えば、評価関数、式の複雑さを測る関数、与えられた変数に別の式を代入する関数などを定義せよ。</p>
+</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="interacting_with_lean.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="induction_and_recursion.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="interacting_with_lean.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="induction_and_recursion.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>

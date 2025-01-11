@@ -1,0 +1,1221 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>タクティク - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html" class="active"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="tactics-タクティク"><a class="header" href="#tactics-タクティク">Tactics (タクティク)</a></h1>
+<p>この章では、<em>tactics</em>(タクティク)を使って証明を構築する方法について説明する。証明項とは数学的証明の表現であり、タクティクは数学的証明を構築する手順を記述するコマンド(指示)である。定理 A ↔ B を証明する際に、非形式的に、「まず A → B を証明する。最初に定義を展開し、次に既存の補題を適用し、それから式を単純化する」という導入から数学の証明を始めることがあるかもしれない。これらの言明が証明を見つける方法を読者に伝える指示であるのと同様に、タクティクは証明項を構築する方法をLeanに伝える指示である。タクティクは、証明を分解し、一歩ずつゴールに向かうという段階的な証明の書き方を自然にサポートする。</p>
+<p>タクティクの連続からなる証明を「タクティクスタイル」の証明と呼び、これまで見てきた証明項の構築の仕方を「項スタイル」の証明と呼ぶ。それぞれのスタイルには長所と短所がある。例えば、タクティクスタイルの証明は、各タクティクの結果を予測・推測することを読者に要求するため、項スタイルの証明より読みにくいという短所がある。しかし、短くて書きやすいという長所もある。さらに、タクティクはLeanの自動証明を利用するための入り口になる。なぜなら、Leanに自動証明を指示するコマンド自体がタクティクだからである。</p>
+<h2 id="用語に関する注意"><a class="header" href="#用語に関する注意">用語に関する注意</a></h2>
+<p>この節は翻訳に際して追加した節である。</p>
+<p>この章では、含意命題 <code>p → q</code> あるいはより一般的に依存関数型 <code>(x : α) → β</code> の中に登場する型 <code>p</code> や型 <code>(x : α)</code> を「前件(antecedent)」、型 <code>q</code> や型 <code>β</code> を「後件(consequent)」と呼び、一方で「ゴール(Goal)」 <code>A ⊢ B</code> の中に登場する項の集まり A を「コンテキスト(Context)」または「前提(Premise)」、ゴールにおいて項構築の目標となる型 B を「ターゲット(Target)」または「結論(Conclusion)」と呼び明確に区別する。特に、ゴールが閉じられていない(open)／未達成(not accomplished)／未証明(not proved)／未解決(not solved)のときは「コンテキスト(Context)」「ターゲット(Target)」という用語を使い、ゴールが閉じられている(closed)／達成済み(accomplished)／証明済み(proved)／解決済(solved)のときは「前提(Premise)」「結論(Conclusion)」という用語を使う。</p>
+<p>コンテキスト(あるいは前提)に含まれる各項を「仮説(Hypothesis)」と呼ぶ。</p>
+<p>ここでいう「ターゲット」を「ゴール」と呼ぶこともあるが、混乱を避けるため本訳ではこのような用語の使い方はしない。</p>
+<p><code>intro</code> タクティクや <code>revert</code> タクティクの働きを理解する際に、この用語の区別が重要となる。</p>
+<h3 id="参考記事"><a class="header" href="#参考記事">参考記事</a></h3>
+<ul>
+<li><a href="https://m-hiyama-memo.hatenablog.com/entry/2023/01/30/130823">コンテキストと組織化原理 - (新) 檜山正幸のキマイラ飼育記 メモ編</a></li>
+<li><a href="https://m-hiyama-memo.hatenablog.com/entry/2023/01/22/130943">証明とリーズニング - (新) 檜山正幸のキマイラ飼育記 メモ編</a></li>
+</ul>
+<h2 id="entering-tactic-mode-タクティクモードへの入り方"><a class="header" href="#entering-tactic-mode-タクティクモードへの入り方">Entering Tactic Mode (タクティクモードへの入り方)</a></h2>
+<p>定理を述べたり、have文を使うと、ゴール、すなわち期待された型を持つ項を構築するという目標が生成される。例えば、仮説 <code>p q : Prop</code>、<code>hp : p</code>、<code>hq : q</code> を持つコンテキストでは、次のような記述は <code>p ∧ q ∧ p</code> という型の項を構築するというゴールを作成する:</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p :=
+  sorry
+</code></pre>
+<p>このゴールは次のように記述できる:</p>
+<pre><code>    p : Prop, q : Prop, hp : p, hq : q ⊢ p ∧ q ∧ p
+</code></pre>
+<p>実際、上記の例で &quot;sorry&quot; をアンダースコアに置き換えると、Leanはまさにこのゴールが未解決であることを報告する。</p>
+<p>通常は、明示的に証明項を記述することでこのようなゴールを達成する。しかし、Leanでは、項が記述されることが期待される任意の場所に、項の記述の代わりに <code>by &lt;tactics&gt;</code> ブロックを挿入することができる。ここで、<code>&lt;tactics&gt;</code> はセミコロンまたは改行で区切られたコマンドの列である。<code>by &lt;tactics&gt;</code> ブロックを使って上記の定理を証明することができる:</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p :=
+  by apply And.intro
+     exact hp
+     apply And.intro
+     exact hq
+     exact hp
+</code></pre>
+<p>つまり、<code>by</code> キーワードを書くことでタクティクモードに入れるのである。しばしば <code>by</code> キーワードは前の行に書き、上記の例はこのように書かれる:</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+  apply And.intro
+  exact hp
+  apply And.intro
+  exact hq
+  exact hp
+</code></pre>
+<p><code>apply</code> タクティクは、0個以上の引数をとる関数を表現する項 <code>t</code> を現在のゴールに適用する。<code>apply</code> タクティクは現在のゴールのターゲット(<code>⊢</code> の後に書かれる型)と関数 <code>t</code> の出力の型を同一視し、引数(関数 <code>t</code> の入力の型を持つ項)を構築するという新しいゴールを作る。ただし、後続の引数の型が先行の引数に依存しない場合に限る。上記の例では、コマンド <code>apply And.intro</code> は2つのサブゴールを生成する:</p>
+<pre><code>    case left
+    p q : Prop
+    hp : p
+    hq : q
+    ⊢ p
+
+    case right
+    p q : Prop
+    hp : p
+    hq : q
+    ⊢ q ∧ p
+</code></pre>
+<p>最初のゴールはコマンド <code>exact hp</code> で達成される。<code>exact</code> コマンドは <code>apply</code> コマンドの一種で、「与えられた項がターゲットと同じ型を持つことを確認し、確認できたらゴールを閉じよ」とLeanに指示する。<code>exact</code> コマンドをタクティク証明で使うのは良いことである。なぜなら、<code>exact</code> コマンドの失敗は何かが間違っていることを示すからである。また <code>exact</code> は <code>apply</code> よりもロバストである。なぜなら、elaboratorは、与えられた項を処理する際に、今期待されている型(ゴールのターゲット)が何であるかを考慮に入れるからである。しかしながら、上記の例では <code>apply</code> も同様に機能する。</p>
+<p><code>#print</code> コマンドを使って最終的に得られた証明項を確認することができる:</p>
+<pre><code class="language-lean"><span class="boring">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+</span><span class="boring"> apply And.intro
+</span><span class="boring"> exact hp
+</span><span class="boring"> apply And.intro
+</span><span class="boring"> exact hq
+</span><span class="boring"> exact hp
+</span>#print test
+/-
+theorem test : ∀ (p q : Prop), p → q → p ∧ q ∧ p :=
+fun p q hp hq =&gt; { left := hp, right := { left := hq, right := hp } }
+-/
+</code></pre>
+<p>タクティク証明は段階的に書くことができる。VS Codeでは、<code>Ctrl-Shift-Enter</code> を押すことでメッセージウィンドウを開くことができる。カーソルがタクティクブロック内にあるときはいつでも、このウィンドウは現在のゴールを表示する。Emacsでは、タクティクブロック内の任意の行末で <code>C-c C-g</code> を押すことで現在のゴールを見ることができる。また、カーソルを最後のタクティクの1文字目に置くことで、不完全な証明内の残りのゴールを見ることができる。証明が不完全な場合、キーワード <code>by</code> に赤い波線が引かれ、エラーメッセージには残りのゴールが表示される。</p>
+<p>タクティクコマンドは単一の項名だけでなく、複合式を受け取ることもできる。以下は、前述の証明の短縮版である:</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+  apply And.intro hp
+  exact And.intro hq hp
+</code></pre>
+<p>当然のことながら、この証明記述は全く同じ証明項を生成する。</p>
+<pre><code class="language-lean"><span class="boring">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+</span><span class="boring"> apply And.intro hp
+</span><span class="boring"> exact And.intro hq hp
+</span>#print test
+</code></pre>
+<p>複数のタクティク適用をセミコロンで連結して1行で書くことができる。</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+  apply And.intro hp; exact And.intro hq hp
+</code></pre>
+<p>複数のサブゴールを生成する可能性のあるタクティクは、自動的に各サブゴールにタグを付けることが多い。例えば、タクティク <code>apply And.intro</code> は最初のサブゴールにタグ <code>left</code> を、2つ目のサブゴールにタグ <code>right</code> を付ける。この場合において、タグ名は <code>And.intro</code> の宣言の中で使われた引数の名前から推測される。<code>case &lt;tag&gt; =&gt; &lt;tactics&gt;</code> という表記を使うことで、タクティクを構造化することができる。つまり、<code>&lt;tactics&gt;</code> をどのタグ付けされたサブゴールに適用するかを明示することができる。以下は、この章の最初のタクティク証明の構造化されたバージョンである:</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+  apply And.intro
+  case left =&gt; exact hp
+  case right =&gt;
+    apply And.intro
+    case left =&gt; exact hq
+    case right =&gt; exact hp
+</code></pre>
+<p><code>case</code> 記法を使うと、サブゴール <code>right</code> を <code>left</code> よりも先に解くことができる:</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+  apply And.intro
+  case right =&gt;
+    apply And.intro
+    case left =&gt; exact hq
+    case right =&gt; exact hp
+  case left =&gt; exact hp
+</code></pre>
+<p><code>case</code> ブロック内で、Leanが他のゴールを隠していることに注意してほしい。言わば、Leanは選択されたゴールに「集中」しているのである。さらに、<code>case</code> ブロックの終了時に選択されたゴールが完全には解かれていない場合、Leanはエラーフラグを建てる。</p>
+<p>サブゴールが単純である場合、タグを使ってサブゴールを選択する価値はないかもしれないが、その場合でも証明を構造化したい場合は <code>case</code> が有用である。また、Leanは証明を構造化するための「箇条書き」記法 <code>. &lt;tactics&gt;</code> (あるいは <code>· &lt;tactics&gt;</code>) を提供する。<code>. &lt;tactics&gt;</code> 記法を使うと、Leanは一番上のゴールに「集中」する。</p>
+<pre><code class="language-lean">theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by
+  apply And.intro
+  . exact hp
+  . apply And.intro
+    . exact hq
+    . exact hp
+</code></pre>
+<h2 id="basic-tactics-基本的なタクティク"><a class="header" href="#basic-tactics-基本的なタクティク">Basic Tactics (基本的なタクティク)</a></h2>
+<p><code>apply</code> と <code>exact</code> に加えて、もう一つの便利なタクティクが <code>intro</code> である。<code>intro</code> タクティクはゴールのターゲットの前件(ゴールのターゲットの <code>→</code> の前にある命題)をゴールのコンテキスト(ゴールの <code>⊢</code> の前)に移動させる。以降、この <code>intro</code> タクティクの機能を「ターゲットの前件をコンテキストに導入する」または単に「導入する」と表現する。以下は、3章で証明した命題論理の恒真式を今一度タクティクを使って証明した例である。</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro h
+    apply Or.elim (And.right h)
+    . intro hq
+      apply Or.inl
+      apply And.intro
+      . exact And.left h
+      . exact hq
+    . intro hr
+      apply Or.inr
+      apply And.intro
+      . exact And.left h
+      . exact hr
+  . intro h
+    apply Or.elim h
+    . intro hpq
+      apply And.intro
+      . exact And.left hpq
+      . apply Or.inl
+        exact And.right hpq
+    . intro hpr
+      apply And.intro
+      . exact And.left hpr
+      . apply Or.inr
+        exact And.right hpr
+</code></pre>
+<p><code>intro</code> タクティクはより一般的に任意の型の項をコンテキストに導入できる:</p>
+<pre><code class="language-lean">example (α : Type) : α → α := by
+  intro a
+  exact a
+
+example (α : Type) : ∀ x : α, x = x := by
+  intro x
+  exact Eq.refl x
+</code></pre>
+<p><code>intro</code> タクティクは複数の項を一度に導入できる:</p>
+<pre><code class="language-lean">example : ∀ a b c : Nat, a = b → a = c → c = b := by
+  intro a b c h₁ h₂
+  exact Eq.trans (Eq.symm h₂) h₁
+</code></pre>
+<p><code>apply</code> タクティクが対話的に関数適用を構築するためのコマンドであるように、<code>intro</code> タクティクは対話的に関数抽象(つまり <code>fun x =&gt; e</code> の形の項)を構築するためのコマンドである。ラムダ抽象記法と同様に、<code>intro</code> タクティクでは暗黙の <code>match</code> を使うことができる。</p>
+<pre><code class="language-lean">example (α : Type) (p q : α → Prop) : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x := by
+  intro ⟨w, hpw, hqw⟩
+  exact ⟨w, hqw, hpw⟩
+</code></pre>
+<p>また、<code>intro</code> タクティクは <code>match</code> 式のようにコンテキストに導入した項を場合分けすることもできる(詳しくは<a href="./induction_and_recursion.html">8章 Induction and Recursion (帰納と再帰)</a>を参照のこと)。</p>
+<pre><code class="language-lean">example (α : Type) (p q : α → Prop) : (∃ x, p x ∨ q x) → ∃ x, q x ∨ p x := by
+  intro
+  | ⟨w, Or.inl h⟩ =&gt; exact ⟨w, Or.inr h⟩
+  | ⟨w, Or.inr h⟩ =&gt; exact ⟨w, Or.inl h⟩
+
+example (α : Type) (p q : α → Prop) : (∃ x, p x ∨ q x) → ∃ x, q x ∨ p x := by
+  intro h
+  let ⟨w, hpq⟩ := h
+  exact Or.elim hpq (fun hp : p w =&gt; ⟨w, Or.inr hp⟩) (fun hq : q w =&gt; ⟨w, Or.inl hq⟩)
+</code></pre>
+<p><code>intros</code> タクティクは引数を与えずに使うことができる。その場合、<code>intros</code> タクティクはできる限り多くの項を一度に導入し、導入した各項に自動で名前を付ける。その例はすぐ後に紹介する。</p>
+<p><code>assumption</code> タクティクは現在のゴールの仮説たちに目を通し、それらの中にゴールのターゲットと合致するものがあればそれを適用する。</p>
+<pre><code class="language-lean">example (x y z w : Nat) (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := by
+  apply Eq.trans h₁
+  apply Eq.trans h₂
+  assumption   -- applied h₃
+</code></pre>
+<p><code>assumption</code> タクティクは、必要に応じてゴールのターゲット内のメタ変数( <code>?b</code> など、どんな項が代入されるかが未決定の変数)を解決する(メタ変数に具体的な項を代入する):</p>
+<pre><code class="language-lean">example (x y z w : Nat) (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := by
+  apply Eq.trans
+  assumption      -- solves x = ?b with h₁
+  apply Eq.trans
+  assumption      -- solves y = ?h₂.b with h₂
+  assumption      -- solves z = w with h₃
+</code></pre>
+<p>次の例では、<code>intros</code> タクティクを用いて3つの変数と2つの命題の証明を自動的にコンテキストに導入している:</p>
+<pre><code class="language-lean">example : ∀ a b c : Nat, a = b → a = c → c = b := by
+  intros
+  apply Eq.trans
+  apply Eq.symm
+  assumption
+  assumption
+</code></pre>
+<p>デフォルトでは、Leanが自動生成した名前( <code>a✝</code> など)にはアクセスできないことに注意してほしい。この仕様はタクティク証明の成否が自動生成された名前に依存しないようにするためにあり、この仕様があるおかげで証明はよりロバストになる。ただし、キーワード <code>unhygienic</code> を <code>by</code> の後に書くことでこの制限を無効にすることができる(証明のロバスト性は低下する)。</p>
+<pre><code class="language-lean">example : ∀ a b c : Nat, a = b → a = c → c = b := by unhygienic
+  intros
+  apply Eq.trans
+  apply Eq.symm
+  exact a_2
+  exact a_1
+</code></pre>
+<p>また、<code>rename_i</code> タクティクを用いて、現在のゴール内の最も直近のアクセス不能な名前を変更することができる。次の例では、タクティク <code>rename_i h1 _ h2</code> がゴール内の最後の3つの仮説のうち2つの名前を変更している。</p>
+<pre><code class="language-lean">example : ∀ a b c d : Nat, a = b → a = d → a = c → c = b := by
+  intros
+  rename_i h1 _ h2
+  apply Eq.trans
+  apply Eq.symm
+  exact h2
+  exact h1
+</code></pre>
+<p><code>rfl</code> タクティクは <code>exact rfl</code> の、つまり <code>exact Eq.refl _</code> の糖衣構文である。</p>
+<pre><code class="language-lean">example (y : Nat) : (fun x : Nat =&gt; 0) y = 0 := by
+  rfl
+
+example (y : Nat) : (fun x : Nat =&gt; 0) y = 0 := by
+  exact Eq.refl _
+</code></pre>
+<p>タクティクの前に <code>repeat</code> キーワードを書くと、そのタクティクは何度か繰り返し適用される。</p>
+<pre><code class="language-lean">example : ∀ a b c : Nat, a = b → a = c → c = b := by
+  intros
+  apply Eq.trans
+  apply Eq.symm
+  repeat assumption
+</code></pre>
+<p><code>revert</code> タクティクは時々有用である。これは <code>intro</code> タクティクの逆の機能を持つ。つまり、指定した項をゴールのコンテキストからゴールのターゲットの前件に移動させる。以降、<code>revert</code> タクティクの機能を「コンテキストの一部をターゲットに戻す」または単に「戻す」と表現する。</p>
+<pre><code class="language-lean">example (x : Nat) : x = x := by
+  revert x
+  -- goal is ⊢ ∀ (x : Nat), x = x
+  intro y
+  -- goal is y : Nat ⊢ y = y
+  rfl
+</code></pre>
+<p>(この章の最初に書いたように用語の区別をしていれば明らかなことだが、)コンテキスト(の一部)をターゲットに移すと含意命題が得られる:</p>
+<pre><code class="language-lean">example (x y : Nat) (h : x = y) : y = x := by
+  revert h
+  -- goal is x y : Nat ⊢ x = y → y = x
+  intro h₁
+  -- goal is x y : Nat, h₁ : x = y ⊢ y = x
+  apply Eq.symm
+  assumption
+</code></pre>
+<p>しかし、<code>revert</code> はさらに賢く、指定した項だけでなく、指定した項に依存する型を持つ要素も全てゴールのターゲットに移動させる。例えば、上の例で <code>x</code> を戻すと、<code>h</code> も一緒に戻される:</p>
+<pre><code class="language-lean">example (x y : Nat) (h : x = y) : y = x := by
+  revert x
+  -- goal is y : Nat ⊢ ∀ (x : Nat), x = y → y = x
+  intros
+  apply Eq.symm
+  assumption
+</code></pre>
+<p>また、コンテキスト内の複数の仮説を一度に戻すこともできる:</p>
+<pre><code class="language-lean">example (x y : Nat) (h : x = y) : y = x := by
+  revert x y
+  -- goal is ⊢ ∀ (x y : Nat), x = y → y = x
+  intros
+  apply Eq.symm
+  assumption
+</code></pre>
+<p><code>revert</code> で戻せるのは現在のゴールのコンテキスト内の項(仮説)だけである。しかし、タクティク <code>generalize e = x</code> を使えば、ゴールのターゲットに登場する任意の式 <code>e</code> を新しい変数 <code>x</code> に置き換えることができる。また、タクティク <code>generalize e = x at h₁</code> を使えば、ゴールの仮説 <code>h₁</code> に登場する任意の式 <code>e</code> を新しい変数 <code>x</code> に置き換えることができる。</p>
+<pre><code class="language-lean">example : 3 = 3 := by
+  generalize 3 = x
+  -- goal is x : Nat ⊢ x = x
+  revert x
+  -- goal is ⊢ ∀ (x : Nat), x = x
+  intro y
+  -- goal is y : Nat ⊢ y = y
+  rfl
+</code></pre>
+<p>上記の例において、<code>generalize 3 = x</code> は <code>3</code> に任意の変数 <code>x</code> を割り当てることでゴールのターゲットを一般化している。全ての一般化がゴールの証明可能性を保存するわけではないことに注意してほしい。次の例では、<code>generalize</code> が <code>rfl</code> を使うだけで証明できるゴールを決して証明できないゴールに置き換えている:</p>
+<pre><code class="language-lean">example : 2 + 3 = 5 := by
+  generalize 3 = x
+  -- goal is x : Nat ⊢ 2 + x = 5
+  admit
+</code></pre>
+<p><code>admit</code> タクティクは <code>exact sorry</code> の糖衣構文である。これは現在のゴールを閉じ、<code>sorry</code> が使われたという警告を出す。一般化以前のゴールの証明可能性を保存するために、<code>generalize</code> タクティクを使う際に <code>3</code> が <code>x</code> に置き換えられたという事実を記録することができる。そのためには、置き換えの事実を保存するためのラベルを <code>generalize</code> に与えるだけでよい:</p>
+<pre><code class="language-lean">example : 2 + 3 = 5 := by
+  generalize h : 3 = x
+  -- goal is x : Nat, h : 3 = x ⊢ 2 + x = 5
+  rw [← h]
+</code></pre>
+<p>ここでは、<code>rewrite</code> タクティク(略称は <code>rw</code>)が <code>h</code> を用いて <code>x</code> を <code>3</code> で再び置き換えている。<code>rewrite</code> タクティクについては後述する。</p>
+<h2 id="more-tactics-他のタクティク"><a class="header" href="#more-tactics-他のタクティク">More Tactics (他のタクティク)</a></h2>
+<p>命題やデータを構築したり分解したりするには、他のいくつかのタクティクが有用である。例えば、<code>p ∨ q</code> の形のターゲットに対して <code>apply</code> タクティクを使う場合は、タクティク <code>apply Or.inl</code> や <code>apply Or.inr</code> を使うだろう。逆に、<code>cases</code> タクティクは選言命題型(など)の仮説を分解する。</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∨ q → q ∨ p := by
+  intro h
+  cases h with
+  | inl hp =&gt; apply Or.inr; exact hp
+  | inr hq =&gt; apply Or.inl; exact hq
+</code></pre>
+<p><code>cases</code> タクティクの構文は <code>match</code> 式の構文と似ていることに注意。新しいサブゴールは好きな順番で解くことができる。</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∨ q → q ∨ p := by
+  intro h
+  cases h with
+  | inr hq =&gt; apply Or.inl; exact hq
+  | inl hp =&gt; apply Or.inr; exact hp
+</code></pre>
+<p><code>with</code> と後続のタクティクを書かずに(構造化されていない) <code>cases</code> を使うこともできる。この場合、複数のサブゴールが生成される。</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∨ q → q ∨ p := by
+  intro h
+  cases h
+  apply Or.inr
+  assumption
+  apply Or.inl
+  assumption
+</code></pre>
+<p>(構造化されていない) <code>cases</code> は、同じタクティクを使って複数のサブゴールを閉じられる場合に特に便利である。</p>
+<pre><code class="language-lean">example (p : Prop) : p ∨ p → p := by
+  intro h
+  cases h
+  repeat assumption
+</code></pre>
+<p><code>tac1 &lt;;&gt; tac2</code> という結合子を使えば、タクティク <code>tac1</code> により生成された各サブゴールに <code>tac2</code> を適用することもできる。</p>
+<pre><code class="language-lean">example (p : Prop) : p ∨ p → p := by
+  intro h
+  cases h &lt;;&gt; assumption
+</code></pre>
+<p>構造化されていない <code>cases</code> タクティクと <code>case</code> 記法や <code>.</code> 記法を組み合わせることができる。</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∨ q → q ∨ p := by
+  intro h
+  cases h
+  . apply Or.inr
+    assumption
+  . apply Or.inl
+    assumption
+
+example (p q : Prop) : p ∨ q → q ∨ p := by
+  intro h
+  cases h
+  case inr h =&gt;
+    apply Or.inl
+    assumption
+  case inl h =&gt;
+    apply Or.inr
+    assumption
+
+example (p q : Prop) : p ∨ q → q ∨ p := by
+  intro h
+  cases h
+  case inr h =&gt;
+    apply Or.inl
+    assumption
+  . apply Or.inr
+    assumption
+</code></pre>
+<p><code>cases</code> タクティクは連言命題を分解することもできる。</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∧ q → q ∧ p := by
+  intro h
+  cases h with
+  | intro hp hq =&gt; constructor; exact hq; exact hp
+
+example (p q : Prop) : p ∧ q → q ∧ p := by
+  intro h
+  cases h with
+  | intro hp hq =&gt; apply And.intro; exact hq; exact hp
+</code></pre>
+<p>この例では、<code>cases</code> タクティクにより <code>h : p ∧ q</code> が一対の項 <code>hp : p</code> と <code>hq : q</code> に置き換えられた。<code>constructor</code> タクティクは、連言のための唯一のコンストラクタ <code>And.intro</code> をターゲットに適用する。これらのタクティクにより、前節の例は以下のように書き換えられる:</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro h
+    cases h with
+    | intro hp hqr =&gt;
+      cases hqr
+      . apply Or.inl; constructor &lt;;&gt; assumption
+      . apply Or.inr; constructor &lt;;&gt; assumption
+  . intro h
+    cases h with
+    | inl hpq =&gt;
+      cases hpq with
+      | intro hp hq =&gt; constructor; exact hp; apply Or.inl; exact hq
+    | inr hpr =&gt;
+      cases hpr with
+      | intro hp hr =&gt; constructor; exact hp; apply Or.inr; exact hr
+</code></pre>
+<p>これらのタクティクを非常に一般的に用いることができることは、<a href="./inductive_types.html">7章 Inductive Types (帰納型)</a>で説明する。端的に説明すると、<code>cases</code> タクティクは帰納的に定義された型の任意の項を分解することができる。<code>constructor</code> タクティクは常に、帰納的に定義された型の適用可能な最初のコンストラクタを適用する。例えば、<code>cases</code> と <code>constructor</code> は存在量化子に対して使うことができる:</p>
+<pre><code class="language-lean">example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
+  intro h
+  cases h with
+  | intro x px =&gt; constructor; apply Or.inl; exact px
+
+example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
+  intro h
+  cases h with
+  | intro x px =&gt; apply Exists.intro; apply Or.inl; exact px
+</code></pre>
+<p>ここでは、<code>constructor</code> タクティクは <code>Exists.intro</code> の最初の引数である <code>x</code> の値を暗黙のままにしている。これは一旦メタ変数で表され、そのメタ変数の値は後で決定される。前の例では、メタ変数の適切な値はタクティク <code>exact px</code> が使われた時点で決定される。なぜなら、<code>px</code> は型 <code>p x</code> を持つからである。存在量化子に対する証人を明示的に指定したい場合は、代わりに <code>exists</code> タクティクを使うことができる:</p>
+<pre><code class="language-lean">example (p q : Nat → Prop) : (∃ x, p x) → ∃ x, p x ∨ q x := by
+  intro h
+  cases h with
+  | intro x px =&gt; exists x; apply Or.inl; exact px
+</code></pre>
+<p>これは他の例である:</p>
+<pre><code class="language-lean">example (p q : Nat → Prop) : (∃ x, p x ∧ q x) → ∃ x, q x ∧ p x := by
+  intro h
+  cases h with
+  | intro x hpq =&gt;
+    cases hpq with
+    | intro hp hq =&gt;
+      exists x
+</code></pre>
+<p><code>cases</code> タクティクや<code>constructor</code> タクティクは命題だけでなくデータにも使える。次の例では、直積型の項の成分を入れ替える関数と直和型の項の成分を入れ替える関数を定義するためにこれらのタクティクが使われている:</p>
+<pre><code class="language-lean">def swap_pair : α × β → β × α := by
+  intro p
+  cases p
+  constructor &lt;;&gt; assumption
+
+def swap_sum : Sum α β → Sum β α := by
+  intro p
+  cases p
+  . apply Sum.inr; assumption
+  . apply Sum.inl; assumption
+
+theorem swap_and : a ∧ b → b ∧ a := by
+  intro p
+  cases p
+  constructor &lt;;&gt; assumption
+
+theorem swap_or : a ∨ b → b ∨ a := by
+  intro p
+  cases p
+  . apply Or.inr; assumption
+  . apply Or.inl; assumption
+</code></pre>
+<p>上2つの関数定義の記述と、下2つの定理の証明が、わずかな差を除いて同じであることに注意してほしい。</p>
+<p><code>cases</code> タクティクは自然数を「場合分け」することもできる:</p>
+<pre><code class="language-lean">open Nat
+example (P : Nat → Prop) (h₀ : P 0) (h₁ : ∀ n, P (succ n)) (m : Nat) : P m := by
+  cases m with
+  | zero    =&gt; exact h₀
+  | succ m' =&gt; exact h₁ m'
+</code></pre>
+<p><code>cases</code> タクティクとその仲間である <code>induction</code> タクティクについては、<a href="./inductive_types.html#tactics-for-inductive-types-%E5%B8%B0%E7%B4%8D%E5%9E%8B%E3%81%AE%E3%81%9F%E3%82%81%E3%81%AE%E3%82%BF%E3%82%AF%E3%83%86%E3%82%A3%E3%82%AF">Tactics for Inductive Types (帰納型のためのタクティク)</a>節で詳しく説明する。</p>
+<p><code>contradiction</code> タクティクは現在のゴールのコンテキストの中から矛盾を探す:</p>
+<pre><code class="language-lean">example (p q : Prop) : p ∧ ¬ p → q := by
+  intro h
+  cases h
+  contradiction
+</code></pre>
+<p><code>match</code> はタクティクブロック内でも使うことができる。</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro h
+    match h with
+    | ⟨_, Or.inl _⟩ =&gt; apply Or.inl; constructor &lt;;&gt; assumption
+    | ⟨_, Or.inr _⟩ =&gt; apply Or.inr; constructor &lt;;&gt; assumption
+  . intro h
+    match h with
+    | Or.inl ⟨hp, hq⟩ =&gt; constructor; exact hp; apply Or.inl; exact hq
+    | Or.inr ⟨hp, hr⟩ =&gt; constructor; exact hp; apply Or.inr; exact hr
+</code></pre>
+<p><code>intro h</code> を <code>match h ...</code> と「組み合わせる」と、上記の例は次のように書ける:</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro
+    | ⟨hp, Or.inl hq⟩ =&gt; apply Or.inl; constructor &lt;;&gt; assumption
+    | ⟨hp, Or.inr hr⟩ =&gt; apply Or.inr; constructor &lt;;&gt; assumption
+  . intro
+    | Or.inl ⟨hp, hq⟩ =&gt; constructor; assumption; apply Or.inl; assumption
+    | Or.inr ⟨hp, hr⟩ =&gt; constructor; assumption; apply Or.inr; assumption
+</code></pre>
+<h2 id="structuring-tactic-proofs-タクティク証明の構造化"><a class="header" href="#structuring-tactic-proofs-タクティク証明の構造化">Structuring Tactic Proofs (タクティク証明の構造化)</a></h2>
+<p>タクティクはしばしば証明を構築する効率的な方法を提供するが、長いタクティクの列は証明の構造を不明瞭にすることがある。このセクションでは、タクティクスタイルの証明をより読みやすくよりロバストにするために、タクティクスタイルの証明を構造化する方法を説明する。</p>
+<p>Leanの証明記述構文の優れている点のひとつは、項スタイルの証明とタクティクスタイルの証明をミックスさせて、その間を自由に行き来できることだ。例えば、<code>apply</code> タクティクや <code>exact</code> タクティクは <code>have</code> や <code>show</code> などを使って書かれた任意の型の項を受け取ることができる。逆に、Leanで任意の項を書くときは、<code>by</code> キーワードを挿入することで、いつでもタクティクモードを呼び出すことができる。以下はその例である:</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
+  intro h
+  exact
+    have hp : p := h.left
+    have hqr : q ∨ r := h.right
+    show (p ∧ q) ∨ (p ∧ r) by
+      cases hqr with
+      | inl hq =&gt; exact Or.inl ⟨hp, hq⟩
+      | inr hr =&gt; exact Or.inr ⟨hp, hr⟩
+</code></pre>
+<p>次はより自然な例である:</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro h
+    cases h.right with
+    | inl hq =&gt; exact Or.inl ⟨h.left, hq⟩
+    | inr hr =&gt; exact Or.inr ⟨h.left, hr⟩
+  . intro h
+    cases h with
+    | inl hpq =&gt; exact ⟨hpq.left, Or.inl hpq.right⟩
+    | inr hpr =&gt; exact ⟨hpr.left, Or.inr hpr.right⟩
+</code></pre>
+<p>実際、<code>show</code> タクティクというものがあり、これは項スタイルの証明の <code>show</code> 式に似ている。これは、タクティクモードの中で、解こうとしているゴールのターゲットの型を宣言するだけのタクティクである。</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro h
+    cases h.right with
+    | inl hq =&gt;
+      show (p ∧ q) ∨ (p ∧ r)
+      exact Or.inl ⟨h.left, hq⟩
+    | inr hr =&gt;
+      show (p ∧ q) ∨ (p ∧ r)
+      exact Or.inr ⟨h.left, hr⟩
+  . intro h
+    cases h with
+    | inl hpq =&gt;
+      show p ∧ (q ∨ r)
+      exact ⟨hpq.left, Or.inl hpq.right⟩
+    | inr hpr =&gt;
+      show p ∧ (q ∨ r)
+      exact ⟨hpr.left, Or.inr hpr.right⟩
+</code></pre>
+<p>実は、<code>show</code> タクティクは、ゴールのターゲットをdefinitionally equalな他の表現に書き換えるために使うことができる:</p>
+<pre><code class="language-lean">example (n : Nat) : n + 1 = Nat.succ n := by
+  -- goal is n: Nat ⊢ n + 1 = Nat.succ n
+  show Nat.succ n = Nat.succ n
+  -- goal is n: Nat ⊢ Nat.succ n = Nat.succ n
+  rfl
+
+example (n : Nat) : n + 1 = Nat.succ n := by
+  -- goal is n: Nat ⊢ n + 1 = Nat.succ n
+  rfl
+</code></pre>
+<p>項スタイルの証明のときと同様に、<code>have</code> タクティクは、宣言した型の項を作るというサブゴールを導入する:</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
+  intro ⟨hp, hqr⟩
+  show (p ∧ q) ∨ (p ∧ r)
+  cases hqr with
+  | inl hq =&gt;
+    have hpq : p ∧ q := And.intro hp hq
+    apply Or.inl
+    exact hpq
+  | inr hr =&gt;
+    have hpr : p ∧ r := And.intro hp hr
+    apply Or.inr
+    exact hpr
+</code></pre>
+<p>項スタイルの証明のときと同様に、<code>have</code> タクティクでは項に付けるラベルを省略することもできる。その場合、デフォルトのラベル <code>this</code> が使われる:</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
+  intro ⟨hp, hqr⟩
+  show (p ∧ q) ∨ (p ∧ r)
+  cases hqr with
+  | inl hq =&gt;
+    have : p ∧ q := And.intro hp hq
+    apply Or.inl
+    exact this
+  | inr hr =&gt;
+    have : p ∧ r := And.intro hp hr
+    apply Or.inr
+    exact this
+</code></pre>
+<p><code>have</code> タクティクでは型も省略することができる。したがって、<code>have hp := h.left</code> や <code>have hqr := h.right</code> と書くことができる。これらの省略記法を用いると、<code>have</code> タクティクにおいて型とラベルの両方を省略することさえできる。その場合、新しい項にはデフォルトのラベル <code>this</code> が使われる。</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) → (p ∧ q) ∨ (p ∧ r) := by
+  intro ⟨hp, hqr⟩
+  cases hqr with
+  | inl hq =&gt;
+    have := And.intro hp hq
+    apply Or.inl; exact this
+  | inr hr =&gt;
+    have := And.intro hp hr
+    apply Or.inr; exact this
+</code></pre>
+<p>Leanには <code>let</code> タクティクもある。これは <code>have</code> タクティクに似ているが、<code>have</code> タクティクが補助的な事実を導入するのに対して、<code>let</code> タクティクは局所的な定義を導入する。これは項スタイルの証明における <code>let</code> に類似したタクティクである。</p>
+<pre><code class="language-lean">example : ∃ x, x + 2 = 8 := by
+  let a : Nat := 3 * 2
+  exists a
+</code></pre>
+<p><code>have</code> と同様に、<code>let a := 3 * 2</code> と書くことで、型を暗黙のままにすることができる。<code>let</code> と <code>have</code> の違いは、<code>let</code> はコンテキストの中でローカルな定義を導入することである。ローカルに宣言された定義はその証明の中で展開することができる。</p>
+<p>先ほど、<code>.</code> を使って入れ子のタクティクブロックを作成した。入れ子のブロックの中では、Leanは最初のゴールに注目し、そのブロックの最後でそのゴールが完全に解決されていなければエラーを生成する。これは、タクティクによって導入された複数のサブゴールを一つ一つ証明するのに便利である。<code>.</code> 記法はインデントに敏感である。なぜなら、インデントを見て各タクティクブロックが終了したかどうかを検知するからである。あるいは、波括弧とセミコロンを使ってタクティクブロックを表すこともできる。</p>
+<pre><code class="language-lean">example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  { intro h;
+    cases h.right;
+    { show (p ∧ q) ∨ (p ∧ r);
+      exact Or.inl ⟨h.left, ‹q›⟩ }
+    { show (p ∧ q) ∨ (p ∧ r);
+      exact Or.inr ⟨h.left, ‹r›⟩ } }
+  { intro h;
+    cases h;
+    { show p ∧ (q ∨ r);
+      rename_i hpq;
+      exact ⟨hpq.left, Or.inl hpq.right⟩ }
+    { show p ∧ (q ∨ r);
+      rename_i hpr;
+      exact ⟨hpr.left, Or.inr hpr.right⟩ } }
+</code></pre>
+<p>証明を構造化するためにインデントを使うと便利である: タクティクが2つ以上のサブゴールを残すたびに、残りのサブゴールをブロックで囲んでインデントして分離するとよい。もし定理 <code>foo</code> の適用が1つのゴールから4つのサブゴールを生成するなら、証明の見た目は次のようになるだろう:</p>
+<pre><code>  apply foo
+  . &lt;proof of first goal&gt;
+  . &lt;proof of second goal&gt;
+  . &lt;proof of third goal&gt;
+  . &lt;proof of final goal&gt;
+</code></pre>
+<p>あるいは</p>
+<pre><code>  apply foo
+  case &lt;tag of first goal&gt;  =&gt; &lt;proof of first goal&gt;
+  case &lt;tag of second goal&gt; =&gt; &lt;proof of second goal&gt;
+  case &lt;tag of third goal&gt;  =&gt; &lt;proof of third goal&gt;
+  case &lt;tag of final goal&gt;  =&gt; &lt;proof of final goal&gt;
+</code></pre>
+<p>あるいは</p>
+<pre><code>  apply foo
+  { &lt;proof of first goal&gt;  }
+  { &lt;proof of second goal&gt; }
+  { &lt;proof of third goal&gt;  }
+  { &lt;proof of final goal&gt;  }
+</code></pre>
+<h2 id="tactic-combinators-タクティク結合子"><a class="header" href="#tactic-combinators-タクティク結合子">Tactic Combinators (タクティク結合子)</a></h2>
+<p><em>Tactic combinators</em>(タクティク結合子) は既存のタクティクから新しいタクティクを作る。逐次結合子 <code>;</code> は <code>by</code> ブロックの中で既に暗黙のうちに使われている:</p>
+<pre><code class="language-lean">example (p q : Prop) (hp : p) : p ∨ q :=
+  by apply Or.inl; assumption
+</code></pre>
+<p>ここで、<code>apply Or.inl; assumption</code> はまず単一のタクティク <code>apply Or.inl</code> を使ってから <code>assumption</code> を使うのと機能的に同等である。</p>
+<p><code>t₁ &lt;;&gt; t₂</code> において、結合子 <code>&lt;;&gt;</code> は逐次結合子の「パラレル」版である: まず <code>t₁</code> が現在のゴールに適用される。それから <code>t₂</code> がサブゴール「全て」に適用される。</p>
+<pre><code class="language-lean">example (p q : Prop) (hp : p) (hq : q) : p ∧ q :=
+  by constructor &lt;;&gt; assumption
+</code></pre>
+<p>この方法は、<code>t₁</code> の適用の結果得られるサブゴールが一様の形式を持つ場合、あるいは少なくとも、全てのゴールを一様な方法で進めることができる場合に特に有効である。</p>
+<p><code>first | t₁ | t₂ | ... | tₙ</code> はどれか一つが成功するまで各 <code>tᵢ</code> を適用する。その全てが成功しなかったら失敗する:</p>
+<pre><code class="language-lean">example (p q : Prop) (hp : p) : p ∨ q := by
+  first | apply Or.inl; assumption | apply Or.inr; assumption
+
+example (p q : Prop) (hq : q) : p ∨ q := by
+  first | apply Or.inl; assumption | apply Or.inr; assumption
+</code></pre>
+<p>最初の例では左のタクティクが成功し、2番目の例では右のタクティクが成功している。次の3つの例では、いずれも同じ複合タクティクにより証明が成功している。</p>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p) : p ∨ q ∨ r :=
+  by repeat (first | apply Or.inl; assumption | apply Or.inr | assumption)
+
+example (p q r : Prop) (hq : q) : p ∨ q ∨ r :=
+  by repeat (first | apply Or.inl; assumption | apply Or.inr | assumption)
+
+example (p q r : Prop) (hr : r) : p ∨ q ∨ r :=
+  by repeat (first | apply Or.inl; assumption | apply Or.inr | assumption)
+
+/- repeat と first を使わなかった場合 -/
+
+example (p q r : Prop) (hp : p) : p ∨ q ∨ r :=
+  by apply Or.inl; assumption
+
+example (p q r : Prop) (hq : q) : p ∨ q ∨ r :=
+  by apply Or.inr
+     apply Or.inl; assumption
+
+example (p q r : Prop) (hr : r) : p ∨ q ∨ r :=
+  by apply Or.inr
+     apply Or.inr
+     assumption
+</code></pre>
+<p>このタクティクはまず選言命題の左側をターゲットにし、それを <code>assumption</code> で解こうとする。それが失敗したら、選言命題の右側に注目する。もしそれも失敗したら、<code>assumption</code> タクティクを呼び出す。</p>
+<p>もう気付いているだろうが、タクティクは失敗することがある。実際、<code>first</code> 結合子がバックトラックして次のタクティクを試すのは、一番最初のタクティクが「失敗」したときである。<code>try</code> 結合子は、つまらないかもしれない方法によって、常に成功するタクティクを構築する: <code>try t</code> は <code>t</code> を実行し、たとえ <code>t</code> が失敗しても成功したと報告する。<code>try t</code> は <code>first | t | skip</code> と等価である。ここで、<code>skip</code> は何もせず、そして何もしないことで成功するタクティクである。次の例では、2番目の <code>constructor</code> は連言の右側 <code>q ∧ r</code> については成功するが、連言の左側 <code>p</code> については失敗する (連言と選言は右結合的であることを覚えておこう)。<code>try</code> タクティクは逐次結合されたタクティクが成功することを保証する。</p>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
+  constructor &lt;;&gt; (try constructor) &lt;;&gt; assumption
+</code></pre>
+<p><strong>注意</strong>: <code>try t</code> は決して失敗しないため、<code>repeat (try t)</code> は無限にループする。</p>
+<p>証明では、複数のゴールが未解決であることがよくある。並列逐次結合子 <code>&lt;;&gt;</code> は1つのタクティクを複数のゴールに適用する1つの方法だが、他にも方法はある。例えば、<code>all_goals t</code> は全ての未解決のゴールに <code>t</code> を適用する:</p>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
+  constructor
+  all_goals (try constructor)
+  all_goals assumption
+</code></pre>
+<p>この例では、<code>any_goals</code> タクティクはよりロバストな解を提供する。タクティク <code>any_goals t</code>は <code>all_goals t</code> に似ているが、<code>any_goals t</code> は <code>t</code> が少なくとも1つのゴールで成功すれば成功する。</p>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p) (hq : q) (hr : r) : p ∧ q ∧ r := by
+  constructor
+  any_goals constructor
+  any_goals assumption
+</code></pre>
+<p>次の例において、最初のタクティクは連言命題を繰り返し分解する:</p>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p) (hq : q) (hr : r) :
+      p ∧ ((p ∧ q) ∧ r) ∧ (q ∧ r ∧ p) := by
+  repeat (any_goals constructor)
+  all_goals assumption
+</code></pre>
+<p>実際、上記の例の全てのタクティクを一行に詰め込むことができる:</p>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p) (hq : q) (hr : r) :
+      p ∧ ((p ∧ q) ∧ r) ∧ (q ∧ r ∧ p) := by
+  repeat (any_goals (first | constructor | assumption))
+</code></pre>
+<p>タクティク <code>focus t</code> は、他のゴールを一時的にスコープから隠し、<code>t</code> を現在のゴール(一番上のゴール)だけに作用させる。したがって、通常は <code>t</code> が現在のゴールだけに作用する場合、<code>focus (all_goals t)</code> は <code>all_goals</code> の機能を打ち消して <code>t</code> と同じ作用を持つ。</p>
+<h2 id="rewriting-書き換え"><a class="header" href="#rewriting-書き換え">Rewriting (書き換え)</a></h2>
+<p><a href="./quantifiers_and_equality.html#calculational-proofs-%E8%A8%88%E7%AE%97%E7%9A%84%E8%A8%BC%E6%98%8E">Calculational Proofs (計算的証明)</a>の節で、<code>rewrite</code> タクティク(省略版: <code>rw</code>)と <code>simp</code> タクティクを簡単に紹介した。本節と次節では、これらについてさらに詳しく説明する。</p>
+<p><code>rewrite</code> タクティクはターゲットとコンテキストに置換を適用するための基本的なメカニズムであり、等式を扱う便利で効率的な方法を提供する。このタクティクの最も基本的な構文は <code>rewrite [t]</code> である。ここで、<code>t</code> はある等式が成立することを主張する型である。例えば、仮説 <code>h : x = y</code> を <code>t</code> として採用することができる。<code>t</code> は <code>add_comm : ∀ x y, x + y = y + x</code> のような全称命題でもよい。その場合、<code>rewrite</code> タクティクは <code>x</code> と <code>y</code> に対して適切な項を見つけようとする。あるいは、それが具体的な等式あるいは等式に関する全称命題であれば、<code>t</code> は関数適用などを含む複合的な項であってもよい。次の例では、仮説を用いてターゲットを書き換えるために基本的な構文 <code>rewrite [t]</code> を使う。</p>
+<pre><code class="language-lean">example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
+  rw [h₂] -- replace k with 0
+  rw [h₁] -- replace f 0 with 0
+</code></pre>
+<p>上記の例では、最初の <code>rw</code> はターゲット <code>f k = 0</code> 内の <code>k</code> を <code>0</code> に置き換え、2番目の <code>rw</code> はターゲット <code>f 0 = 0</code> 内の <code>f 0</code> を <code>0</code> に置き換えている。このタクティクは <code>t = t</code> という形の任意のゴールを(<code>rfl</code> を使うまでもなく)自動的に閉じる。次は複合的な項を使った書き換えの例である:</p>
+<pre><code class="language-lean">example (x y : Nat) (p : Nat → Prop) (q : Prop) (h : q → x = y)
+        (h' : p y) (hq : q) : p x := by
+  rw [h hq]; assumption
+</code></pre>
+<p>ここで <code>h hq</code> は <code>x = y</code> の証明を構築している。</p>
+<p><code>rw [t_1, ..., t_n]</code> という記法を使って、複数回の書き換えを1つにまとめることができる。これは <code>rw [t_1]; ...; rw [t_n]</code> の略記である。この記法を用いると、先ほどの例は次のように書ける:</p>
+<pre><code class="language-lean">example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
+  rw [h₂, h₁]
+</code></pre>
+<p>デフォルトでは、<code>rw</code> は等式を順方向に用いる。つまり、書き換え対象の中で <code>t</code> の左辺とマッチした(全ての)部分項を <code>t</code> の右辺で置き換える。記法 <code>←t</code> を使うと、等式 <code>t</code> を逆向きに使うように指示することができる。つまり、書き換え対象の中で <code>t</code> の右辺とマッチした部分項を <code>t</code> の左辺で置き換えることができる。</p>
+<pre><code class="language-lean">example (f : Nat → Nat) (a b : Nat) (h₁ : a = b) (h₂ : f a = 0) : f b = 0 := by
+  rw [←h₁, h₂]
+</code></pre>
+<p>この例では、項 <code>←h₁</code> は <code>b</code> を <code>a</code> に置き換えるよう書き換え器に指示する。エディターでは、<code>\l</code> と打つと <code>←</code> を入力することができる。また、これと等価なアスキー文字列 <code>&lt;-</code> を使うこともできる。</p>
+<p>用いる等式が全称命題の場合、等式の左辺が書き換え対象内の複数の部分項とマッチすることがある。例えば、書き換え対象が <code>a + b + c = a + c + b</code> であるとき、<code>rw [Nat.add_comm]</code> は <code>a + b</code> とも <code>a + c</code> とも <code>a + b + c</code> とも <code>a + c + b</code> ともマッチしうる。その場合、<code>rw</code> タクティクは書き換え対象を走査したときに最初にマッチした部分項を書き換える。それが希望するものではない場合は、追加の引数を与えることでマッチさせたい部分項を指定することができる。</p>
+<pre><code class="language-lean">example (a b c : Nat) : a + b + c = a + c + b := by
+  rw [Nat.add_assoc, Nat.add_comm b, ← Nat.add_assoc]
+
+example (a b c : Nat) : a + b + c = a + c + b := by
+  rw [Nat.add_assoc, Nat.add_assoc, Nat.add_comm b]
+
+example (a b c : Nat) : a + b + c = a + c + b := by
+  rw [Nat.add_assoc, Nat.add_assoc, Nat.add_comm _ b]
+</code></pre>
+<p>上記の最初の例では、最初のステップで <code>a + b + c</code> を <code>a + (b + c)</code> に書き換えている。次のステップでは、項 <code>b + c</code> に可換性を適用している。ここで、引数 <code>b</code> を指定しなければ、<code>a + (b + c)</code> が <code>(b + c) + a</code> に書き換えられていただろう。最後に、結合性を逆向きに使うことで <code>a + (c + b)</code> を <code>a + c + b</code> に書き換えている。次の2つの例では、まず結合性を2回使って両辺の括弧を右に寄せ、それから <code>b</code> と <code>c</code> を入れ替えている。最後の例では、<code>Nat.add_comm</code> の第2引数を指定することで、左辺ではなく右辺の書き換えを指示していることに注意してほしい。</p>
+<p>デフォルトでは、<code>rw</code> タクティクはゴールのターゲットだけに影響する。<code>rw [t] at h</code> という記法は、仮説 <code>h</code> に <code>t</code> による書き換えを適用する。</p>
+<pre><code class="language-lean">example (f : Nat → Nat) (a : Nat) (h : a + 0 = 0) : f a = f 0 := by
+  rw [Nat.add_zero] at h
+  rw [h]
+</code></pre>
+<p>最初のステップでは、<code>rw [Nat.add_zero] at h</code> が仮説 <code>h</code> の型を <code>a + 0 = 0</code> から <code>a = 0</code> に書き換えている。それからターゲットを <code>f 0 = f 0</code> に書き換えるために <code>h : a = 0</code> が用いられている。</p>
+<p><code>rewrite</code> タクティクは命題だけにとどまらず変数の型を書き換えることもできる。次の例では、<code>rw [h] at t</code> が仮説 <code>t : Tuple α n</code> の型を <code>t : Tuple α 0</code> に書き換えている。</p>
+<pre><code class="language-lean">def Tuple (α : Type) (n : Nat) :=
+  { as : List α // as.length = n }
+
+example (n : Nat) (h : n = 0) (t : Tuple α n) : Tuple α 0 := by
+  rw [h] at t
+  exact t
+</code></pre>
+<h2 id="using-the-simplifier-単純化器の使用"><a class="header" href="#using-the-simplifier-単純化器の使用">Using the Simplifier (単純化器の使用)</a></h2>
+<p><code>rewrite</code> タクティクがゴールを操作するために特化したツールとして設計されているのに対し、<em>simplifier</em>(単純化器) はより強力な自動化を提供する。Leanのライブラリには、<code>[simp]</code> 属性が付けられた恒等式が多数収載されており、<code>simp</code> タクティクはそれらを使って単純化対象内の部分項を繰り返し書き換える。</p>
+<pre><code class="language-lean">example (x y z : Nat) : (x + 0) * (0 + y * 1 + z * 0) = x * y := by
+  simp
+
+example (x y z : Nat) (p : Nat → Prop) (h : p (x * y))
+        : p ((x + 0) * (0 + y * 1 + z * 0)) := by
+  simp; assumption
+</code></pre>
+<p>最初の例では、ターゲットの等式の左辺は、0と1を含む普通の恒等式を使って単純化され、ターゲットは <code>x * y = x * y</code> となる。この時点で、<code>simp</code> は反射律を用いてゴールを閉じる。2番目の例では、<code>simp</code> がゴールを <code>p (x * y)</code> に簡約し、その時点で <code>h</code> がゴールを閉じる。次はリストに関する例である:</p>
+<pre><code class="language-lean">open List
+
+example (xs : List Nat)
+        : reverse (xs ++ [1, 2, 3]) = [3, 2, 1] ++ reverse xs := by
+  simp
+
+example (xs ys : List α)
+        : length (reverse (xs ++ ys)) = length xs + length ys := by
+  simp [Nat.add_comm]
+</code></pre>
+<p>ここで、<code>simp [t]</code> は <code>[simp]</code> 属性が付けられた恒等式に加えて <code>t</code> を用いて単純化対象を書き換える。</p>
+<p><code>rw</code> と同様に、キーワード <code>at</code> を使うとコンテキスト内の仮説を単純化することができる:</p>
+<pre><code class="language-lean">example (x y z : Nat) (p : Nat → Prop)
+        (h : p ((x + 0) * (0 + y * 1 + z * 0))) : p (x * y) := by
+  simp at h; assumption
+</code></pre>
+<p>さらに、「ワイルドカード」<code>*</code> を使うと、コンテキスト内の全ての仮説とターゲットを単純化することができる:</p>
+<pre><code class="language-lean">attribute [local simp] Nat.mul_comm Nat.mul_assoc Nat.mul_left_comm
+attribute [local simp] Nat.add_assoc Nat.add_comm Nat.add_left_comm
+
+example (w x y z : Nat) (p : Nat → Prop)
+        (h : p (x * y + z * w * x)) : p (x * w * z + y * x) := by
+  simp at *; assumption
+
+example (x y z : Nat) (p : Nat → Prop)
+        (h₁ : p (1 * x + y)) (h₂ : p (x * z * 1))
+        : p (y + 0 + x) ∧ p (z * x) := by
+  simp at * &lt;;&gt; constructor &lt;;&gt; assumption
+</code></pre>
+<p>自然数の乗法のような可換性と結合性を満たす演算の場合、単純化器は可換性と結合性に加えて<em>left commutativity</em>(左可換性)を用いて式を書き換える。乗法の場合、左可換性は次のように表される: <code>x * (y * z) = y * (x * z)</code>。<code>local</code> 修飾子は、現在のファイル(あるいはセクションや名前空間)内でこれらの規則を使用するように単純化器に指示する。可換性と左可換性は、どちらか片方を繰り返し適用するとループが生じるという点で問題があるように思えるかもしれない。しかし、単純化器は引数を並べ替える恒等式を検出し、<em>ordered rewriting</em>(順序付き書き換え)として知られるテクニックを使用する。これは、システムが項の内部的な順序を保持し、項の順序が小さくなる場合にのみ恒等式を適用することを意味する。上記の可換性、結合性、左可換性の恒等式は全て、部分項中の括弧を右に寄せるという効果を持つ。そのため、項を(多少恣意的ではあるが)正規化された順序で並べることができる。したがって、結合性と可換性の下で等価な式は、同じ正規形に書き換えられる。</p>
+<pre><code class="language-lean">attribute [local simp] Nat.mul_comm Nat.mul_assoc Nat.mul_left_comm
+attribute [local simp] Nat.add_assoc Nat.add_comm Nat.add_left_comm
+example (w x y z : Nat)
+        : x * y + z * w * x = x * w * z + y * x := by
+  simp
+
+example (w x y z : Nat) (p : Nat → Prop)
+        (h : p (x * y + z * w * x)) : p (x * w * z + y * x) := by
+  simp        -- ⊢ p (x * y + w * (x * z))
+  simp at h   -- h: p (x * y + w * (x * z))
+  assumption
+</code></pre>
+<p><code>rewrite</code> と同様に、<code>simp [t_1, ..., t_n]</code> と書くことで、単純化の際に使用する恒等式のリストに <code>t_1</code> ... <code>t_n</code> を追加することができる。追加するものは一般的な補題でも仮説でも定義の展開でも複合的な項でもよい。<code>simp</code> タクティクも <code>rewrite</code> と同様に <code>←t</code> 構文を認識する。</p>
+<pre><code class="language-lean">def f (m n : Nat) : Nat :=
+  m + n + m
+
+example {m n : Nat} (h : n = 1) (h' : 0 = m) : (f m n) = n := by
+  simp [h, ←h', f]
+</code></pre>
+<p>仮説を用いてゴールを単純化するのがよくある使い方である:</p>
+<pre><code class="language-lean">example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
+  simp [h₁, h₂]
+</code></pre>
+<p>単純化の際に全ての仮説を使いたい場合は、ワイルドカード記号 <code>*</code> を使う:</p>
+<pre><code class="language-lean">example (f : Nat → Nat) (k : Nat) (h₁ : f 0 = 0) (h₂ : k = 0) : f k = 0 := by
+  simp [*]
+</code></pre>
+<p>次は他の例である:</p>
+<pre><code class="language-lean">example (u w x y z : Nat) (h₁ : x = y + z) (h₂ : w = u + x)
+        : w = z + y + u := by
+  simp [*, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+</code></pre>
+<p>単純化器は命題の書き換えも行う。例えば、仮説 <code>hp : p</code> を用いて、<code>p ∧ q</code> を <code>q</code> に、<code>p v q</code> を <code>True</code> に書き換え、最終的に自明な命題に書き換えられたゴールを閉じる。命題の書き換えを繰り返すことで、非自明な命題推論を行うことができる。</p>
+<pre><code class="language-lean">example (p q : Prop) (hp : p) : p ∧ q ↔ q := by
+  simp [*]
+
+example (p q : Prop) (hp : p) : p ∨ q := by
+  simp [*]
+
+example (p q r : Prop) (hp : p) (hq : q) : p ∧ (q ∨ r) := by
+  simp [*]
+</code></pre>
+<p>次の例では、単純化器はコンテキスト内の全ての仮説を単純化し、それらをターゲットに適用しゴールを閉じている。</p>
+<pre><code class="language-lean">example (u w x x' y y' z : Nat) (p : Nat → Prop)
+        (h₁ : x + 0 = x') (h₂ : y + 0 = y')
+        : x + y + 0 = x' + y' := by
+  simp at *
+  simp [*]
+</code></pre>
+<p>単純化器の特に便利なところは、ライブラリが発展するにつれてその機能が成長していくところだ。例えば、リスト <code>xs</code> を受け取ると、<code>xs</code> に反転 <code>xs.reverse</code> を追加して <code>xs</code> を対称化するリスト演算 <code>mk_symm</code> を定義したとしよう:</p>
+<pre><code class="language-lean">def mk_symm (xs : List α) :=
+  xs ++ xs.reverse
+</code></pre>
+<p>このとき、任意のリスト <code>xs</code> に対して、<code>List.reverse (mk_symm xs)</code> が <code>mk_symm xs</code> と等しいことが、定義を展開することで容易に証明できる:</p>
+<pre><code class="language-lean"><span class="boring">def mk_symm (xs : List α) :=
+</span><span class="boring"> xs ++ xs.reverse
+</span>theorem reverse_mk_symm (xs : List α)
+        : (mk_symm xs).reverse = mk_symm xs := by
+  simp [mk_symm]
+</code></pre>
+<p><code>reverse_mk_symm</code> が証明された今、新しい定理を証明するために <code>reverse_mk_symm</code> を使った単純化を用いることができる:</p>
+<pre><code class="language-lean"><span class="boring">def mk_symm (xs : List α) :=
+</span><span class="boring"> xs ++ xs.reverse
+</span><span class="boring">theorem reverse_mk_symm (xs : List α)
+</span><span class="boring">       : (mk_symm xs).reverse = mk_symm xs := by
+</span><span class="boring"> simp [mk_symm]
+</span>example (xs ys : List Nat)
+        : (xs ++ mk_symm ys).reverse = mk_symm ys ++ xs.reverse := by
+  simp [reverse_mk_symm]
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p (mk_symm ys ++ xs.reverse) := by
+  simp [reverse_mk_symm] at h; assumption
+</code></pre>
+<p><code>simp [reverse_mk_symm]</code> を使うのは一般的に決して悪いことではないが、ユーザーが明示的にこれを呼び出す必要がない方がなおよいだろう。定理を定義する際に、「これは単純化の際に使う定理だ」とマークすることで明示的な呼び出しの省略を実現できる:</p>
+<pre><code class="language-lean"><span class="boring">def mk_symm (xs : List α) :=
+</span><span class="boring"> xs ++ xs.reverse
+</span>@[simp] theorem reverse_mk_symm (xs : List α)
+        : (mk_symm xs).reverse = mk_symm xs := by
+  simp [mk_symm]
+
+example (xs ys : List Nat)
+        : (xs ++ mk_symm ys).reverse = mk_symm ys ++ xs.reverse := by
+  simp
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p (mk_symm ys ++ xs.reverse) := by
+  simp at h; assumption
+</code></pre>
+<p>記法 <code>@[simp]</code> は <code>reverse_mk_symm</code> が <code>[simp]</code> 属性を持つことを宣言する。この宣言はより明示的に記述することができる:</p>
+<pre><code class="language-lean"><span class="boring">def mk_symm (xs : List α) :=
+</span><span class="boring"> xs ++ xs.reverse
+</span>theorem reverse_mk_symm (xs : List α)
+        : (mk_symm xs).reverse = mk_symm xs := by
+  simp [mk_symm]
+
+attribute [simp] reverse_mk_symm
+
+example (xs ys : List Nat)
+        : (xs ++ mk_symm ys).reverse = mk_symm ys ++ xs.reverse := by
+  simp
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p (mk_symm ys ++ xs.reverse) := by
+  simp at h; assumption
+</code></pre>
+<p>定理が宣言された後なら、いつでもその定理に属性を付与することができる:</p>
+<pre><code class="language-lean"><span class="boring">def mk_symm (xs : List α) :=
+</span><span class="boring"> xs ++ xs.reverse
+</span>theorem reverse_mk_symm (xs : List α)
+        : (mk_symm xs).reverse = mk_symm xs := by
+  simp [mk_symm]
+
+example (xs ys : List Nat)
+        : (xs ++ mk_symm ys).reverse = mk_symm ys ++ xs.reverse := by
+  simp [reverse_mk_symm]
+
+attribute [simp] reverse_mk_symm
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p (mk_symm ys ++ xs.reverse) := by
+  simp at h; assumption
+</code></pre>
+<p>しかし、一度属性が付与されると、それを永続的に削除する方法は<strong>ない</strong>。そして、属性は、その属性が割り当てられているファイルをインポートする全てのファイルに適用される。<a href="./interacting_with_lean.html#attributes-%E5%B1%9E%E6%80%A7">Attributes (属性)</a>の節で詳しく説明するが、<code>local</code> 修飾子を使えば、属性の適用範囲を現在のファイルやセクションに限定することができる:</p>
+<pre><code class="language-lean"><span class="boring">def mk_symm (xs : List α) :=
+</span><span class="boring"> xs ++ xs.reverse
+</span>theorem reverse_mk_symm (xs : List α)
+        : (mk_symm xs).reverse = mk_symm xs := by
+  simp [mk_symm]
+
+section
+attribute [local simp] reverse_mk_symm
+
+example (xs ys : List Nat)
+        : (xs ++ mk_symm ys).reverse = mk_symm ys ++ xs.reverse := by
+  simp
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p (mk_symm ys ++ xs.reverse) := by
+  simp at h; assumption
+end
+</code></pre>
+<p><code>local</code> を使った場合、そのセクションの外では、単純化器はデフォルトで <code>reverse_mk_symm</code> を使わなくなる。</p>
+<p>これまで説明してきた様々な <code>simp</code> のオプション (ルールの明示的なリストを与える、<code>at</code> を使って適用対象を指定するなど) は組み合わせることができるが、オプションを記述する順序は厳格であることに注意してほしい。エディタの中では、<code>simp</code> キーワードにカーソルを合わせて、<code>simp</code> に関連するドキュメントを読むことで、オプションの正しい順序を確認することができる。</p>
+<p>さらに2つの便利な修飾子がある。デフォルトでは、<code>simp</code> は属性 <code>[simp]</code> でマークされた全ての定理を利用する。<code>simp only</code> と書くと、デフォルトで使われる定理は全て除外され、より明確に作られた定理のリストを使うことができる。以下の例では、マイナス記号 <code>-</code> と <code>only</code> が <code>reverse_mk_symm</code> の適用をブロックするために使われている。</p>
+<pre><code class="language-lean">def mk_symm (xs : List α) :=
+  xs ++ xs.reverse
+@[simp] theorem reverse_mk_symm (xs : List α)
+        : (mk_symm xs).reverse = mk_symm xs := by
+  simp [mk_symm]
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p (mk_symm ys ++ xs.reverse) := by
+  simp at h; assumption
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p ((mk_symm ys).reverse ++ xs.reverse) := by
+  simp [-reverse_mk_symm] at h; assumption
+
+example (xs ys : List Nat) (p : List Nat → Prop)
+        (h : p (xs ++ mk_symm ys).reverse)
+        : p ((mk_symm ys).reverse ++ xs.reverse) := by
+  simp only [List.reverse_append] at h; assumption
+</code></pre>
+<p><code>simp</code> タクティクには多くの設定オプションがある。例えば、次のように文脈的な単純化(ターゲットの前件を用いた単純化)を有効にすることができる。</p>
+<pre><code class="language-lean">example : if x = 0 then y + x = y else x ≠ 0 := by
+  simp (config := { contextual := true })
+</code></pre>
+<p><code>contextual := true</code> のとき、 <code>simp</code> は <code>y + x = y</code> を単純化する際は <code>x = 0</code> という事実を使い、<code>x ≠ 0</code> を単純化する際には <code>x ≠ 0</code> を用いる。次は他の例である:</p>
+<pre><code class="language-lean">example : ∀ (x : Nat) (h : x = 0), y + x = y := by
+  simp (config := { contextual := true })
+</code></pre>
+<p>もうひとつの便利な設定オプションは、算術的な単純化を可能にする <code>arith := true</code> である。これは非常に便利なので、<code>simp_arith</code> は <code>simp (config := { arith := true })</code> の省略形になっている。</p>
+<pre><code class="language-lean">example : 0 &lt; 1 + x ∧ x + y + 2 ≥ y + 1 := by
+  simp_arith
+</code></pre>
+<h2 id="split-tactic-splitタクティク"><a class="header" href="#split-tactic-splitタクティク">Split Tactic (Splitタクティク)</a></h2>
+<p><code>split</code> タクティクは、入れ子の <code>if-then-else</code> 式や <code>match</code> 式を場合分けするのに便利である。<code>n</code> 個の場合分けを持つ <code>match</code> 式に対して、<code>split</code> タクティクは最大 <code>n</code> 個のサブゴールを生成する。次に例を示す:</p>
+<pre><code class="language-lean">def f (x y z : Nat) : Nat :=
+  match x, y, z with
+  | 5, _, _ =&gt; y
+  | _, 5, _ =&gt; y
+  | _, _, 5 =&gt; y
+  | _, _, _ =&gt; 1
+
+example (x y z : Nat) : x ≠ 5 → y ≠ 5 → z ≠ 5 → z = w → f x y w = 1 := by
+  intros
+  simp [f]
+  split
+  . contradiction
+  . contradiction
+  . contradiction
+  . rfl
+</code></pre>
+<p>上記の例のタクティク証明は次のように短縮することができる。</p>
+<pre><code class="language-lean"><span class="boring">def f (x y z : Nat) : Nat :=
+</span><span class="boring"> match x, y, z with
+</span><span class="boring"> | 5, _, _ =&gt; y
+</span><span class="boring"> | _, 5, _ =&gt; y
+</span><span class="boring"> | _, _, 5 =&gt; y
+</span><span class="boring"> | _, _, _ =&gt; 1
+</span>example (x y z : Nat) : x ≠ 5 → y ≠ 5 → z ≠ 5 → z = w → f x y w = 1 := by
+  intros; simp [f]; split &lt;;&gt; first | contradiction | rfl
+</code></pre>
+<p>タクティク <code>split &lt;;&gt; first | contradiction | rfl</code> は、まず <code>split</code> タクティクを適用し、次に生成された各サブゴールに対して <code>contradiction</code> を試し、それが失敗したら <code>rfl</code> を試す。<code>simp</code> のように、<code>split</code> をコンテキスト内の特定の仮説に適用することもできる。</p>
+<pre><code class="language-lean">def g (xs ys : List Nat) : Nat :=
+  match xs, ys with
+  | [a, b], _ =&gt; a+b+1
+  | _, [b, c] =&gt; b+1
+  | _, _      =&gt; 1
+
+example (xs ys : List Nat) (h : g xs ys = 0) : False := by
+  simp [g] at h; split at h &lt;;&gt; simp_arith at h
+</code></pre>
+<h2 id="extensible-tactics-拡張可能なタクティク"><a class="header" href="#extensible-tactics-拡張可能なタクティク">Extensible Tactics (拡張可能なタクティク)</a></h2>
+<p>次の例では、コマンド <code>syntax</code> を使って <code>triv</code> という記法を定義する。次に、<code>macro_rules</code> コマンドを使って、<code>triv</code> が使われたときの処理を指定する(<code>triv</code> のマクロ展開を指定する)。<code>triv</code> に対して複数のマクロ展開を指定することができ、タクティク解釈器はどれかが成功するまで全てのマクロ展開を試す。</p>
+<pre><code class="language-lean">-- 新しい記法を定義する
+syntax &quot;triv&quot; : tactic
+
+macro_rules
+  | `(tactic| triv) =&gt; `(tactic| assumption)
+
+example (h : p) : p := by
+  triv
+
+-- 現時点では、`triv` を使って次の定理を証明することはできない
+-- example (x : α) : x = x := by
+--  triv
+
+-- `triv` を拡張しよう。タクティク解釈器はどれかが成功するまで
+-- `triv` のための全てのマクロ展開を試す
+macro_rules
+  | `(tactic| triv) =&gt; `(tactic| rfl)
+
+example (x : α) : x = x := by
+  triv
+
+example (x : α) (h : p) : x = x ∧ p := by
+  apply And.intro &lt;;&gt; triv
+
+-- (再帰的な)マクロ展開を追加する
+macro_rules | `(tactic| triv) =&gt; `(tactic| apply And.intro &lt;;&gt; triv)
+
+example (x : α) (h : p) : x = x ∧ p := by
+  triv
+</code></pre>
+<h2 id="exercises-練習問題"><a class="header" href="#exercises-練習問題">Exercises (練習問題)</a></h2>
+<ol>
+<li>
+<p><a href="./propositions_and_proofs.html">3章 Propositions and Proofs (命題と証明)</a> と <a href="./quantifiers_and_equality.html">4章 Quantifiers and Equality (量化子と等号)</a> に戻り、タクティク証明を用いて出来るだけ多くの練習問題を解き直せ。<code>rw</code> と <code>simp</code> も適切に使うこと。</p>
+</li>
+<li>
+<p>タクティク結合子を使って、次の定理の証明を1行で書け:</p>
+</li>
+</ol>
+<pre><code class="language-lean">example (p q r : Prop) (hp : p)
+        : (p ∨ q ∨ r) ∧ (q ∨ p ∨ r) ∧ (q ∨ r ∨ p) := by
+  admit
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="quantifiers_and_equality.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="interacting_with_lean.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="quantifiers_and_equality.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="interacting_with_lean.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>型クラス - Theorem Proving in Lean 4 日本語訳</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme && theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar && sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title_page.html">Theorem Proving in Lean 4 日本語訳</a></li><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li class="chapter-item expanded "><a href="dependent_type_theory.html"><strong aria-hidden="true">2.</strong> 依存型理論</a></li><li class="chapter-item expanded "><a href="propositions_and_proofs.html"><strong aria-hidden="true">3.</strong> 命題と証明</a></li><li class="chapter-item expanded "><a href="quantifiers_and_equality.html"><strong aria-hidden="true">4.</strong> 量化子と等号</a></li><li class="chapter-item expanded "><a href="tactics.html"><strong aria-hidden="true">5.</strong> タクティク</a></li><li class="chapter-item expanded "><a href="interacting_with_lean.html"><strong aria-hidden="true">6.</strong> Leanとの対話</a></li><li class="chapter-item expanded "><a href="inductive_types.html"><strong aria-hidden="true">7.</strong> 帰納型</a></li><li class="chapter-item expanded "><a href="induction_and_recursion.html"><strong aria-hidden="true">8.</strong> 帰納と再帰</a></li><li class="chapter-item expanded "><a href="structures_and_records.html"><strong aria-hidden="true">9.</strong> 構造体とレコード</a></li><li class="chapter-item expanded "><a href="type_classes.html" class="active"><strong aria-hidden="true">10.</strong> 型クラス</a></li><li class="chapter-item expanded "><a href="conv.html"><strong aria-hidden="true">11.</strong> 変換タクティクモード</a></li><li class="chapter-item expanded "><a href="axioms_and_computation.html"><strong aria-hidden="true">12.</strong> 公理と計算</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Theorem Proving in Lean 4 日本語訳</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/aconite-ac/theorem_proving_in_lean4" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="type-classes-型クラス"><a class="header" href="#type-classes-型クラス">Type Classes (型クラス)</a></h1>
+<p>型クラスは、関数型プログラミング言語においてアドホックな多相性を実現する原理的な方法として導入された。まず、次のことを見る: もし関数が型固有の加法の実装を引数として取り、残りの引数に対してその加法の実装を呼び出すだけであれば、加法のようなアドホックな多相性関数を実装するのは簡単である。例えば、Leanで加法の実装を保持する構造体を宣言したとしよう。</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>structure Add (a : Type) where
+  add : a → a → a
+
+#check @Add.add
+-- Add.add : {a : Type} → Add a → a → a → a
+-- `Add.add` はstructure宣言によって自動生成される射影関数
+<span class="boring">end Ex
+</span></code></pre>
+<p>このLeanコードでは、<code>add</code> フィールドへの射影関数は <code>Add.add : {a : Type} → Add a → a → a → a</code> という型を持っている。ここで、型 <code>a</code> を囲んでいる波括弧は、<code>a</code> が暗黙の引数であることを示している。次のようにして <code>double</code> 関数を実装することができる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span><span class="boring">structure Add (a : Type) where
+</span><span class="boring"> add : a → a → a
+</span>def double (s : Add a) (x : a) : a :=
+  s.add x x
+
+#eval double { add := Nat.add } 10
+-- 20
+
+#eval double { add := Nat.mul } 10
+-- 100
+
+#eval double { add := Int.add } 10
+-- 20
+<span class="boring">end Ex
+</span></code></pre>
+<p><code>double { add := Nat.add } n</code> と書くことで自然数 <code>n</code> を2倍することができる。もちろん、このように手動で実装(を保持するレコード)を渡すのはユーザーにとって非常に面倒である。実際、そのような面倒さがあれば、アドホック多相性の潜在的な利点のほとんどを失うことになる。</p>
+<p>型クラスの主な考え方は、まず <code>Add a</code> のような型の引数を暗黙にすることである。それから、ユーザーが定義したインスタンスを保管するデータベースを使用して、<em>typeclass resolution</em>(型クラス解決)として知られるプロセスを通じて、目的のインスタンス <code>{s : Add a}</code> を自動合成することである。Leanでは、上の例で <code>structure</code> を <code>class</code> に書き換えることで、<code>Add.add</code> の型は次のように変化する:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>class Add (a : Type) where
+  add : a → a → a
+
+#check @Add.add
+-- Add.add : {a : Type} → [self : Add a] → a → a → a
+<span class="boring">end Ex
+</span></code></pre>
+<p>ここで、角括弧 <code>[]</code> は <code>Add a</code> 型の引数が<em>instance implicit</em>(インスタンス暗黙引数)であること、つまり型クラス解決を使って合成されるべきであることを示している。<code>class</code> 宣言によって自動生成された <code>add</code> 射影関数は、Haskellの <code>add :: Add a =&gt; a -&gt; a -&gt; a</code> のLean版である。そして、ユーザー定義インスタンスは次のように登録できる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span><span class="boring">class Add (a : Type) where
+</span><span class="boring"> add : a → a → a
+</span>instance : Add Nat where
+  add := Nat.add
+
+instance : Add Int where
+  add := Int.add
+
+instance : Add Float where
+  add := Float.add
+<span class="boring">end Ex
+</span></code></pre>
+<p>インスタンスの登録後、<code>n : Nat</code> と <code>m : Nat</code> に対して、<code>Add.add n m</code> という項は、<code>Add Nat</code> 型のインスタンス合成を目標とする型クラス解決を引き起こす。型クラス解決は上で <code>instance</code> 宣言を用いて登録した <code>Add Nat</code> のインスタンスを参照し、目標のインスタンスを合成する。インスタンス暗黙引数を使って、<code>double</code> を再実装することができる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span><span class="boring">class Add (a : Type) where
+</span><span class="boring">  add : a → a → a
+</span><span class="boring">instance : Add Nat where
+</span><span class="boring"> add := Nat.add
+</span><span class="boring">instance : Add Int where
+</span><span class="boring"> add := Int.add
+</span><span class="boring">instance : Add Float where
+</span><span class="boring"> add := Float.add
+</span>def double [Add a] (x : a) : a :=
+  Add.add x x
+
+#check @double
+-- @double : {a : Type} → [inst : Add a] → a → a
+
+#eval double 10
+-- 20
+
+#eval double (10 : Int)
+-- 20
+
+#eval double (7 : Float)
+-- 14.000000
+
+#eval double (239.0 + 2)
+-- 482.000000
+
+<span class="boring">end Ex
+</span></code></pre>
+<!--
+(訳者注: この時点では、大雑把に言えば、型クラスは型クラス解決によりインスタンスが自動合成される構造体だといえる。)
+-->
+<p>一般的に、インスタンスは複雑な方法で他のインスタンスに依存することがある。例えば、「もし <code>a</code> が加法を持つなら、<code>Array a</code> も加法を持つ」と主張する(無名)インスタンスを宣言することができる:</p>
+<pre><code class="language-lean">instance [Add a] : Add (Array a) where
+  add x y := Array.zipWith x y (· + ·)
+
+#eval Add.add #[1, 2] #[3, 4]
+-- #[4, 6]
+
+#eval #[1, 2] + #[3, 4]
+-- #[4, 6]
+</code></pre>
+<p>Leanにおいて <code>(· + ·)</code> は <code>fun x y =&gt; x + y</code> の略記であることに注意してほしい。</p>
+<p>上記の例では、記法をオーバーロード(多重定義)するために型クラスを使う方法を実践した。別の応用例も見てみよう。まず、Leanにおいて、型は項を1つも持たないことがあることを思い出してほしい。しかし、型が有項なら、その型について様々なことができるようになる。Leanを使っていると、ある型の任意の項が必要になることがよくある。例えば、「コーナーケース」において任意の項を返す関数を定義したいと思うことがよくある。また、<code>xs</code> が <code>List a</code> 型を持つとき、<code>head xs</code> は <code>a</code> 型を持ってほしいと思うかもしれない。同様に、型が空でないという付加的な仮定の下では、多くの付加的な定理が成立する。例えば、<code>a</code> が型であるとき、<code>exists x : a, x = x</code> が成立するためには <code>a</code> が空でないことが必要である。標準ライブラリは、有項型の<em>default</em>要素を推論できるようにするために、<code>Inhabited</code> という型クラスを定義している。今述べた応用例を実践するために、まず適切なクラスを宣言することから始めよう:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>class Inhabited (a : Type u) where
+  default : a
+
+#check @Inhabited.default
+-- Inhabited.default : {a : Type u} → [self : Inhabited a] → a
+<span class="boring">end Ex
+</span></code></pre>
+<p><code>Inhabited.default</code> は明示的な引数を持たないことに注意してほしい。</p>
+<p><code>Inhabited a</code> クラスの項とは、ある項 <code>x : a</code> に対する <code>Inhabited.mk x</code> という形の式である。射影 <code>Inhabited.default</code> を使えば、<code>Inhabited a</code> の項から <code>a</code> の項 <code>x</code> を「抽出」することができる。次に、このクラスにいくつかのインスタンスを登録する:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span><span class="boring">class Inhabited (a : Type _) where
+</span><span class="boring"> default : a
+</span>instance : Inhabited Bool where
+  default := true
+
+instance : Inhabited Nat where
+  default := 0
+
+instance : Inhabited Unit where
+  default := ()
+
+instance : Inhabited Prop where
+  default := True
+
+#eval (Inhabited.default : Nat)
+-- 0
+
+#eval (Inhabited.default : Bool)
+-- true
+<span class="boring">end Ex
+</span></code></pre>
+<p><code>export</code> コマンドを使うと、<code>Inhabited.default</code> に対して別名 <code>default</code> を生成することができる(正確には、<code>export</code> コマンドは名前空間 <code>Foo</code> 内で <code>Bar.baz</code> に対して別名 <code>Foo.baz</code> を生成する)。</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span><span class="boring">class Inhabited (a : Type _) where
+</span><span class="boring"> default : a
+</span><span class="boring">instance : Inhabited Bool where
+</span><span class="boring"> default := true
+</span><span class="boring">instance : Inhabited Nat where
+</span><span class="boring"> default := 0
+</span><span class="boring">instance : Inhabited Unit where
+</span><span class="boring"> default := ()
+</span><span class="boring">instance : Inhabited Prop where
+</span><span class="boring"> default := True
+</span>export Inhabited (default)
+
+#eval (default : Nat)
+-- 0
+
+#eval (default : Bool)
+-- true
+<span class="boring">end Ex
+</span></code></pre>
+<h2 id="chaining-instances-インスタンスの連鎖"><a class="header" href="#chaining-instances-インスタンスの連鎖">Chaining Instances (インスタンスの連鎖)</a></h2>
+<p>型クラス推論で出来ることがこれで終わりだとしたら、それほど印象的なものではないだろう。もしそうなら、型クラス推論はユーザー定義インスタンスを保存して、elaboratorがルックアップテーブル(配列や連想配列などのデータ構造)からそれらを見つけられるようにする仕組みに過ぎないからである。型クラス推論が強力なのは、インスタンスを「連鎖」させることができるからである。つまり、インスタンス宣言は、他の型クラスの暗黙のインスタンスに依存することができる。これにより、型クラス推論は、Prolog-likeな探索を用いて、必要に応じてバックトラッキングしながら、再帰的にインスタンスを連鎖させることができる。</p>
+<p>例えば、次の定義は、2つの型 <code>a</code> と <code>b</code> が有項なら、その直積型 <code>a × b</code> も有項であることを示している:</p>
+<pre><code class="language-lean">instance [Inhabited a] [Inhabited b] : Inhabited (a × b) where
+  default := (default, default)
+</code></pre>
+<p>前節のインスタンス宣言に今の宣言を加えることで、例えば <code>Nat × Bool</code> のデフォルト項を推論できるようになる:</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span><span class="boring">class Inhabited (a : Type u) where
+</span><span class="boring"> default : a
+</span><span class="boring">instance : Inhabited Bool where
+</span><span class="boring"> default := true
+</span><span class="boring">instance : Inhabited Nat where
+</span><span class="boring"> default := 0
+</span><span class="boring">opaque default [Inhabited a] : a :=
+</span><span class="boring"> Inhabited.default
+</span>instance [Inhabited a] [Inhabited b] : Inhabited (a × b) where
+  default := (default, default)
+
+#eval (default : Nat × Bool)
+-- (0, true)
+<span class="boring">end Ex
+</span></code></pre>
+<p>同様に、適切な定数関数の存在により、型 <code>b</code> が有項なら関数型 <code>a → b</code> も有項であることを示すことができる:</p>
+<pre><code class="language-lean">instance [Inhabited b] : Inhabited (a → b) where
+  default := fun _ =&gt; default
+</code></pre>
+<p>練習として、<code>List</code> 型や <code>Sum</code> 型などの他の型のデフォルトインスタンスを定義してみよう。</p>
+<p>Leanの標準ライブラリには <code>inferInstance</code> という定義がある。これは型 <code>{α : Sort u} → [i : α] → α</code> を持ち、期待される型がインスタンスを持つときに型クラス解決手続きを実行させるのに便利である。</p>
+<pre><code class="language-lean">#check (inferInstance : Inhabited Nat) -- Inhabited Nat
+
+def foo : Inhabited (Nat × Nat) :=
+  inferInstance
+
+#eval foo.default  -- (0, 0)
+
+theorem ex : foo.default = (default, default) :=
+  rfl
+</code></pre>
+<p><code>#print</code> コマンドを使うと、<code>inferInstance</code> がいかにシンプルかを見ることができる。</p>
+<pre><code class="language-lean">#print inferInstance
+</code></pre>
+<h2 id="tostring-tostring-型クラス"><a class="header" href="#tostring-tostring-型クラス">ToString (<code>ToString</code> 型クラス)</a></h2>
+<p><code>ToString</code> 型クラスの多相メソッド <code>toString</code> は型 <code>{α : Type u} → [ToString α] → α → String</code> を持つ。ユーザー定義の型 <code>Foo</code> に対して型 <code>ToString Foo</code> のインスタンスを宣言すると、連鎖を利用して複雑な値を文字列に変換することができる。Leanでは、ほとんどのビルトイン型 <code>α</code> について <code>ToString α</code> のインスタンスが付属している。</p>
+<pre><code class="language-lean">structure Person where
+  name : String
+  age  : Nat
+
+instance : ToString Person where
+  toString p := p.name ++ &quot;@&quot; ++ toString p.age
+
+#eval toString { name := &quot;Leo&quot;, age := 542 : Person }
+#eval toString ({ name := &quot;Daniel&quot;, age := 18 : Person }, &quot;hello&quot;)  -- `instToStringProd` と `instToStringPerson` の連鎖
+
+</code></pre>
+<h2 id="numerals-数字"><a class="header" href="#numerals-数字">Numerals (数字)</a></h2>
+<p>Leanでは数字は多相である。型クラス <code>OfNat</code> に関するインスタンスを持つ任意の型の項を表すために、数字(例えば <code>2</code>)を使うことができる。</p>
+<pre><code class="language-lean">structure Rational where
+  num : Int
+  den : Nat
+  inv : den ≠ 0
+
+instance instOfNatRational (n : Nat) : OfNat Rational n where
+  ofNat := { num := n, den := 1, inv := by decide }
+
+instance : ToString Rational where
+  toString r := s!&quot;{r.num}/{r.den}&quot;
+
+#eval (2 : Rational) -- 2/1
+
+#check (2 : Rational) -- Rational
+#check (2 : Nat)      -- Nat
+
+#check @OfNat.ofNat Nat 2 (instOfNatNat 2)  -- Nat
+#check @OfNat.ofNat Rational 2 (instOfNatRational 2)  -- Rational
+</code></pre>
+<p>Leanのelaboratorは、項 <code>(2 : Nat)</code> と <code>(2 : Rational)</code> をそれぞれ <code>@OfNat.ofNat Nat 2 (instOfNatNat 2)</code> と <code>@OfNat.ofNat Rational 2 (instOfNatRational 2)</code> に変換する。変換後の項中に出現する数字 <code>2</code> は「生の」自然数と呼ばれる。マクロ <code>nat_lit 2</code> を使うと生の自然数 <code>2</code> を入力することができる。</p>
+<pre><code class="language-lean">#check nat_lit 2  -- Nat
+</code></pre>
+<p>生の自然数は多相では<strong>ない</strong>。</p>
+<p><code>OfNat</code> インスタンスは生の自然数を引数に取る。そのため、特定の数字に対して <code>OfNat</code> のインスタンスを定義することができる。<code>OfNat</code> 型クラスの2番目の引数は、上の例のように変数であることが多いが、生の自然数の場合もある。</p>
+<pre><code class="language-lean">class Monoid (α : Type u) where
+  unit : α
+  op   : α → α → α
+
+instance [s : Monoid α] : OfNat α (nat_lit 1) where
+  ofNat := s.unit
+
+def getUnit [Monoid α] : α :=
+  1
+</code></pre>
+<h2 id="output-parameters-出力パラメータ"><a class="header" href="#output-parameters-出力パラメータ">Output Parameters (出力パラメータ)</a></h2>
+<p>デフォルトでは、Leanは型 <code>T</code> のデフォルト項が既知であり、<code>T</code> が欠落部分を含まない場合にのみ、<code>Inhabited T</code> のインスタンスを合成しようとする。次のコマンドは、型が欠落部分(つまり <code>_</code>)を含むため、&quot;failed to create type class instance for Inhabited (Nat × ?m.1499)&quot; というエラーを生成する。</p>
+<pre><code class="language-lean">#check_failure (inferInstance : Inhabited (Nat × _))
+</code></pre>
+<p><code>Inhabited</code> 型クラスのパラメータは、<code>Inhabited</code> 型クラスのコンストラクタの「入力」の型とみなすことができる。型クラスが複数のパラメータを持つ場合、そのうちのいくつかを出力パラメータ(型クラスのインスタンス合成時に、既に与えられた型から推論される型)としてマークすることができる。出力パラメータの推論のために使われる型は入力パラメータと呼ばれる。出力パラメータに欠落部分があっても、Leanは型クラスのインスタンス合成を開始する。以下の例では、出力パラメータを使って<em>heterogeneous</em>(異種)多相乗法を定義している。</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>class HMul (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  hMul : α → β → γ
+
+export HMul (hMul)
+
+instance : HMul Nat Nat Nat where
+  hMul := Nat.mul
+
+instance : HMul Nat (Array Nat) (Array Nat) where
+  hMul a bs := bs.map (fun b =&gt; hMul a b)
+
+#eval hMul 4 3           -- 12
+#eval hMul 4 #[2, 3, 4]  -- #[8, 12, 16]
+<span class="boring">end Ex
+</span></code></pre>
+<p>パラメータ <code>α</code> と <code>β</code> は入力パラメータ、<code>γ</code> は出力パラメータとみなされる。関数適用 <code>hMul a b</code> が与えられると、<code>a</code> と <code>b</code> の型が分かっているなら型クラスインスタンス合成器が呼び出され、型クラスインスタンス合成器は <code>hMul a b</code> の出力の型情報を(入力パラメータ <code>α</code> と <code>β</code> から推論された)出力パラメータ <code>γ</code> から得る。上の例では、2つのインスタンスを定義した。最初のインスタンスは自然数上の同種乗法である。2つ目のインスタンスは配列のスカラー倍である。2つ目のインスタンスの定義では、インスタンスの連鎖が使われていることに注意してほしい。</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>class HMul (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  hMul : α → β → γ
+
+export HMul (hMul)
+
+instance : HMul Nat Nat Nat where
+  hMul := Nat.mul
+
+instance : HMul Int Int Int where
+  hMul := Int.mul
+
+instance [HMul α β γ] : HMul α (Array β) (Array γ) where
+  hMul a bs := bs.map (fun b =&gt; hMul a b)
+
+#eval hMul 4 3                    -- 12
+#eval hMul 4 #[2, 3, 4]           -- #[8, 12, 16]
+#eval hMul (-2) #[3, -1, 4]       -- #[-6, 2, -8]
+#eval hMul 2 #[#[2, 3], #[0, 4]]  -- #[#[4, 6], #[0, 8]]
+<span class="boring">end Ex
+</span></code></pre>
+<p>この新しい配列スカラー倍インスタンスは、<code>HMul α β γ</code> のインスタンスがあれば、いつでも <code>Array β</code> 型の配列と <code>α</code> 型のスカラーに対して使用することができる。最後の <code>#eval</code> では、<code>HMul Nat Nat Nat</code> のインスタンスから <code>HMul Nat (Array Nat) (Array Nat)</code> のインスタンスが合成され、<code>HMul Nat (Array Nat) (Array Nat)</code> のインスタンスから <code>HMul Nat (Array (Array Nat)) (Array (Array Nat))</code> のインスタンスが合成されていることに注意してほしい。</p>
+<h2 id="default-instances-デフォルトインスタンス"><a class="header" href="#default-instances-デフォルトインスタンス">Default Instances (デフォルトインスタンス)</a></h2>
+<p>型クラス <code>HMul</code> では、パラメータ <code>α</code> と <code>β</code> は入力パラメータとして扱われる。したがって、型クラスインスタンス合成はこれら2つの型が特定されてから開始される。場合によっては、この制約は強すぎるかもしれない。</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>class HMul (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  hMul : α → β → γ
+
+export HMul (hMul)
+
+instance : HMul Int Int Int where
+  hMul := Int.mul
+
+def xs : List Int := [1, 2, 3]
+
+-- Error &quot;typeclass instance problem is stuck, it is often due to metavariables HMul ?m.89 ?m.90 ?m.91&quot;
+-- `y` の型を明示的に与えればエラーは消える
+#check_failure fun y =&gt; xs.map (fun x =&gt; hMul x y)
+<span class="boring">end Ex
+</span></code></pre>
+<p><code>y</code> の型が与えられていないため、<code>HMul</code> のインスタンスはLeanによって合成されない。しかし、このような状況では <code>y</code> と <code>x</code> の型は同じはずだと考えるのが自然である。<em>default instances</em>(デフォルトインスタンス)を使えば、まさにそれを実現できる。</p>
+<pre><code class="language-lean">namespace Ex
+class HMul (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  hMul : α → β → γ
+
+export HMul (hMul)
+
+@[default_instance]
+instance : HMul Int Int Int where
+  hMul := Int.mul
+
+def xs : List Int := [1, 2, 3]
+
+#check fun y =&gt; xs.map (fun x =&gt; hMul x y)    -- Int → List Int
+#eval (fun y =&gt; xs.map (fun x =&gt; hMul x y)) 3 -- [3, 6, 9]
+end Ex
+</code></pre>
+<p>上記のインスタンスに <code>default_instance</code> 属性を付けることで、保留中の型クラスインスタンス合成問題においてこのインスタンスを使用するようLeanに指示することができる。実際のLeanの実装では、各算術演算子について同種型クラス(<code>Add</code> など)と異種型クラス(<code>HAdd</code> など)が定義されている。さらに言うと、<code>a+b</code>、<code>a*b</code>、<code>a-b</code>、<code>a/b</code>、<code>a%b</code> は異種版演算子を表す。<code>OfNat Nat n</code> のインスタンスは <code>OfNat</code> 型クラスのデフォルトインスタンス(優先度100)である。これが、期待される型が不明な場合に、数字 <code>2</code> が <code>Nat</code> 型を持つ理由である。より高い優先度を持つデフォルトインスタンスを定義することで、ビルトインのデフォルトインスタンスをオーバーライドすることができる。</p>
+<pre><code class="language-lean">structure Rational where
+  num : Int
+  den : Nat
+  inv : den ≠ 0
+
+@[default_instance 200]
+instance : OfNat Rational n where
+  ofNat := { num := n, den := 1, inv := by decide }
+
+instance : ToString Rational where
+  toString r := s!&quot;{r.num}/{r.den}&quot;
+
+#check 2 -- Rational
+</code></pre>
+<p>優先度は、異なるデフォルトインスタンス間の相互作用を制御するのにも便利である。例えば、<code>xs</code> が <code>List α</code> 型を持つとする。elaboratorが式 <code>xs.map (fun x =&gt; 2 * x)</code> を解釈するとき、この式が多相性を持つために、同種乗法のデフォルトインスタンスが <code>OfNat</code> のデフォルトインスタンスより高い優先度を持つようにしたい。これは、<code>HMul α α α</code> のインスタンスを実装し、<code>HMul Nat α α</code> のインスタンスは実装しなかった場合に特に重要である。ここで、Leanにおいて表記 <code>a*b</code> がどう定義されているかを種明かしする。</p>
+<pre><code class="language-lean"><span class="boring">namespace Ex
+</span>class OfNat (α : Type u) (n : Nat) where
+  ofNat : α
+
+@[default_instance]
+instance (n : Nat) : OfNat Nat n where
+  ofNat := n
+
+class HMul (α : Type u) (β : Type v) (γ : outParam (Type w)) where
+  hMul : α → β → γ
+
+class Mul (α : Type u) where
+  mul : α → α → α
+
+@[default_instance 10]
+instance [Mul α] : HMul α α α where
+  hMul a b := Mul.mul a b
+
+infixl:70 &quot; * &quot; =&gt; HMul.hMul
+<span class="boring">end Ex
+</span></code></pre>
+<p><code>Mul</code> 型クラスは、同種乗法は実装されているが異種乗法は実装されていない型を扱う際に便利である。</p>
+<h2 id="local-instances-ローカルインスタンス"><a class="header" href="#local-instances-ローカルインスタンス">Local Instances (ローカルインスタンス)</a></h2>
+<p>Leanにおいて、型クラスのインスタンスは属性を用いて実装される。そのため、<code>local</code> 修飾子を使うことで、そのインスタンスが現在のセクションや名前空間が閉じられるまで、あるいは現在のファイルの終わりまでしか効果がないことを示すことができる。</p>
+<pre><code class="language-lean">structure Point where
+  x : Nat
+  y : Nat
+
+section
+
+local instance : Add Point where
+  add a b := { x := a.x + b.x, y := a.y + b.y }
+
+def double (p : Point) :=
+  p + p
+
+end -- もうインスタンス `Add Point` は使えない
+
+-- def triple (p : Point) :=
+--  p + p + p  -- Error: failed to synthesize instance
+</code></pre>
+<p>コマンド <code>attribute [-instance]</code> を使えば、現在のセクションや名前空間が閉じられるまで、あるいは現在のファイルの終わりまで、指定したインスタンスを一時的に無効化することもできる。</p>
+<pre><code class="language-lean">structure Point where
+  x : Nat
+  y : Nat
+
+instance addPoint : Add Point where
+  add a b := { x := a.x + b.x, y := a.y + b.y }
+
+def double (p : Point) :=
+  p + p
+
+attribute [-instance] addPoint
+
+-- def triple (p : Point) :=
+--  p + p + p  -- Error: failed to synthesize instance
+</code></pre>
+<p>コマンド <code>attribute [-instance]</code> は問題の分析時にのみ使うことを勧める。</p>
+<h2 id="scoped-instances-スコープ付きインスタンス"><a class="header" href="#scoped-instances-スコープ付きインスタンス">Scoped Instances (スコープ付きインスタンス)</a></h2>
+<p><code>scoped instance</code> を用いてスコープ付きのインスタンスを宣言することもできる。スコープ付きインスタンスは、名前空間の中にいるとき、または名前空間を開いているときのみ使用可能である。</p>
+<pre><code class="language-lean">structure Point where
+  x : Nat
+  y : Nat
+
+namespace Point
+
+scoped instance : Add Point where
+  add a b := { x := a.x + b.x, y := a.y + b.y }
+
+def double (p : Point) :=
+  p + p
+
+end Point
+-- インスタンス `Add Point` はもう使えない
+
+-- #check fun (p : Point) =&gt; p + p + p  -- Error
+
+namespace Point
+-- インスタンス `Add Point` は再び利用可能になった
+#check fun (p : Point) =&gt; p + p + p
+
+end Point
+
+open Point -- 名前空間を開き、インスタンス `Add Point` を利用可能にする
+#check fun (p : Point) =&gt; p + p + p
+</code></pre>
+<p>コマンド <code>open scoped &lt;namespace&gt;</code> を使うと、名前空間 <code>&lt;namespace&gt;</code> 内の <code>scoped</code> 属性のついた定義が利用可能になるが、名前空間 <code>&lt;namespace&gt;</code> 内のそれ以外の定義に短い別名でアクセスすることはできない。</p>
+<pre><code class="language-lean">structure Point where
+  x : Nat
+  y : Nat
+
+namespace Point
+
+scoped instance : Add Point where
+  add a b := { x := a.x + b.x, y := a.y + b.y }
+
+def double (p : Point) :=
+  p + p
+
+end Point
+
+open scoped Point -- インスタンス `Add Point` を利用可能にする
+#check fun (p : Point) =&gt; p + p + p
+
+-- #check fun (p : Point) =&gt; double p -- Error: unknown identifier 'double'
+</code></pre>
+<h2 id="decidable-propositions-決定可能命題"><a class="header" href="#decidable-propositions-決定可能命題">Decidable Propositions (決定可能命題)</a></h2>
+<p>標準ライブラリで定義されている、命題に関する型クラス <code>Decidable</code> について考えてみよう。大雑把に言えば、<code>Prop</code> 型の項(具体的な命題)は、それが真か偽かを決めることができる場合、決定可能であると言われる。古典論理において全ての命題は決定可能であるため、命題が決定可能かどうかという区別は構成的論理においてのみ有用である。古典論理を使っているかどうかの区別は重要である。古典論理を使って、例えば場合分けによって関数を定義すると、その関数は計算不能になる。</p>
+<pre><code class="language-lean">variable (p : Nat → Prop)
+
+-- error : failed to synthesize instance
+--   Decidable (p n)
+/-
+def bad_foo : Nat → Bool :=
+  fun (n : Nat) =&gt;
+  if p n then true
+  else false
+-/
+
+open Classical
+
+noncomputable def foo : Nat → Bool :=
+  fun (n : Nat) =&gt;
+  if p n then true
+  else false
+
+#print axioms foo
+-- 'foo' depends on axioms: [Classical.choice, Quot.sound, propext]
+</code></pre>
+<p>アルゴリズム的に言えば、<code>Decidable</code> 型クラスは、その命題が真か偽かを効果的に決定する手続きを推論するために使うことができる。結果として、この型クラスはある定義が計算可能なときその定義をサポートすると同時に、古典論理を使った定義や推論の使用へのスムーズな移行を可能にする。</p>
+<p>標準ライブラリでは、<code>Decidable</code> は次のように形式的に定義されている:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>class inductive Decidable (p : Prop) where
+  | isFalse (h : ¬p) : Decidable p
+  | isTrue  (h : p)  : Decidable p
+<span class="boring">end Hidden
+</span></code></pre>
+<p>論理的に言えば、項 <code>t : Decidable p</code> を持つことは、証明項 <code>t : p ∨ ¬p</code> を持つことよりも強い。項 <code>t : Decidable p</code> の存在は、<code>p</code> の真理値に依存して任意の型の値や関数を定義することを可能にする。例えば、<code>if p then a else b</code> という式が意味をなすには、<code>p</code> が決定可能であることを知っている必要がある。ここで <code>if p then a else b</code> は <code>ite p a b</code> の糖衣構文である。<code>ite</code> は次のように定義される:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>def ite {α : Sort u} (c : Prop) [h : Decidable c] (t e : α) : α :=
+  Decidable.casesOn (motive := fun _ =&gt; α) h (fun _ =&gt; e) (fun _ =&gt; t)
+<span class="boring">end Hidden
+</span></code></pre>
+<p>標準ライブラリは <code>dite</code> と呼ばれる <code>ite</code> の変形版を持っている。<code>dite</code> は依存版if-then-else式である。これは次のように定義される:</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>def dite {α : Sort u} (c : Prop) [h : Decidable c] (t : c → α) (e : Not c → α) : α :=
+  Decidable.casesOn (motive := fun _ =&gt; α) h e t
+<span class="boring">end Hidden
+</span></code></pre>
+<p>つまり、<code>dite c t e</code> において、「then」分岐では <code>hc : c</code> を、「else」分岐では <code>hnc : ¬ c</code> を仮定できる。Leanでは、<code>dite</code> をより使いやすくするために、<code>dite c (λ h : c =&gt; t) (λ h : ¬ c =&gt; e)</code> の代わりに <code>if h : c then t else e</code> と書くことができる。</p>
+<p>古典論理がなければ、全ての命題が決定可能であることを証明することはできない。しかし、<strong>ある</strong>命題が決定可能であることは証明できる。例えば、自然数や整数に関する等式や不等式のような基本関係の決定可能性は古典論理なしで証明できる。さらに、決定可能性は命題結合子の適用前後で保存される:</p>
+<pre><code class="language-lean">#check @instDecidableAnd
+  -- {p q : Prop} → [Decidable p] → [Decidable q] → Decidable (And p q)
+
+#check @instDecidableOr
+#check @instDecidableNot
+</code></pre>
+<p>したがって、自然数上の決定可能述語を用いた場合分けによって関数を定義することができる:</p>
+<pre><code class="language-lean">def step (a b x : Nat) : Nat :=
+  if x &lt; a ∨ x &gt; b then 0 else 1
+
+set_option pp.explicit true  -- 暗黙の引数を表示する
+#print step
+</code></pre>
+<p>暗黙の引数の表示をオンにすると、elaboratorは適切なインスタンス <code>instDecidableOr</code> と <code>Nat.decLt</code> を適用しただけで、命題 <code>x &lt; a ∨ x &gt; b</code> の決定可能性を推論したことがわかる。</p>
+<p>古典論理の公理を使うと、全ての命題が決定可能であることが証明できる。<code>Classical</code> 名前空間を開くと、古典論理の公理がインポートされ、全ての命題 <code>p</code> に対して <code>Decidable p</code> のインスタンスが利用できるようになる。</p>
+<pre><code class="language-lean">open Classical
+</code></pre>
+<p>したがって、古典論理的に推論したい場合、決定可能性を前提とするライブラリ内の定理は、全て自由に利用できる。<a href="./axioms_and_computation.html">12章 Axioms and Computation (公理と計算)</a>では、排中律を使って関数を定義すると、その関数が計算に使われなくなることがあることを説明する。したがって、標準ライブラリでは <code>Classical.propDecidable</code> インスタンスに低い優先度を割り当てている。</p>
+<pre><code class="language-lean"><span class="boring">namespace Hidden
+</span>open Classical
+noncomputable scoped
+instance (priority := low) propDecidable (a : Prop) : Decidable a :=
+  choice &lt;| match em a with
+    | Or.inl h =&gt; ⟨isTrue h⟩
+    | Or.inr h =&gt; ⟨isFalse h⟩
+<span class="boring">end Hidden
+</span></code></pre>
+<p>これは、<code>Decidable p</code> の型クラス解決において、Leanが他のインスタンスを優先し、他の試みが全て失敗した後にのみインスタンス <code>propDecidable p</code> を使うことを保証する。</p>
+<p><code>Decidable</code> 型クラスは、定理証明の小規模な自動化もいくつか提供している。標準ライブラリには、<code>Decidable</code> のインスタンスを使って単純なゴールを解くタクティク <code>decide</code> が含まれている。</p>
+<pre><code class="language-lean">example : 10 &lt; 5 ∨ 1 &gt; 0 := by
+  decide
+
+example : ¬ (True ∧ False) := by
+  decide
+
+example : 10 * 20 = 200 := by
+  decide
+
+theorem ex : True ∧ 2 = 1+1 := by
+  decide
+
+#print ex
+-- theorem ex : True ∧ 2 = 1 + 1 :=
+-- of_decide_eq_true (Eq.refl true)
+
+#check @of_decide_eq_true
+-- ∀ {p : Prop} [Decidable p], decide p = true → p
+
+#check @decide
+-- (p : Prop) → [Decidable p] → Bool
+</code></pre>
+<p>これらは次のように動作する。式 <code>decide p</code> は <code>p</code> の決定可能性を用いて <code>p</code> の真偽決定手続きの推論を試み、成功すれば <code>decide p</code> は <code>true</code> か <code>false</code> のどちらかに評価される。特に、<code>p</code> が正しい閉論理式である場合、<code>decide p</code> はdefinitionallyにブール値 <code>true</code> に簡約される。<code>decide p = true</code> が成立するという前提を受け取ると、<code>of_decide_eq_true</code> は <code>p</code> の証明を出力する。ターゲット <code>p</code> を証明するために以上の過程をまとめたものが <code>decide</code> タクティクである。前述した内容により、<code>decide</code> は、推論された <code>c</code> の真偽決定手続きが、<code>c</code> が <code>isTrue</code> の場合であることをdefinitionallyに評価するために十分な情報を持っていれば、いつでも成功する。</p>
+<h2 id="managing-type-class-inference-型クラス推論の管理"><a class="header" href="#managing-type-class-inference-型クラス推論の管理">Managing Type Class Inference (型クラス推論の管理)</a></h2>
+<p>Leanの型クラス推論によって合成できる式 <code>t</code> を提供する必要があるとき、<code>inferInstance</code> を使うと <code>t</code> を推論によって合成するようLeanに依頼することができる:</p>
+<pre><code class="language-lean">def foo : Add Nat := inferInstance
+def bar : Inhabited (Nat → Nat) := inferInstance
+
+#check @inferInstance
+-- {α : Sort u} → [α] → α
+</code></pre>
+<p>Leanの <code>(t : T)</code> 記法を使えば、今探している <code>t</code> がどの型クラス <code>T</code> のインスタンスなのかを簡潔に指定することができる:</p>
+<pre><code class="language-lean">#check (inferInstance : Add Nat)
+</code></pre>
+<p>型 <code>T</code> を引数に取る補助定義 <code>inferInstanceAs</code> を使うこともできる:</p>
+<pre><code class="language-lean">#check inferInstanceAs (Add Nat)
+
+#check @inferInstanceAs
+-- (α : Sort u) → [α] → α
+</code></pre>
+<p>型クラスが定義の下に埋もれているために、Leanがインスタンスを見つけられないことがある。例えば、単に <code>inferInstance</code> を使うだけで <code>Inhabited (Set α)</code> のインスタンスを見つけることはできない。この場合、定義を使って <code>Set α</code> を <code>α → Prop</code> に書き下し、それを明示的に与えればよい:</p>
+<pre><code class="language-lean">def Set (α : Type u) := α → Prop
+
+-- fails
+-- example : Inhabited (Set α) :=
+--  inferInstance
+
+instance : Inhabited (Set α) :=
+  inferInstanceAs (Inhabited (α → Prop))
+
+-- 別解
+example : Inhabited (Set α) :=
+  @inferInstance (Inhabited (α → Prop)) _
+</code></pre>
+<p>時には、型クラス推論が期待されるインスタンスを見つけることに失敗したり、最悪の場合、無限ループに陥ってタイムアウトすることがある。このような状況でのデバッグを手伝ってもらうために、Leanにインスタンス探索の追跡を依頼することができる:</p>
+<pre><code class="language-lean">set_option trace.Meta.synthInstance true
+</code></pre>
+<p>VSCodeを使用している場合は、関連する定理や定義にカーソルを合わせるか、<code>Ctrl-Shift-Enter</code> によりメッセージウィンドウを開くことで、追跡結果を読むことができる。Emacsでは、<code>C-c C-x</code> によりファイルと独立したLeanプロセスを実行することができる。その後、出力バッファには型クラス解決手順が起きるたびに追跡内容が表示される。</p>
+<p>次のオプションを使ってインスタンス探索を制限することもできる:</p>
+<pre><code class="language-lean">set_option synthInstance.maxHeartbeats 10000
+set_option synthInstance.maxSize 400
+</code></pre>
+<p><code>synthInstance.maxHeartbeats</code> オプションは、型クラス解決問題ごとのheartbeatsの最大量を指定する。heartbeatsとは(小さな)メモリ割り当ての数(1000単位)であり、<code>synthInstance.maxHeartbeats 0</code> は制限がないことを意味する。<code>synthInstance.maxSize</code> オプションは、型クラスインスタンス合成過程で解を構築するために使われるインスタンスの最大数を指定する。</p>
+<p>VSCodeでもEmacsでも、<code>set_option</code> の中でタブ補完が機能することを覚えてほしい。タブ補完は適切なオプションを探すのに役立つ。</p>
+<p>上述したように、与えられたコンテキストでの型クラスインスタンス合成はProlog-likeなプログラムであり、これはバックトラック探索を生じさせる。プログラムの効率も発見される解も、システムがインスタンスを探索する順番に依存して変化する。探索においては、最後に宣言されたインスタンスから順番に探索される。さらに、インスタンスが他のモジュール(ファイル)で宣言されている場合、インスタンスが探索される順番は名前空間を開いた順番に依存する。後に開いた名前空間で宣言されたインスタンスほど先に探索される。</p>
+<p>型クラスのインスタンスに「優先度」を割り当てることで、探索される順番を変更することができる。普通にインスタンスが宣言されると、そのインスタンスにはデフォルトの優先度が割り当てられる。インスタンスを定義するとき、デフォルト以外の優先度を割り当てることができる。次の例はその方法を示している:</p>
+<pre><code class="language-lean">class Foo where
+  a : Nat
+  b : Nat
+
+instance (priority := default+1) i1 : Foo where
+  a := 1
+  b := 1
+
+instance i2 : Foo where
+  a := 2
+  b := 2
+
+example : Foo.a = 1 :=
+  rfl
+
+instance (priority := default+2) i3 : Foo where
+  a := 3
+  b := 3
+
+example : Foo.a = 3 :=
+  rfl
+</code></pre>
+<h2 id="coercions-using-type-classes-型クラスを用いた強制"><a class="header" href="#coercions-using-type-classes-型クラスを用いた強制">Coercions using Type Classes (型クラスを用いた強制)</a></h2>
+<p>最も基本的なタイプの(型)強制は、ある型の項を別の型の項にマッピングする。例えば、<code>Nat</code> 型から <code>Int</code> 型への強制は、任意の項 <code>n : Nat</code> を <code>Int</code> の項とみなすことを可能にする。しかし、いくつかの強制はより複雑で、パラメータに依存する。例えば、任意の型 <code>α</code> に対して、任意の項 <code>as : List α</code> を <code>Set α</code> の項、つまりリストに出現する <code>α</code> の項全体からなる集合とみなすことが可能である。これに対応する強制は、<code>α</code> によってパラメータ化された型の「族」<code>List α</code> 上で定義される。</p>
+<p>Leanでは3種類の強制を宣言することができる:</p>
+<ul>
+<li>ある型の族から他の型の族への強制</li>
+<li>ある型の族からSortのクラスへの強制</li>
+<li>ある型の族から関数型のクラスへの強制</li>
+</ul>
+<p>1種類目の強制は、強制元の族に属する型の任意の「項」を、強制先の族に属する対応する型の「項」として見ることを可能にする。2種類目の強制は、強制元の族に属する型の任意の「項」を「型」として見ることを可能にする。3種類目の強制は、強制元の族に属する型の任意の「項」を「関数」として見ることを可能にする。それぞれを順番に考えてみよう:</p>
+<pre><code class="language-lean">instance : Coe Bool Prop where
+  coe b := b = true
+</code></pre>
+<p>この強制により、if-then-else式の条件の中でブール型の項を使うことができる:</p>
+<pre><code class="language-lean">#eval if true then 5 else 3
+#eval if false then 5 else 3
+</code></pre>
+<p><code>List α</code> から <code>Set α</code> への強制は次のように定義される:</p>
+<pre><code class="language-lean"><span class="boring">def Set (α : Type u) := α → Prop
+</span><span class="boring">def Set.empty {α : Type u} : Set α := fun _ =&gt; False
+</span><span class="boring">def Set.mem (a : α) (s : Set α) : Prop := s a
+</span><span class="boring">def Set.singleton (a : α) : Set α := fun x =&gt; x = a
+</span><span class="boring">def Set.union (a b : Set α) : Set α := fun x =&gt; a x ∨ b x
+</span><span class="boring">notation &quot;{ &quot; a &quot; }&quot; =&gt; Set.singleton a
+</span><span class="boring">infix:55 &quot; ∪ &quot; =&gt; Set.union
+</span>def List.toSet : List α → Set α
+  | []    =&gt; Set.empty
+  | a::as =&gt; {a} ∪ as.toSet
+
+instance : Coe (List α) (Set α) where
+  coe a := a.toSet
+
+def s : Set Nat := {1}
+#check s ∪ [2, 3]
+-- s ∪ List.toSet [2, 3] : Set Nat
+</code></pre>
+<p>特定の場所に明示的に強制を導入するために、<code>↑</code> という記法を使うことができる。この記法は書き手の意図を明確にすることや、強制解決システムの制限を回避することにも役立つ。</p>
+<pre><code class="language-lean"><span class="boring">def Set (α : Type u) := α → Prop
+</span><span class="boring">def Set.empty {α : Type u} : Set α := fun _ =&gt; False
+</span><span class="boring">def Set.mem (a : α) (s : Set α) : Prop := s a
+</span><span class="boring">def Set.singleton (a : α) : Set α := fun x =&gt; x = a
+</span><span class="boring">def Set.union (a b : Set α) : Set α := fun x =&gt; a x ∨ b x
+</span><span class="boring">notation &quot;{ &quot; a &quot; }&quot; =&gt; Set.singleton a
+</span><span class="boring">infix:55 &quot; ∪ &quot; =&gt; Set.union
+</span><span class="boring">def List.toSet : List α → Set α
+</span><span class="boring">  | []    =&gt; Set.empty
+</span><span class="boring">  | a::as =&gt; {a} ∪ as.toSet
+</span><span class="boring">instance : Coe (List α) (Set α) where
+</span><span class="boring">  coe a := a.toSet
+</span>def s : Set Nat := {1}
+
+#check let x := ↑[2, 3]; s ∪ x
+-- let x := List.toSet [2, 3]; s ∪ x : Set Nat
+#check let x := [2, 3]; s ∪ x
+-- let x := [2, 3]; s ∪ List.toSet x : Set Nat
+</code></pre>
+<p>Leanは <code>CoeDep</code> 型クラスを使った依存強制もサポートしている。例えば、<code>Prop</code> 型の任意の項 <code>p</code> をBool型の項に強制することはできないが、<code>Decidable p</code> 型クラスがインスタンスを持つような <code>p</code> だけはBool型の項に強制できる。</p>
+<pre><code class="language-lean">instance (p : Prop) [Decidable p] : CoeDep Prop p Bool where
+  coe := decide p
+</code></pre>
+<p>Leanは必要に応じて(非依存)強制を連鎖させる。実際、型クラス <code>CoeT</code> は <code>Coe</code> の推移的閉包である。</p>
+<p>次に、2種類目の強制について考えよう。「Sortのクラス」とは、宇宙 <code>Type u</code> の集まりを意味する。2種類目の強制は次のような形をとる:</p>
+<pre><code>    c : (x1 : A1) → ... → (xn : An) → F x1 ... xn → Type u
+</code></pre>
+<p>ここで、<code>F</code> は型の族であり、<code>F x1 ... xn</code> は型の族に属する特定の型である。この種類の強制により、<code>t</code> が型 <code>F a1 ... an</code> の項であるときは、いつでも <code>s : t</code> と書くことができる。言い換えれば、この強制は <code>F a1 ... an</code> の項を型として見ることを可能にする。これは、構造体の1つの要素、つまり構造の台(集合) <code>carrier</code> が型であるような代数的構造を定義するときに非常に便利である。例えば、<em>semigroup</em>(半群)は次のように定義できる:</p>
+<pre><code class="language-lean">structure Semigroup where
+  carrier : Type u
+  mul : carrier → carrier → carrier
+  mul_assoc (a b c : carrier) : mul (mul a b) c = mul a (mul b c)
+
+instance (S : Semigroup) : Mul S.carrier where
+  mul a b := S.mul a b
+</code></pre>
+<p>つまり、半群は型 <code>carrier</code>、乗法 <code>mul</code>、「乗法は結合的である」という性質の3要素からなる。上記の <code>instance</code> コマンドは、<code>a b : S.carrier</code> があるとき、<code>Semigroup.mul S a b</code> を <code>a * b</code> と略記することを可能にする。Leanは <code>a</code> と <code>b</code> の型からインスタンスの引数 <code>S</code> を推測できることに注意してほしい。関数 <code>Semigroup.carrier</code> はクラス <code>Semigroup</code> の項(半群)を <code>Type u</code> の項(型)にマッピングする:</p>
+<pre><code class="language-lean"><span class="boring">structure Semigroup where
+</span><span class="boring">  carrier : Type u
+</span><span class="boring">  mul : carrier → carrier → carrier
+</span><span class="boring">  mul_assoc (a b c : carrier) : mul (mul a b) c = mul a (mul b c)
+</span><span class="boring">instance (S : Semigroup) : Mul S.carrier where
+</span><span class="boring">  mul a b := S.mul a b
+</span>#check Semigroup.carrier
+</code></pre>
+<p>この関数は強制であると宣言すれば、半群 <code>S : Semigroup</code> があるときはいつでも、<code>a : S.carrier</code> を <code>a : S</code> と略記することができる:</p>
+<pre><code class="language-lean"><span class="boring">structure Semigroup where
+</span><span class="boring">  carrier : Type u
+</span><span class="boring">  mul : carrier → carrier → carrier
+</span><span class="boring">  mul_assoc (a b c : carrier) : mul (mul a b) c = mul a (mul b c)
+</span><span class="boring">instance (S : Semigroup) : Mul S.carrier where
+</span><span class="boring">  mul a b := S.mul a b
+</span>instance : CoeSort Semigroup (Type u) where
+  coe s := s.carrier
+
+example (S : Semigroup) (a b c : S) : (a * b) * c = a * (b * c) :=
+  Semigroup.mul_assoc _ a b c
+</code></pre>
+<p>上記の <code>CoeSort Semigroup (Type u)</code> のインスタンスは、<code>(a b c : S)</code> と書くことを可能にする強制である。ここで、2種類目の強制では <code>Coe Semigroup (Type u)</code> ではなく <code>CoeSort Semigroup (Type u)</code> のインスタンスを定義したことに注意してほしい。</p>
+<p>最後に、3種類目の強制について考えよう。「関数型のクラス」とは、依存関数型(パイ型) <code>(z : B) → C</code> の集まりを意味する。3種類目の強制は次のような形をとる:</p>
+<pre><code>    c : (x1 : A1) → ... → (xn : An) → (y : F x1 ... xn) → (z : B) → C
+</code></pre>
+<p>ここで、<code>F</code> は再び型の族であり、<code>F x1 ... xn</code> は型の族に属する特定の型である。<code>B</code> と <code>C</code> は <code>x1, ..., xn, y</code> に依存することができる。この種類の強制により、<code>t</code> が <code>F a1 ... an</code> の項であるときは、いつでも <code>t s</code> と書くことができる。言い換えれば、この強制は <code>F a1 ... an</code> の項を関数として見ることを可能にする。上記の例の続きとして、半群 <code>S1</code> と <code>S2</code> の間の<em>morphism</em>(射)あるいは<em>homomorphism</em>(準同型)という概念を定義できる。射とは、<code>S1</code> の台から <code>S2</code> の台への、乗法を保存する(<code>mor (a * b) = (mor a) * (mor b)</code>)関数である。次のコードでは、<code>S1</code>、<code>S2</code>、<code>*</code> に関する暗黙の強制に注意してほしい。射影 <code>Morphism.mor</code> は、構造体 <code>Morphism S1 S2</code> の項を受け取り、射の台関数を返す:</p>
+<pre><code class="language-lean"><span class="boring">structure Semigroup where
+</span><span class="boring">  carrier : Type u
+</span><span class="boring">  mul : carrier → carrier → carrier
+</span><span class="boring">  mul_assoc (a b c : carrier) : mul (mul a b) c = mul a (mul b c)
+</span><span class="boring">instance (S : Semigroup) : Mul S.carrier where
+</span><span class="boring">  mul a b := S.mul a b
+</span><span class="boring">instance : CoeSort Semigroup (Type u) where
+</span><span class="boring">  coe s := s.carrier
+</span>structure Morphism (S1 S2 : Semigroup) where
+  mor : S1 → S2
+  resp_mul : ∀ a b : S1, mor (a * b) = (mor a) * (mor b)
+
+#check @Morphism.mor
+</code></pre>
+<p>以下のコードにより、半群間の射は3種類目の強制 <code>CoeFun</code> の代表例となった。</p>
+<pre><code class="language-lean"><span class="boring">structure Semigroup where
+</span><span class="boring">  carrier : Type u
+</span><span class="boring">  mul : carrier → carrier → carrier
+</span><span class="boring">  mul_assoc (a b c : carrier) : mul (mul a b) c = mul a (mul b c)
+</span><span class="boring">instance (S : Semigroup) : Mul S.carrier where
+</span><span class="boring">  mul a b := S.mul a b
+</span><span class="boring">instance : CoeSort Semigroup (Type u) where
+</span><span class="boring">  coe s := s.carrier
+</span><span class="boring">structure Morphism (S1 S2 : Semigroup) where
+</span><span class="boring">  mor : S1 → S2
+</span><span class="boring">  resp_mul : ∀ a b : S1, mor (a * b) = (mor a) * (mor b)
+</span>instance (S1 S2 : Semigroup) : CoeFun (Morphism S1 S2) (fun _ =&gt; S1 → S2) where
+  coe m := m.mor
+
+theorem resp_mul {S1 S2 : Semigroup} (f : Morphism S1 S2) (a b : S1)
+        : f (a * b) = f a * f b :=
+  f.resp_mul a b
+
+example (S1 S2 : Semigroup) (f : Morphism S1 S2) (a : S1) :
+      f (a * a * a) = f a * f a * f a :=
+  calc f (a * a * a)
+    _ = f (a * a) * f a := by rw [resp_mul f]
+    _ = f a * f a * f a := by rw [resp_mul f]
+</code></pre>
+<p>この強制を使えば、<code>f.mor (a * a * a)</code> を <code>f (a * a * a)</code> と略記することができる。関数型が期待される場所で <code>Morphism</code> や <code>f</code> が使われると、Leanは強制を挿入する。フィールド <code>F</code> は強制先の関数型を指定するために使われる。<code>F</code> の型は強制元の型に依存しうる。</p>
+<p>まとめると、1種類目の強制のために型クラス <code>Coe</code> があり、2種類目の強制のために型クラス <code>CoeSort</code> があり、3種類目の強制のために型クラス <code>CoeFun</code> がある。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="structures_and_records.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="conv.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="structures_and_records.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="conv.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="assets/fzf.umd.js"></script>
+        <script type="text/javascript" src="assets/elasticlunr.js"></script>
+
+
+    </body>
+</html>
